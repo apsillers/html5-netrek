@@ -1,0 +1,15 @@
+This is a HTML5 browser-based client for the game Netrek.  It includes client
+files and a WebSocket-to-TCP proxy.  (This should be replaced with websockify
+ASAP, since it keeps crashing whenever errors happen on the client.)  The
+proxy must run somewhere in order for the client to connect, since a browser
+cannot directly connect to a raw Netrek TCP server/socket.
+
+The code is mainly in /lib at the moment:
+world - handles user input and manages all objects in the game
+outfitting - draws the outfitting screen and sends/receives relevant net info
+ship - represents a ship; information send to a ship object is used to update
+       its local and tactical graphics
+net - makes connections, reads the data stream, and performs virtually all
+      server-driven action.  Includes objects for many types of messages.
+jspack - 
+
