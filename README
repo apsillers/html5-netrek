@@ -8,7 +8,7 @@ The code is mainly in /lib at the moment:
 world - handles user input and manages all objects in the game
 outfitting - draws the outfitting screen and sends/receives relevant net info
 ui - draws and updates the UI meters for the player (shields, fuel, etc)
-ship - represents a ship; information send to a ship object is used to update
+ship - represents a ship; information sent to a ship object is used to update
        its local and tactical graphics
 net - makes connections (through the proxy), reads the data stream, and
       delegates work to message objects, which perform virtually all
