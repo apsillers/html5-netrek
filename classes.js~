@@ -1,0 +1,234 @@
+var FED=0, ROM=1, ORI=2, KLI=3, NEU=4;
+var FUEL=5, REPAIR=6;
+
+var MINTHETA = Math.PI/80;
+
+
+/**
+  WORLD
+  
+  The world keeps a list of all objects in the world.
+  The world has viewX and viewY properties which indicate logical (x,y) center of the canvas
+  
+  +-------+
+  |O      |
+  | +-+   |
+  | |C|   |
+  | +-+   |
+  |      X|
+  +-------+
+  
+  This box represents the whole of the world.
+  O is at (0,0); X is at (5,6).  The inner box represents the canvas; C is the center.
+  
+  The world operates in steps, executed at regular interval defined by the period parameter.
+  Non-stationary world objects should have a doStep() function, which is called every step.
+  After the World object invokes doStep on an object, the World object adjusts that object's graphical position on the canvas, based on the object's logical x/y position, and viewX/viewY.
+  Cake.js handles automatically redrawing the objects.  Redrawing can happen faster or slower than the frequency of updating the world state.  Thus, even if the frame rate slows down (requestAnimationFrame fires more slowly due to, e.g., the user switching tabs), the world keeps marching on at th eexact same speed.
+
+  @param canvas the cake.js canvas object used to draw the world
+  @param period how often the state of the world is updated (in ms)
+*/
+var World = function(canvas, period) {
+    this.stepPeriod = period;
+    this.canvas = canvas;
+};
+World.prototype = {
+    last: 0,
+    objects: [],         // all objects in the world
+    stepPeriod: 50,      // time between steps
+    stepInterval: null,  // interval identifier, used for clearInterval
+    stepListeners: [],   // list of functions called immediately after each step
+    viewX: 0,            // logical x/y that is the center of the canvas
+    viewY: 0,
+    run: function() {
+        this.last = Date.now();
+        this.stepInterval = setInterval(function(that){ return function() { that.step(); } }(this), this.stepPeriod);
+    },
+    step: function() {
+        // detect if setTimeout is slowing down (Chromium does this on inactive tabs, boo)
+        this.now = Date.now();
+        var elapsedTime = this.now - this.last;
+        // check how many steps we need to do: normally just 1, but could be more
+        var stepsToDo = Math.max(Math.floor(elapsedTime / this.stepPeriod),1);
+        for(var s=0;s<stepsToDo;++s) {
+            // run each object's doStep function and update its position on the canvas
+            for(var i=0;i<this.objects.length;++i){
+                var o = this.objects[i];
+                if(typeof o.doStep === "function") o.doStep(world);
+                o.gfx.x = o.x + this.canvas.width/2 - this.viewX;
+                o.gfx.y = o.y + this.canvas.height/2 - this.viewY;
+            }
+            // run all listener functions
+            for(var i=0;i<this.stepListeners.length;++i) {
+                this.stepListeners[i](world);
+            }
+        }
+        this.last = Date.now();
+    },
+    pause: function() {
+        clearInterval(stepInterval);
+    },
+    add: function(obj) {
+        this.objects.push(obj);
+        this.canvas.append(obj.gfx);
+    },
+    remove: function(obj) {
+        this.objects.splice(this.objects.indexOf(obj),1);
+        obj.gfx.removeSelf();
+    },
+    centerView: function(x,y) {
+        this.viewX = x;
+        this.viewY = y;
+    },
+    addStepListener: function(fnc) {
+        this.stepListeners.push(fnc);
+    },
+    removeStepListener: function(fnc) {
+        this.stepListeners.splice(this.stepListeners.indexOf(fnc),1);
+    }
+}
+
+
+var Ship = function(options) {
+    this.x = options.x || 0;
+    this.y = options.y || 0;
+
+    this.team = options.team;
+    this.radius = options.radius || 12;
+    this.heading = options.heading || 0;
+    this.omega = options.omega || 0;
+    this.speed = options.speed || 0;
+    this.targetHeading = options.targetHeading || null;
+    this.targetSpeed = options.targetSpeed || 0;
+
+    if(typeof options.gfx != "object") {
+        this.gfx = new Circle(this.radius,
+        {
+            y: options.img.height/2,
+            x: options.img.width/2,
+            stroke: '#0F0',
+            strokeWidth: 1,
+            fill: 'none',
+            zIndex:10000000
+        })
+        thisgfx..append(new ImageNode(options.img,
+        {
+          x: -options.img.width/2,
+          y: -options.img.height/2,
+          stroke: 'none'
+        }));
+    } else {
+        this.gfx = options.gfx;
+    }
+
+console.log(this.gfx);
+
+    this.includingWorld = options.world;
+    if(this.includingWorld) { this.includingWorld.add(this); }
+}
+Ship.prototype = {
+    doStep: function() {
+        // increment location and angle according to heading/speed and omega (angular velocity), respectively
+        this.x += Math.sin(this.heading)*this.speed;
+        this.y += -Math.cos(this.heading)*this.speed;
+
+        // TODO: tractors and pressors
+        
+        // change speed toward the targetSpeed
+        if(this.speed != this.targetSpeed) {
+            if(this.speed < 0.05 && this.targetSpeed == 0) this.speed = 0; 
+            this.speed += this.speed>this.targetSpeed?-0.05:0.05;
+        }
+        
+        // rotate toward the targetHeading
+        if(this.targetHeading !== null) {
+            if(Math.abs(this.targetHeading-this.heading) >= MINTHETA) {
+                var change = this.targetHeading>this.heading?MINTHETA:-MINTHETA;
+                if(Math.abs(this.targetHeading-this.heading) > Math.PI) change *= -1;
+                this.heading += change;
+                // stop endless spinning
+                if(this.heading>Math.PI) this.heading = this.heading - Math.PI*2;
+                if(this.heading<=-Math.PI) this.heading = this.heading + Math.PI*2;
+            }
+        }
+        // set rotation -- QUIRK: setting rotation to exactly +/-Math.PI flips the image, so use "almost" pi
+        this.gfx.rotation = [Math.abs(this.heading)!=Math.PI?this.heading:this.heading-0.0000001,0,0];
+    }
+}
+
+
+
+var Shot = function(placeX, placeY, angle, team, includingWorld) {
+    var cir = new Circle(2,
+    {
+      x: placeX + includingWorld.canvas.width/2 + includingWorld.viewX,
+      y: placeY + includingWorld.canvas.height/2 + includingWorld.viewY,
+      fill: '#00F'
+    });
+    this.x = placeX;
+    this.y = placeY;
+    this.team = team;
+    this.angle = (angle + (0.25 - Math.random()/2)) % Math.PI;
+    this.gfx = cir;
+    this.includingWorld = includingWorld;
+    this.includingWorld.add(this);
+}
+Shot.prototype = {
+    ttl : 50,
+    speed : 4,
+    // every step of the world, move; eventually die when TTL is up
+    doStep : function(world){
+        this.x += Math.sin(this.angle)*this.speed;
+        this.y += -Math.cos(this.angle)*this.speed;
+
+        // check all objects in the world for collision
+        for(var i=0; i<world.objects.length; ++i) {
+            var obj = world.objects[i];
+            var dx = obj.x - this.x; dy = obj.y - this.y;
+            if(obj instanceof Ship &&
+               this.team != obj.team &&
+               Math.sqrt(dx*dx+dy*dy) < obj.radius) {
+                this.ttl = 0;
+            }
+        }
+
+        this.ttl--;
+        if(this.ttl < 0) {
+            this.includingWorld.remove(this);
+        }
+    }
+}
+
+
+var Planet = function(placeX, placeY, name, features, includingWorld) {
+    var cir = new Circle(18,
+    {
+      x: placeX + canvas.width/2 + includingWorld.viewX,
+      y: placeY + canvas.height/2 + includingWorld.viewY,
+      fill: 'none',
+      stroke: '#FF0'
+    });
+    var text = new TextNode(name, {y:cir.radius+15,textAlign:"center",fill:'yellow',scale:1.2,font:"bold 9px courier"});
+    cir.append(text);
+    
+    if(features.indexOf(FUEL)!=-1) {
+        var tank = new Polygon([0,0,5,0,8,2,8,13,0,13], {x:cir.radius-12,y:-7});
+        tank.append(new Polygon([2,3,5,6]));
+        tank.append(new Polygon([2,6,5,3]));
+        cir.append(tank);
+    }
+    if(REPAIR in features) {
+        //TODO: draw wrench
+    }
+    
+    this.x = placeX;
+    this.y = placeY;
+    this.gfx = cir;
+    this.includingWorld = includingWorld;
+    this.includingWorld.add(this);
+}
+Planet.prototype = {
+    // every step of the world, do nothing
+    doStep : function(){}
+}
