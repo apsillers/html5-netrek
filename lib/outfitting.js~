@@ -14,7 +14,7 @@ outfitting = {
     otherElems: [],
     selectedShip: CA,
     mask: [],
-    defaultInfoText: ["Select a ship, then choose a race to","enter the game.","","","","New players should try a Cruiser first."],
+    defaultInfoText: ["Select a ship, then choose a race to","enter the game.","","Click 'HELP' below for controls.","","New players should try a Cruiser first."],
 
     /* Add a race button to the canvas and return its cake.js object. */
     makeRaceButton: function(txt, longtxt, racenum, x, y, fg, bg) {
