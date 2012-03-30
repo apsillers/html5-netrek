@@ -29,7 +29,7 @@ function initWorld() {
 
     imageLib.loadAll();
 
-    net = new NetrekConnection("trekproxy.nodester.com", 16446, function() {
+    net = new NetrekConnection("trekproxy.nodester.com", 80, function() {
         net.connectToServer("continuum.us.netrek.org",2592,function(){
             net.sendArray(CP_LOGIN.data(0,"guest","","hello world"));
             outfitting.draw();
