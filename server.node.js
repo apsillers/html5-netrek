@@ -29,7 +29,7 @@ NOTES:
 // info for the metaserver
 var META_HOST = "";
 var META_PORT = 0;
-var USE_META = false;
+var USE_REAL_META = false;
 var STATIC_HOSTS = [{host:"192.168.1.34",port:2592},{host:"127.0.0.1",port:2592}];
 
 var net = require('net');
@@ -46,13 +46,13 @@ io.sockets.on('connection', function (socket) {
     console.log("CONNECTION");
 
     socket.on('serverDataReq', function (hostInfo) {
-		if(USE_META) {
-			// TODO: query metaserver and send server info to client
-			var metaServerConn = net.connect(hostInfo.port, hostInfo.host, function() {
+		if(USE_REAL_META) {
+			//TODO: query metaserver and send server info to client
+			var metaServerConn = net.connect(META_HOST, META_PORT, function() {
 				socket.emit("serverData", []);
 			});
 		} else {
-			// just use the static list of hosts
+			// just use a static list of hosts
 			socket.emit("serverData", STATIC_HOSTS);
 		}
 	});
@@ -73,10 +73,13 @@ io.sockets.on('connection', function (socket) {
 
 			    serverConn.on('end', function() {
                     console.log("server connection finished");
+                    socket.emit("serverClosure");
+                    socket.disconnect();
                 });
 
 			    serverConn.on('close', function() {
                     console.log("server connection died");
+                    socket.disconnect();
                 });
 
 			    serverConn.on('error', function(e) {
@@ -84,8 +87,7 @@ io.sockets.on('connection', function (socket) {
                 });
 
                 // foward all data from the browser client to the server
-                // data is an array of ints valued 0 - 255
-			    // TODO: or should it be a base64 string?
+                // data is a base64-encoded string
                 socket.on('message', function(cp_data) {
                     cp_data = new Buffer(cp_data, "base64");
 				    console.log("FROM CLIENT", cp_data);
