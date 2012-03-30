@@ -37,7 +37,8 @@ var express = require("express"),
     app = express.createServer();
 // serve files
 app.use(express.static(__dirname));
-app.listen(16446);
+
+app.listen(process.argv[2] || 16446)
 
 var io = require('socket.io').listen(app);
 

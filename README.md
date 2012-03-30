@@ -4,7 +4,7 @@ This is a HTML5 browser-based client for the game Netrek.  It includes:
 
   2. `server.node.js`, a Socket.io-to-TCP proxy which can also serve content.  (This may be replaced with websockify, since it does nearly the same thing, and might handle errors more gracefully.)  The proxy is necessary for the client to connect, since a browser cannot directly connect to a raw Netrek TCP server/socket.
 
-The code is mainly in /lib at the moment:
+The code is mainly in /js at the moment:
 
 * **world** - handles user input and manages all objects in the game
 * **outfitting** - draws the outfitting screen and sends/receives relevant net info
@@ -13,6 +13,8 @@ The code is mainly in /lib at the moment:
 * **net** - makes connections (through the proxy), reads the data stream, and delegates work to message objects, which perform virtually all server-driven action; e.g., when a SP\_YOU message comes in, the net object should read it and send the data to the SP\_YOU hnadler, which should update the UI with info about the player
 
 Each file (except for a few, like `ship.js`) includes a singleton.  The code is built around a few powerful singletons that each handle a single aspect of the program (world, net, outfitting...).  These are namespaces that allow the code to be read/used in a sane way that doesn't polute the global namespace.
+
+You must first build the code using `./build.sh`, which invokes the Closure compiler and builds the code into `all.js`.
 
 Included libraries:
 

@@ -1,17 +1,18 @@
 <html>
 <head>
 <title>Netrek Client</title>
-<script src="lib/cake.min.js"></script>
-<script src="lib/jquery.min.js"></script> <!-- 1.7.1 TODO: replace with jQuip, we use it only for event bindings -->
 <script src="/socket.io/socket.io.js"></script>
-<script src="lib/jspack.js"></script>
+<script src="js/lib/cake.min.js"></script>
+<script src="js/lib/jquip.events.css.min.js"></script>
+<script src="all.js"></script>
+<!--<script src="lib/jspack.js"></script>
 <script src="lib/images.js"></script>
 <script src="lib/classes.js"></script>
 <script src="lib/outfitting.js"></script>
 <script src="lib/world.js"></script>
 <script src="lib/ui.js"></script>
 <script src="lib/ship.js"></script>
-<script src="lib/net.js"></script>
+<script src="lib/net.js"></script>-->
 <script language="javascript">
 
 function initWorld() {
@@ -29,7 +30,7 @@ function initWorld() {
 
     imageLib.loadAll();
 
-    net = new NetrekConnection("trekproxy.nodester.com", 80, function() {
+    net = new NetrekConnection(location.hostname, location.port||80, function() {
         net.connectToServer("continuum.us.netrek.org",2592,function(){
             net.sendArray(CP_LOGIN.data(0,"guest","","hello world"));
             outfitting.draw();
