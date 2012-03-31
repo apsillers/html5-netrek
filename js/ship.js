@@ -26,7 +26,7 @@ var Ship = function(options) {
         {
             y: world_xy[0] + options.img.height/2,
             x: world_xy[1] + options.img.width/2,
-            stroke: imageLib.getRaceColor(options.team),
+            stroke: team.getRaceColor(options.team),
             strokeWidth: 1,
             fill: 'none',
             radius: 12,

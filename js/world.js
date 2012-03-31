@@ -3,6 +3,7 @@ world = {
     gCanvas: null,       // galactic canvas
     wGroup: new CanvasNode(),        // world group
     gGroup: new CanvasNode(),        // galactic group
+    redrawInterval: null,
     objects: [],         // all objects in the world (which are doubly recorded in the arrays below)
     ships: [],           // array of ships, indexed by ship id
     planets: [],         // array of planets, indexed by planet id
@@ -27,9 +28,10 @@ world = {
         this.wCanvas.append(this.wGroup);
         this.gCanvas.append(this.gGroup);
         var _self = this;        
-        this.wCanvas.addFrameListener(function recenter(){
+        _self.redrawInterval = setInterval(function recenter(){
             _self.centerView(_self.player.x, _self.player.y);
 
+            // for all objects in the world
             for(var i = 0; i < _self.objects.length; ++i) {
                 var obj = _self.objects[i];
 
@@ -45,7 +47,7 @@ world = {
                     obj.galGfx.y = tac_coords[1];
                 }
             }
-        });
+        }, 100);
 
         hud.draw();
 
@@ -93,6 +95,7 @@ world = {
         this.wCanvas.removeChild(this.wGroup);
         this.gCanvas.removeChild(this.gGroup);
         hud.undraw();
+        clearInterval(this.redrawInterval);
         $(this.wCanvas.canvas).unbind("click", fireTorpWithLeftClick);
         $(this.wCanvas.canvas).unbind("contextmenu", setCourseWithRightClick);
         $(this.wCanvas.canvas).unbind("mousedown", firePhasersWithMIddleClick);

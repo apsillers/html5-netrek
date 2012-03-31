@@ -28,7 +28,7 @@ outfitting = {
         button.addEventListener("click",function(){
             world.player.setImage(imageLib.images[racenum][_self.selectedShip]); 
             world.player.setTeam(racenum);
-            net.sendArray(CP_OUTFIT.data(racenum, _self.selectedShip));
+            net.sendArray(CP_OUTFIT.data(team.teamNumber(racenum), _self.selectedShip));
         });
         return button;
     },
@@ -51,18 +51,18 @@ outfitting = {
         var bufferPx = 10;
         var rightAlignPx = this.canvasWidth - this.raceButtonDim - bufferPx;
         var bottomAlignPx = this.canvasHeight - this.raceButtonDim - bufferPx;
+        this.raceButtons.push(this.makeRaceButton("FED", "Federation", FED,
+                              bufferPx, bottomAlignPx, team.getRaceColor(FED),
+                              team.getRaceColor(FED, true)));
         this.raceButtons.push(this.makeRaceButton("ROM", "Romulans", ROM,
-                              bufferPx, bufferPx, imageLib.getRaceColor(ROM),
-                              imageLib.getRaceColor(ROM, true)));
+                              bufferPx, bufferPx, getRaceColor(team.ROM),
+                              getRaceColor(team.race, true)));
         this.raceButtons.push(this.makeRaceButton("KLI", "Klingons", KLI,
-                              rightAlignPx, bufferPx, imageLib.getRaceColor(KLI),
-                              imageLib.getRaceColor(KLI, true)));
-        this.raceButtons.push(this.makeRaceButton("FED", "Federation", 3,
-                              bufferPx, bottomAlignPx, imageLib.getRaceColor(3),
-                              imageLib.getRaceColor(FED, true)));
-        this.raceButtons.push(this.makeRaceButton("ORI", "Orions", 4,
-                              rightAlignPx, bottomAlignPx, imageLib.getRaceColor(4),
-                              imageLib.getRaceColor(ORI, true)));
+                              rightAlignPx, bufferPx, team.getRaceColor(KLI),
+                              team.getRaceColor(KLI, true)));
+        this.raceButtons.push(this.makeRaceButton("ORI", "Orions", ORI,
+                              rightAlignPx, bottomAlignPx, team.getRaceColor(4),
+                              team.getRaceColor(ORI, true)));
  
         // add ship buttons
         var centerPx = (this.canvasWidth - this.shipButtonDim) / 2 - 5;

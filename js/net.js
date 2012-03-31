@@ -45,7 +45,7 @@ NetrekConnection = function(webhost, webport, callback) {
             // base64-decode all messages from the server
 			this.on('message', function(e) {
                 _self.buffer += atob(e);
-                _self.readMessages();
+                if(!_self.reading) _self.readMessages();
             });
             this.once('serverClosure', function() { alert('The Netrek server unexpected closed the connection.  You probably timed out.  Anyway, try reloading the page.'); })
 		    callback();
@@ -88,7 +88,7 @@ NetrekConnection = function(webhost, webport, callback) {
             this.buffer = this.buffer.substr(length);
             // send data to the handler for this message type
             msgClass.handler(packer.stringToBytes(data));
-            this.readMessages();
+            setTimeout(this.readMessages(), 0);
         } else {
             this.reading = false;
             return;
@@ -140,9 +140,10 @@ serverPackets = [
                     damage,"shield=",shield,"fuel=",fuel,"etemp=",etemp,"wtemp=",
                     wtemp,"whydead=",whydead,"whodead=",whodead);
         if(world.playerNum == null) { world.playerNum = pnum; }
+        // FIXME: actually use shipwise maximums
         hud.showFuelLevel(fuel/100);
-        hud.showHullLevel(100-damage/100);
-        hud.showShieldLevel(shield/100);
+        hud.showHullLevel(100 - Math.max(damage, 0));
+        hud.showShieldLevel(Math.min(shield, 100));
     }
   },
   { // SP_PL_LOGIN
@@ -282,8 +283,10 @@ team:team[0]||1, number:pnum.toString() }));
         if(world.torps[tnum] == undefined && status == 1) {
             world.addTorp(tnum, new Torp(-10000, -10000, 0, war, world));
         }
-        if(world.torps[tnum] != undefined && status == 0) {
+        else if(world.torps[tnum] != undefined && status == 0) {
             world.removeTorp(tnum);
+        } else {
+            console.log("SP_TORP_INFO war=",team_decode(war)," status=",status," tnum=",tnum);
         }
     }
   },
@@ -492,13 +495,4 @@ function team_decode(mask) {
     if (mask & KLI) x.push(KLI)
     if (mask & ORI) x.push(ORI)
     return x;
-}
-function race_decode(race) {
-    switch(race) {
-        case 0: return "IND";
-        case 1: return "FED";
-        case 2: return "ROM";
-        case 4: return "KLI";
-        case 8: return "ORI";
-    }
 }
