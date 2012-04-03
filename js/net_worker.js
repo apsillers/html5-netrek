@@ -1,6 +1,5 @@
 importScripts("jspack.js");
 importScripts("packets.js");
-importScripts("lib/base64.js");
 
 var buffer = "";
 var reading = false;
