@@ -20,13 +20,15 @@ var Ship = function(options) {
     this.targetHeading = options.targetHeading || null;
     this.targetSpeed = options.targetSpeed || 0;
 
+    this.isOnCanvas = true;
+
     if(typeof options.gfx != "object") {
         var world_xy = world.netrek2world(options.x, options.y);
         this.gfx = new Circle(this.radius,
         {
             y: world_xy[0] + options.img.height/2,
             x: world_xy[1] + options.img.width/2,
-            stroke: team.getRaceColor(options.team),
+            stroke: teamLib.getRaceColor(options.team),
             strokeWidth: 1,
             fill: 'none',
             radius: 12,
@@ -46,7 +48,7 @@ var Ship = function(options) {
     this.gfx.append(new TextNode(this.number, {
         x: 15,
         y: -3,
-        fill: imageLib.getRaceColor(options.team),
+        fill: teamLib.getRaceColor(options.team),
         font: "bold"
     }));
 
@@ -56,7 +58,7 @@ var Ship = function(options) {
         {
             y: tac_xy[0],
             x: tac_xy[1],
-            fill: imageLib.getRaceColor(options.team),
+            fill: teamLib.getRaceColor(options.team),
             radius: 4,
             zIndex:10000000
         })
@@ -65,7 +67,7 @@ var Ship = function(options) {
     }
 
     this.includingWorld = options.world;
-    if(this.includingWorld) { this.includingWorld.add(this); }
+    this.gfxRoot = world.wGroup;
 }
 Ship.prototype = {
     setPosition: function(x,y) {
@@ -85,7 +87,7 @@ Ship.prototype = {
 
     setTeam: function(team) {
         this.team = team;
-        this.galGfx.fill = imageLib.getRaceColor(team);
+        this.galGfx.fill = teamLib.getRaceColor(team);
     },
 
     setVisible: function(isVis) {
@@ -93,6 +95,16 @@ Ship.prototype = {
             
         } else {
 
+        }
+    },
+
+    setOnCanvas: function(setOn) {
+        if(setOn && !this.isOnCanvas) {
+            this.gfxRoot.append(this.gfx);
+            this.isOnCanvas = true;
+        } else if(!setOn && this.isOnCanvas) {
+            this.gfx.removeSelf();
+            this.isOnCanvas = false;
         }
     }
 }

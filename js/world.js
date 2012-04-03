@@ -29,23 +29,32 @@ world = {
         this.gCanvas.append(this.gGroup);
         var _self = this;        
         _self.redrawInterval = setInterval(function recenter(){
+            var centerX = _self.player.x, centerY = _self.player.y,
+                viewBuffer = 150,
+                cnvHalfHgt = _self.wCanvas.height / 2 * _self.subgalacticFactor + viewBuffer,
+                cnvHalfWid = _self.wCanvas.width / 2 * _self.subgalacticFactor + viewBuffer;
+
             _self.centerView(_self.player.x, _self.player.y);
 
             // for all objects in the world
             for(var i = 0; i < _self.objects.length; ++i) {
                 var obj = _self.objects[i];
+                setTimeout(function(obj, centerX, centerY, cnvHalfHgt, cnvHalfWid) {
+                    return function() {
+                        // update display of object in world
+                        var coords = _self.netrek2world(obj.x, obj.y);
+                        obj.gfx.x = coords[0];
+                        obj.gfx.y = coords[1];
 
-                // update display of object in world
-                var coords = _self.netrek2world(obj.x, obj.y);
-                obj.gfx.x = coords[0];
-                obj.gfx.y = coords[1];
-
-                // update display of object in tactical
-                if(obj.galGfx) { 
-                    var tac_coords = _self.netrek2tac(obj.x, obj.y);
-                    obj.galGfx.x = tac_coords[0];
-                    obj.galGfx.y = tac_coords[1];
-                }
+                        // update display of object in tactical
+                        if(obj.galGfx) { 
+                            var tac_coords = _self.netrek2tac(obj.x, obj.y);
+                            obj.galGfx.x = tac_coords[0];
+                            obj.galGfx.y = tac_coords[1];
+                        }
+                        obj.setOnCanvas(Math.abs(centerX - obj.x) < cnvHalfWid && Math.abs(centerY - obj.y) < cnvHalfHgt);
+                    }
+                }(obj, centerX, centerY, cnvHalfHgt, cnvHalfWid), 0);
             }
         }, 100);
 
@@ -194,9 +203,9 @@ world = {
             tank.append(new Polygon([2,6,5,3]));
             cir.append(tank);
         }
-        if(this.REPAIR in features) {
+        //if(this.REPAIR in features) {
             //TODO: draw wrench
-        }
+        //}
         
         this.x = placeX;
         this.y = placeY;
@@ -214,9 +223,20 @@ world = {
 
         this.includingWorld = includingWorld;
         //this.includingWorld.addPlanet(this);
+        this.gfxRoot = world.wGroup;
+        this.isOnCanvas = true;
     }
 }
 world.Planet.prototype = {
     FUEL:0,
-    REPAIR:1
+    REPAIR:1,
+    setOnCanvas: function(setOn) {
+        if(setOn && !this.isOnCanvas) {
+            this.gfxRoot.append(this.gfx);
+            this.isOnCanvas = true;
+        } else if(!setOn && this.isOnCanvas) {
+            this.gfx.removeSelf();
+            this.isOnCanvas = false;
+        }
+    }
 }

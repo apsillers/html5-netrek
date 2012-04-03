@@ -4,7 +4,8 @@ var Torp = function(placeX, placeY, dir, team, includingWorld) {
     {
         y: world_xy[0],
         x: world_xy[1],
-        fill: imageLib.getRaceColor(team)
+        fill: teamLib.getRaceColor(team)
+
     });
     this.x = placeX;
     this.y = placeY;
@@ -12,8 +13,17 @@ var Torp = function(placeX, placeY, dir, team, includingWorld) {
     this.dir = dir;
     this.gfx = cir;
     this.includingWorld = includingWorld;
-    this.includingWorld.add(this);
+    this.gfxRoot = world.wGroup;
+    this.isOnCanvas = true;
 }
 Torp.prototype = {
-
+    setOnCanvas: function(setOn) {
+        if(setOn && !this.isOnCanvas) {
+            this.gfxRoot.append(this.gfx);
+            this.isOnCanvas = true;
+        } else if(!setOn && this.isOnCanvas) {
+            this.gfx.removeSelf();
+            this.isOnCanvas = false;
+        }
+    }
 }

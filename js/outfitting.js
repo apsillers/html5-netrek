@@ -26,9 +26,11 @@ outfitting = {
         button.addEventListener("mouseover",function(){ _self.showInfoText(desc); });
         button.addEventListener("mouseout",function(){ _self.showInfoText(_self.defaultInfoText); });
         button.addEventListener("click",function(){
-            world.player.setImage(imageLib.images[racenum][_self.selectedShip]); 
-            world.player.setTeam(racenum);
-            net.sendArray(CP_OUTFIT.data(team.teamNumber(racenum), _self.selectedShip));
+            if(!this._netrekDisabled) {
+                world.player.setImage(imageLib.images[racenum][_self.selectedShip]); 
+                world.player.setTeam(racenum);
+                net.sendArray(CP_OUTFIT.data(teamLib.teamNumber(racenum), _self.selectedShip));
+            }
         });
         return button;
     },
@@ -52,17 +54,18 @@ outfitting = {
         var rightAlignPx = this.canvasWidth - this.raceButtonDim - bufferPx;
         var bottomAlignPx = this.canvasHeight - this.raceButtonDim - bufferPx;
         this.raceButtons.push(this.makeRaceButton("FED", "Federation", FED,
-                              bufferPx, bottomAlignPx, team.getRaceColor(FED),
-                              team.getRaceColor(FED, true)));
+                              bufferPx, bottomAlignPx, teamLib.getRaceColor(FED),
+                              teamLib.getRaceColor(FED, true)));
         this.raceButtons.push(this.makeRaceButton("ROM", "Romulans", ROM,
-                              bufferPx, bufferPx, getRaceColor(team.ROM),
-                              getRaceColor(team.race, true)));
+                              bufferPx, bufferPx, teamLib.getRaceColor(ROM),
+                              teamLib.getRaceColor(ROM, true)));
+
         this.raceButtons.push(this.makeRaceButton("KLI", "Klingons", KLI,
-                              rightAlignPx, bufferPx, team.getRaceColor(KLI),
-                              team.getRaceColor(KLI, true)));
+                              rightAlignPx, bufferPx, teamLib.getRaceColor(KLI),
+                              teamLib.getRaceColor(KLI, true)));
         this.raceButtons.push(this.makeRaceButton("ORI", "Orions", ORI,
-                              rightAlignPx, bottomAlignPx, team.getRaceColor(4),
-                              team.getRaceColor(ORI, true)));
+                              rightAlignPx, bottomAlignPx, teamLib.getRaceColor(ORI),
+                              teamLib.getRaceColor(ORI, true)));
  
         // add ship buttons
         var centerPx = (this.canvasWidth - this.shipButtonDim) / 2 - 5;
@@ -145,7 +148,15 @@ outfitting = {
 
     /* respond to SP_MASK packets */
     applyMask: function(mask) {
-       
+        this.mask = mask;
+        for(var i = 0; i < this.raceButtons.length; ++i) {
+            this.raceButtons[i].opacity = 0.15;
+            this.raceButtons[i]._netrekDisabled = true;
+        }
+        for(var i = 0; i < mask.length; ++i) {
+            this.raceButtons[teamLib.teamNumber(mask[i])].opacity = 1;
+            this.raceButtons[i]._netrekDisabled = false;
+        }
     },
    
     showInfoText: function(strArray) {
