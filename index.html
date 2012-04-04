@@ -34,7 +34,7 @@ function initWorld() {
     imageLib.loadAll();
 
     net = new NetrekConnection(location.hostname, location.port||80, function() {
-        net.connectToServer("localhost",2592,function(){ //continuum.us.netrek.org
+        net.connectToServer("continuum.us.netrek.org",2592,function(){ //continuum.us.netrek.org
             net.sendArray(CP_LOGIN.data(0,"guest","","hello world"));
             outfitting.draw();
         })
