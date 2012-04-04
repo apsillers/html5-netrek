@@ -4,6 +4,7 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="js/lib/cake.min.js"></script>
 <script src="js/lib/jquip.events.css.min.js"></script>
+<script src="js/lib/base64.js"></script>
 <!--<script src="all.js"></script>-->
 <script src="js/team.js"></script>
 <script src="js/jspack.js"></script>
@@ -33,7 +34,7 @@ function initWorld() {
     imageLib.loadAll();
 
     net = new NetrekConnection(location.hostname, location.port||80, function() {
-        net.connectToServer("continuum.us.netrek.org",2592,function(){ //continuum.us.netrek.org
+        net.connectToServer("localhost",2592,function(){ //continuum.us.netrek.org
             net.sendArray(CP_LOGIN.data(0,"guest","","hello world"));
             outfitting.draw();
         })

@@ -1,12 +1,13 @@
 importScripts("jspack.js");
 importScripts("packets.js");
+importScripts("lib/base64.js");
 
 var buffer = "";
 var reading = false;
 var net_logging = false;
 
 onmessage = function(msg) {
-    buffer += msg.data;
+    buffer += Base64.decode(msg.data);
     if(!reading) readMessages();
 }
 
@@ -37,7 +38,7 @@ readMessages = function() {
     if(data.length == length) {
         this.buffer = this.buffer.substr(length);
         // send the handler for this message type and the data
-        webkitPostMessage({ "msgCode":msgCode,
+        postMessage({ "msgCode":msgCode,
                       "data":packer.stringToBytes(data) });
         readMessages();
     } else {

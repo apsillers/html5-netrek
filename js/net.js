@@ -53,7 +53,7 @@ NetrekConnection = function(webhost, webport, callback) {
 
                 // base64-decode all packets from the server and send them to the worker
 			    this.on('message', function(e) {
-                    _self.worker.postMessage(atob(e));
+                    _self.worker.postMessage(e);
                 });
             } else {
 			    this.on('message', function(e) {

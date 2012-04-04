@@ -194,7 +194,10 @@ world = {
             fill: 'none',
             stroke: '#FF0'
         });
-        var text = new TextNode(name, {y:cir.radius+15,textAlign:"center",fill:'yellow',scale:1.2,font:"bold 9px courier"});
+        var text = new TextNode(name.replace(/\x00/g,""),
+                                {y:cir.radius+15, textAlign:"center",
+                                 fill:'yellow', scale:1.2,
+                                 font:"bold 9px courier"});
         cir.append(text);
         
         if(features.indexOf(this.FUEL)!=-1) {
