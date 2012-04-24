@@ -29,6 +29,7 @@ outfitting = {
             if(!this._netrekDisabled) {
                 world.player.setImage(imageLib.images[racenum][_self.selectedShip]); 
                 world.player.setTeam(racenum);
+                net.sendArray(CP_UPDATES.data(100000));
                 net.sendArray(CP_OUTFIT.data(teamLib.teamNumber(racenum), _self.selectedShip));
             }
         });
@@ -53,17 +54,17 @@ outfitting = {
         var bufferPx = 10;
         var rightAlignPx = this.canvasWidth - this.raceButtonDim - bufferPx;
         var bottomAlignPx = this.canvasHeight - this.raceButtonDim - bufferPx;
-        this.raceButtons.push(this.makeRaceButton("FED", "Federation", FED,
+        this.raceButtons.push(this.makeRaceButton("FED", "Federation", teamLib.FED,
                               bufferPx, bottomAlignPx, teamLib.getRaceColor(FED),
                               teamLib.getRaceColor(FED, true)));
-        this.raceButtons.push(this.makeRaceButton("ROM", "Romulans", ROM,
+        this.raceButtons.push(this.makeRaceButton("ROM", "Romulans", teamLib.ROM,
                               bufferPx, bufferPx, teamLib.getRaceColor(ROM),
                               teamLib.getRaceColor(ROM, true)));
 
-        this.raceButtons.push(this.makeRaceButton("KLI", "Klingons", KLI,
+        this.raceButtons.push(this.makeRaceButton("KLI", "Klingons", teamLib.KLI,
                               rightAlignPx, bufferPx, teamLib.getRaceColor(KLI),
                               teamLib.getRaceColor(KLI, true)));
-        this.raceButtons.push(this.makeRaceButton("ORI", "Orions", ORI,
+        this.raceButtons.push(this.makeRaceButton("ORI", "Orions", teamLib.ORI,
                               rightAlignPx, bottomAlignPx, teamLib.getRaceColor(ORI),
                               teamLib.getRaceColor(ORI, true)));
  

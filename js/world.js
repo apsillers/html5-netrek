@@ -39,22 +39,19 @@ world = {
             // for all objects in the world
             for(var i = 0; i < _self.objects.length; ++i) {
                 var obj = _self.objects[i];
-                setTimeout(function(obj, centerX, centerY, cnvHalfHgt, cnvHalfWid) {
-                    return function() {
-                        // update display of object in world
-                        var coords = _self.netrek2world(obj.x, obj.y);
-                        obj.gfx.x = coords[0];
-                        obj.gfx.y = coords[1];
+                
+                // update display of object in world
+                var coords = _self.netrek2world(obj.x, obj.y);
+                obj.gfx.x = coords[0];
+                obj.gfx.y = coords[1];
 
-                        // update display of object in tactical
-                        if(obj.galGfx) { 
-                            var tac_coords = _self.netrek2tac(obj.x, obj.y);
-                            obj.galGfx.x = tac_coords[0];
-                            obj.galGfx.y = tac_coords[1];
-                        }
-                        obj.setOnCanvas(Math.abs(centerX - obj.x) < cnvHalfWid && Math.abs(centerY - obj.y) < cnvHalfHgt);
-                    }
-                }(obj, centerX, centerY, cnvHalfHgt, cnvHalfWid), 0);
+                // update display of object in tactical
+                if(obj.galGfx) { 
+                    var tac_coords = _self.netrek2tac(obj.x, obj.y);
+                    obj.galGfx.x = tac_coords[0];
+                    obj.galGfx.y = tac_coords[1];
+                }
+                obj.setOnCanvas(Math.abs(centerX - obj.x) < cnvHalfWid && Math.abs(centerY - obj.y) < cnvHalfHgt);
             }
         }, 100);
 

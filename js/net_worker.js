@@ -39,7 +39,9 @@ readMessages = function() {
         this.buffer = this.buffer.substr(length);
         // send the handler for this message type and the data
         postMessage({ "msgCode":msgCode,
-                      "data":packer.stringToBytes(data) });
+                      "data":packer.stringToBytes(data),
+                      "clear": buffer.length == 0 });
+        postMessage(buffer.length);
         readMessages();
     } else {
         // wait for more data

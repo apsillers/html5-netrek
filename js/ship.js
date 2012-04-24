@@ -7,6 +7,8 @@
 var Ship = function(options) {
     if(options == undefined) options = {};
 
+    var _self = this;
+
     this.x = options.x || 0;
     this.y = options.y || 0;
 
@@ -68,6 +70,24 @@ var Ship = function(options) {
 
     this.includingWorld = options.world;
     this.gfxRoot = world.wGroup;
+
+    /*this.gfx.addFrameListener(function() {
+        var viewBuffer = 150,
+            cnvHalfHgt = world.wCanvas.height / 2 * world.subgalacticFactor + viewBuffer,
+            cnvHalfWid = world.wCanvas.width / 2 * world.subgalacticFactor + viewBuffer;
+
+        var coords = world.netrek2world(_self.x, _self.y);
+        _self.gfx.x = coords[0];
+        _self.gfx.y = coords[1];
+
+        // update display of Object in tactical
+        if(_self.galGfx) {
+            var tac_coords = world.netrek2tac(_self.x, _self.y);
+            _self.galGfx.x = tac_coords[0];
+            _self.galGfx.y = tac_coords[1];
+        }
+        if(_self == world.player) console.log(world.viewY, _self.y, world.viewY - _self.y);
+    });*/
 }
 Ship.prototype = {
     setPosition: function(x,y) {

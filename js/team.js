@@ -1,10 +1,10 @@
 var IND = 0x0, FED = 0x1, ROM = 0x2, KLI = 0x4, ORI = 0x8;
 var teamLib = {
     IND:0x0,
-    ROM:0x1,
-    KLI:0x2,
-    ORI:0x4,
-    FED:0x8,
+    ROM:0x2,
+    KLI:0x4,
+    ORI:0x8,
+    FED:0x1,
 
     getRaceColor: function(race, isLight) {
         if(race == FED) return isLight?"#330":"#FF0";

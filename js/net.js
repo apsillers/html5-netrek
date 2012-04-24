@@ -48,7 +48,9 @@ NetrekConnection = function(webhost, webport, callback) {
             if(_self.worker) {
                 // listen for messages from the worker
                 _self.worker.addEventListener("message", function(evt) {
-                    serverPackets[evt.data.msgCode].handler(evt.data.data);
+                    if(typeof evt.data == "object" && typeof evt.data.msgCode != "undefined") {
+                        serverPackets[evt.data.msgCode].handler(evt.data.data);
+                    }
                 });
 
                 // base64-decode all packets from the server and send them to the worker

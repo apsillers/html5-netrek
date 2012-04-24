@@ -5,7 +5,7 @@
  See http://james.tooraweenah.com/darcs/netrek-server/Vanilla/include/packets.h
  for an explanation of how the netrek protocol works
 */
-net_logging = false;
+net_logging = 0;
 
 
 /*
