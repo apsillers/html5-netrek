@@ -41,6 +41,7 @@ app.use(express.static(__dirname));
 app.listen(process.argv[2] || 16446)
 
 var io = require('socket.io').listen(app);
+io.set('log level', 1);
 
 // new browser client is connecting to the WS server
 io.sockets.on('connection', function (socket) {
@@ -68,7 +69,7 @@ io.sockets.on('connection', function (socket) {
                 // forward all data from the server to the browser client
                 serverConn.on('data', function(sp_data) {
                     // base64-encode the Buffer of bytes and send it to the client
-                    console.log("FROM SERVER", sp_data);
+                    //console.log("FROM SERVER", sp_data);
 				    socket.send(sp_data.toString("base64"));
                 });
 
@@ -91,7 +92,7 @@ io.sockets.on('connection', function (socket) {
                 // data is a base64-encoded string
                 socket.on('message', function(cp_data) {
                     cp_data = new Buffer(cp_data, "base64");
-				    console.log("FROM CLIENT", cp_data);
+				    //console.log("FROM CLIENT", cp_data);
                     serverConn.write(cp_data);
                 });
 

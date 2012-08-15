@@ -9,7 +9,7 @@ net_logging = 0;
 
 
 /*
-    SERVER MESSAGES - these objects all contain a data() member function that
+    CLIENT MESSAGES - these objects all contain a data() member function that
     returns an array of bytes, which can be sent to the server using
     net.sendArray()
 */
@@ -68,6 +68,15 @@ CP_DIRECTION = {
     }
 }
 
+CP_MESSAGE = {
+    code: 1,
+    format: "!bBBx80s",
+
+    data: function(group, indiv, mesg) {
+        if(net_logging) console.log("CP_MESSAGE group=",group,"indiv=",indiv,"mesg=",mesg);
+        return struct.pack(this.format, [this.code, group, indiv, mesg]);
+    }
+}
 
 CP_PHASER = {
     code: 4,
@@ -127,11 +136,12 @@ serverPackets = [
             flags = uvars.next(),   damage = uvars.next(), shield = uvars.next(),
             fuel = uvars.next(),    etemp = uvars.next(),  wtemp = uvars.next(),
             whydead = uvars.next(), whodead = uvars.next();
-        if(net_logging) console.log("SP_YOU pnum=",pnum,"hostile=",team_decode(hostile),"swar=",team_decode(swar),
+        if(net_logging || whydead) console.log("SP_YOU pnum=",pnum,"hostile=",team_decode(hostile),"swar=",team_decode(swar),
                     "armies=",armies,"tractor=",tractor,"flags=",flags.toString(2),"damage=",
                     damage,"shield=",shield,"fuel=",fuel,"etemp=",etemp,"wtemp=",
                     wtemp,"whydead=",whydead,"whodead=",whodead);
         if(world.playerNum == null) { world.playerNum = pnum; }
+
         // FIXME: actually use shipwise maximums
         hud.showFuelLevel(fuel/100);
         hud.showHullLevel(100 - Math.max(damage, 0));
@@ -187,7 +197,11 @@ team:team[0]||1, number:pnum.toString() }));
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.next(), pnum = uvars.next(), status = uvars.next();
-        if(net_logging) console.log("SP_PSTATUS pnum=",pnum,"status=",status);
+        if(net_logging || true) console.log("SP_PSTATUS pnum=",pnum,"status=",status);
+        if(status == 1) {
+            world.undraw();
+            outfitting.draw(leftCanvas);
+        }
     }
   },
   { // SP_PLAYER
@@ -248,7 +262,7 @@ team:team[0]||1, number:pnum.toString() }));
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.next(), state = uvars.next();
-        if(net_logging) console.log("SP_PICKOK state=", state);
+        if(net_logging || true) console.log("SP_PICKOK state=", state);
         if(state == 1) {
             outfitting.undraw();
             world.ships[world.playerNum]; 
@@ -352,6 +366,8 @@ team:team[0]||1, number:pnum.toString() }));
         var ignored = uvars.next(), m_flags = uvars.next(),
             m_recpt = uvars.next(), m_from = uvars.next(), mesg = uvars.next();
         if(net_logging) console.log("SP_MESSAGE m_flags=",m_flags.toString(2),"m_recpt=",m_recpt,"m_from=",m_from,"mesg=",mesg);
+        $("inbox").append("<b>" + m_from + ":</b> " + mesg + "<br />");
+        $("#inbox").scrollTop($("#inbox").height())
     }
   },
   { // SP_STATS
@@ -381,7 +397,7 @@ team:team[0]||1, number:pnum.toString() }));
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.next(), message = uvars.next();
-        if(net_logging) console.log("SP_WARNING message=", message);
+        console.log("SP_WARNING message=", message);
     }
   }
 ]

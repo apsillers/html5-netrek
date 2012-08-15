@@ -99,15 +99,19 @@ Ship.prototype = {
     setRotation: function(byteRot) {
         var rads = Math.PI*2 * byteRot/255;
         this.gfx.childNodes[0].rotation = [rads,0,0];
+        this.gfx.childNodes[0].needMatrixUpdate = true;
+        this.gfx.needMatrixUpdate = true;
     },
 
     setImage: function(img) {
         this.gfx.childNodes[0].image = img;
+        this.gfx.needMatrixUpdate = true;
     },
 
     setTeam: function(team) {
         this.team = team;
         this.galGfx.fill = teamLib.getRaceColor(team);
+        this.galGfx.needMatrixUpdate = true;
     },
 
     setVisible: function(isVis) {

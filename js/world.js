@@ -50,8 +50,14 @@ world = {
                     var tac_coords = _self.netrek2tac(obj.x, obj.y);
                     obj.galGfx.x = tac_coords[0];
                     obj.galGfx.y = tac_coords[1];
+                    obj.galGfx.needMatrixUpdate = true;
                 }
+
+                // objects not on canvas shouldn't get drawn
                 obj.setOnCanvas(Math.abs(centerX - obj.x) < cnvHalfWid && Math.abs(centerY - obj.y) < cnvHalfHgt);
+
+                // let Cake know this should get redrawn
+                obj.gfx.needMatrixUpdate = true;
             }
         }, 100);
 
@@ -102,10 +108,10 @@ world = {
         this.gCanvas.removeChild(this.gGroup);
         hud.undraw();
         clearInterval(this.redrawInterval);
-        $(this.wCanvas.canvas).unbind("click", fireTorpWithLeftClick);
-        $(this.wCanvas.canvas).unbind("contextmenu", setCourseWithRightClick);
-        $(this.wCanvas.canvas).unbind("mousedown", firePhasersWithMIddleClick);
-        $(this.wCanvas.canvas).unbind("keyup", setSpeedWithNumbers);
+        $(this.wCanvas.canvas).unbind("click", this.fireTorpWithLeftClick);
+        $(this.wCanvas.canvas).unbind("contextmenu", this.setCourseWithRightClick);
+        $(this.wCanvas.canvas).unbind("mousedown", this.firePhasersWithMIddleClick);
+        $(this.wCanvas.canvas).unbind("keyup", this.setSpeedWithNumbers);
     },
 
     add: function(obj) {

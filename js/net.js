@@ -109,7 +109,7 @@ NetrekConnection = function(webhost, webport, callback) {
         // only read if there is a full message on the buffer; otherwise stop
         if(data.length == length) {
             this.buffer = this.buffer.substr(length);
-            // send data to the handler for this message type
+            // send data to the handler for this message type; this causes the action to occur
             msgClass.handler(packer.stringToBytes(data));
             setTimeout(this.readMessages(), 0);
         } else {

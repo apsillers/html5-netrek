@@ -19,6 +19,7 @@ outfitting = {
     /* Add a race button to the canvas and return its cake.js object. */
     makeRaceButton: function(txt, longtxt, racenum, x, y, fg, bg) {
         var _self = this;
+        this._netrekDisabled = false;
         var desc = ["Your race sets your team alligience and", "your home planet (for refit & respawn).","","Each ship class is identical across all","races, e.g., a Klingon Scout is just","as good as a Federation one."];
         var button = new Rectangle(this.raceButtonDim, this.raceButtonDim, {x:x, y:y, rx:10, ry:10, strokeWidth:2, stroke: fg, fill:bg});
         button.append(new TextNode(txt, {y:30, x:this.raceButtonDim/2, fill: fg, font: "bold 20pt Courier", textAlign:"center"}));
@@ -26,11 +27,13 @@ outfitting = {
         button.addEventListener("mouseover",function(){ _self.showInfoText(desc); });
         button.addEventListener("mouseout",function(){ _self.showInfoText(_self.defaultInfoText); });
         button.addEventListener("click",function(){
+            //alert("is this disabled: " + !!this._netrekDisabled);
             if(!this._netrekDisabled) {
                 world.player.setImage(imageLib.images[racenum][_self.selectedShip]); 
                 world.player.setTeam(racenum);
                 net.sendArray(CP_UPDATES.data(100000));
                 net.sendArray(CP_OUTFIT.data(teamLib.teamNumber(racenum), _self.selectedShip));
+                //alert("sent data");
             }
         });
         return button;
@@ -156,7 +159,7 @@ outfitting = {
         }
         for(var i = 0; i < mask.length; ++i) {
             this.raceButtons[teamLib.teamNumber(mask[i])].opacity = 1;
-            this.raceButtons[i]._netrekDisabled = false;
+            this.raceButtons[teamLib.teamNumber(mask[i])]._netrekDisabled = false;
         }
     },
    
