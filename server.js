@@ -40,7 +40,8 @@ var express = require("express"),
 // serve files
 app.use(express.static(__dirname));
 
-//server.listen(process.argv[2] || 16446)
+var port = process.env.PORT || process.argv[2] || 16446;
+server.listen(port);
 
 var io = require('socket.io').listen(server);
 io.set('log level', 1);
