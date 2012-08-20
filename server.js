@@ -34,13 +34,15 @@ var STATIC_HOSTS = [{host:"192.168.1.34",port:2592},{host:"127.0.0.1",port:2592}
 
 var net = require('net');
 var express = require("express"),
-    app = express.createServer();
+    app = express()
+  , http = require('http')
+  , server = http.createServer(app)
 // serve files
 app.use(express.static(__dirname));
 
-app.listen(process.argv[2] || 16446)
+server.listen(process.argv[2] || 16446)
 
-var io = require('socket.io').listen(app);
+var io = require('socket.io').listen(server);
 io.set('log level', 1);
 
 // new browser client is connecting to the WS server
