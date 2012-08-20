@@ -16,34 +16,9 @@
 <script src="js/torp.js"></script>
 <script src="js/packets.js"></script>
 <script src="js/net.js"></script>
-<script language="javascript">
-
-function initWorld() {
-    // make canvas and world
-    rightCanvas = new Canvas(document.getElementById("rightCanvas"), 500, 500, {
-        fill: 'black'
-    });
-    leftCanvas = new Canvas(document.getElementById("leftCanvas"), 500, 500, {
-        fill: 'black'
-    });
-
-    outfitting.init(leftCanvas);
-    world.init(leftCanvas, rightCanvas);
-    hud.init(leftCanvas);
-
-    imageLib.loadAll();
-
-    net = new NetrekConnection(location.hostname, location.port||80, function() {
-        net.connectToServer("continuum.us.netrek.org",2592,function(){ //continuum.us.netrek.org
-            net.sendArray(CP_LOGIN.data(0,"guest","","hello world"));
-            outfitting.draw();
-        })
-    });
-}
-
-</script>
+<script src="js/main.js"></script>
 </head>
-<body onload="initWorld()">
+<body>
 <div id="canvasland" style="margin-left:auto; margin-right:auto; width: 1001px;">
   <div id="leftCanvas" style="float:left;"></div>
   <div id="rightCanvas" style="float:left; margin-left:1px;"></div>
