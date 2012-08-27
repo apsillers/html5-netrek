@@ -21,6 +21,7 @@ var Ship = function(options) {
     this.speed = options.speed || 0;
     this.targetHeading = options.targetHeading || null;
     this.targetSpeed = options.targetSpeed || 0;
+    this.cloaked = false;
 
     this.isOnCanvas = true;
 
@@ -115,11 +116,13 @@ Ship.prototype = {
     },
 
     setVisible: function(isVis) {
-        if(isVis) {
-            
-        } else {
+        this.gfx.visible = isVis;
+        this.gfx.needMatrixUpdate = true;
 
-        }
+        this.galGfx.fill = isVis?teamLib.getRaceColor(this.team):"#666";
+        this.galGfx.needMatrixUpdate = true;
+
+        this.cloaked = !isVis;
     },
 
     setOnCanvas: function(setOn) {
@@ -130,5 +133,10 @@ Ship.prototype = {
             this.gfx.removeSelf();
             this.isOnCanvas = false;
         }
+    },
+
+    handleFlags: function(flags) {
+        //console.log(flags.toString(2))
+        this.setVisible(!(flags & 0x10));
     }
 }

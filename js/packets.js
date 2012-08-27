@@ -74,7 +74,13 @@ CP_MESSAGE = {
 
     data: function(group, indiv, mesg) {
         if(net_logging) console.log("CP_MESSAGE group=",group,"indiv=",indiv,"mesg=",mesg);
-        return struct.pack(this.format, [this.code, group, indiv, mesg]);
+
+        if ((group == MGOD)) {
+            $("#inbox").append(mesg + "<br />");
+            $("#inbox").scrollTop($("#inbox").height())
+        }
+
+        return packer.pack(this.format, [this.code, group, indiv, mesg]);
     }
 }
 
@@ -105,7 +111,15 @@ CP_TORP = {
         return packer.pack(this.format, [this.code, direction & 255]);
     }
 }
+CP_CLOAK = {
+    code: 19,
+    format: '!bbxx',
 
+    data: function(self, state) {
+        if(net_logging) console.log("CP_CLOAK state=",state);
+        return packer.pack(this.format, [this.code, state])
+    }
+}
 
 /*************************************************************************
  All server packet types listed below
@@ -141,6 +155,7 @@ serverPackets = [
                     damage,"shield=",shield,"fuel=",fuel,"etemp=",etemp,"wtemp=",
                     wtemp,"whydead=",whydead,"whodead=",whodead);
         if(world.playerNum == null) { world.playerNum = pnum; }
+        else { world.ships[world.playerNum].handleFlags(flags); }
 
         // FIXME: actually use shipwise maximums
         hud.showFuelLevel(fuel/100);
@@ -197,7 +212,7 @@ team:team[0]||1, number:pnum.toString() }));
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.next(), pnum = uvars.next(), status = uvars.next();
-        if(net_logging || true) console.log("SP_PSTATUS pnum=",pnum,"status=",status);
+        if(net_logging) console.log("SP_PSTATUS pnum=",pnum,"status=",status);
         if(status == 1) {
             world.undraw();
             outfitting.draw(leftCanvas);
@@ -223,6 +238,8 @@ team:team[0]||1, number:pnum.toString() }));
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.next(), pnum = uvars.next(), tractor = uvars.next(), flags = uvars.next();
         if(net_logging) console.log("SP_FLAGS pnum=",pnum,"tractor=",tractor,"flags=",flags);
+
+        world.ships[pnum].handleFlags(flags);
     }
   },
   { // SP_PLANET_LOC
@@ -262,7 +279,7 @@ team:team[0]||1, number:pnum.toString() }));
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.next(), state = uvars.next();
-        if(net_logging || true) console.log("SP_PICKOK state=", state);
+        if(net_logging) console.log("SP_PICKOK state=", state);
         if(state == 1) {
             outfitting.undraw();
             world.ships[world.playerNum]; 
@@ -366,7 +383,8 @@ team:team[0]||1, number:pnum.toString() }));
         var ignored = uvars.next(), m_flags = uvars.next(),
             m_recpt = uvars.next(), m_from = uvars.next(), mesg = uvars.next();
         if(net_logging) console.log("SP_MESSAGE m_flags=",m_flags.toString(2),"m_recpt=",m_recpt,"m_from=",m_from,"mesg=",mesg);
-        $("inbox").append("<b>" + m_from + ":</b> " + mesg + "<br />");
+
+        $("#inbox").append(mesg + "<br />");
         $("#inbox").scrollTop($("#inbox").height())
     }
   },

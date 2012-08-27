@@ -94,11 +94,15 @@ world = {
             }
         });
 
-        $(document).bind("keyup", function setSpeedWithNumbers(e) {
+        $(document).bind("keyup", function handleKeys(e) {
             // set speed with number keys
             if(e.which >= 48 && e.which <= 57) {
                 net.sendArray(CP_SPEED.data(e.which - 48));
                 //player.targetSpeed = (e.which - 48) / 2;
+            } else {
+                if(e.keyCode == 67) {
+                    net.sendArray(CP_CLOAK.data(_self.player.cloaked?0:1));
+                }
             }
         });
     },
@@ -111,7 +115,7 @@ world = {
         $(this.wCanvas.canvas).unbind("click", this.fireTorpWithLeftClick);
         $(this.wCanvas.canvas).unbind("contextmenu", this.setCourseWithRightClick);
         $(this.wCanvas.canvas).unbind("mousedown", this.firePhasersWithMIddleClick);
-        $(this.wCanvas.canvas).unbind("keyup", this.setSpeedWithNumbers);
+        $(this.wCanvas.canvas).unbind("keyup", this.handleKeys);
     },
 
     add: function(obj) {
@@ -138,9 +142,13 @@ world = {
     addTorp: function(num, torpObj) {
         this.torps[num] = torpObj;
         this.add(torpObj);
+        torpObj.vanishTimeout = setTimeout(function() {
+            if(world.torps[num]) { world.torps[num].gfx.visible = false; }
+        }, 7000);
     },
     removeTorp: function(num) {
         this.remove(this.torps[num]);
+        clearTimeout(this.torps[num].vanishTimeout);
         this.torps[num] = undefined;
     },
     centerView: function(x,y) {
@@ -223,7 +231,7 @@ world = {
             y: tac_xy[0],
             x: tac_xy[1],
             stroke: "#FF0",
-            radius: 5,
+            radius: 4,
             zIndex:1
         });
 

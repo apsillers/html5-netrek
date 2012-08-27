@@ -7,6 +7,7 @@
 <script src="js/lib/base64.js"></script>
 <script src="js/jspack.js"></script>
 <!--<script src="all.js"></script>-->
+<script src="js/constants.js"></script>
 <script src="js/team.js"></script>
 <script src="js/images.js"></script>
 <script src="js/world.js"></script>
@@ -17,15 +18,42 @@
 <script src="js/packets.js"></script>
 <script src="js/net.js"></script>
 <script src="js/main.js"></script>
+<link href="css/all.css" rel="stylesheet" type="text/css" media="all">
+
 </head>
 <body>
-<div id="canvasland" style="margin-left:auto; margin-right:auto; width: 1001px;">
+<div id="canvasland" style="margin-left:auto; margin-right:auto; width: 800px;">
   <div id="leftCanvas" style="float:left;"></div>
-  <div id="rightCanvas" style="float:left; margin-left:1px;"></div>
-  <div id="chatbox" style="width:700px; height:100px; border: thin solid black; clear: both;">
-    <div id="inbox" style="width:700px; height:85px; overflow-y: scroll;"></div>
-    <input type="text" style="width:100%; height: 12pt;" />
+
+  <div>
+  <div id="rightCanvas" style="margin-left:1px;"></div>
+  <div id="chatbox" style="width: 298px; height:198px; border: thin solid black; float:left">
+    <div id="inbox" style=" height:170px; overflow-y: scroll;"></div>
+    <input type="text" style=" height: 28px; font-size: 16px; width: 298px;" />
   </div>
+  <div>
+</div>
+
+<div id="overlay"></div>
+
+<div id="login-box">
+    <div id="login-inner"><div id="login-inner-inner">
+<div id="login-title">Netrek Login</div>
+        <div style="float:left;">
+            <div class="login-row login-label">Host:</div>
+            <div class="login-row login-label">Username:</div>
+            <div class="login-row login-label">Password: </div>
+        </div>
+        <div style="float:left;">
+            <div class="login-row"><select id="nt-host-input"><option>localhost</option><option>continuum.us.netrek.org</option></select></div>
+            <div class="login-row"><input id="username-input" type="text" value="guest" /></div>
+            <div class="login-row"><input id="pass-input" type="password" /></div>
+        </div>
+        <div style="clear:left;"></div>
+        <div><input type="button" value="Connect" id="connect-button" /></div>
+        <div id="login-tips"><em>Not sure what to do?</em> Just make sure the username says "guest" and the password field is empty. Press "Connect" and the game will start.</div>
+    </div></div>
+    <div style="clear:left;"></div>
 </div>
 
 </body>

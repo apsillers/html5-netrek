@@ -1,10 +1,10 @@
 // used to start the game
 window.addEventListener("load", function() {
     // make canvas and world
-    rightCanvas = new Canvas(document.getElementById("rightCanvas"), 500, 500, {
+    leftCanvas = new Canvas(document.getElementById("leftCanvas"), 500, 500, {
         fill: 'black'
     });
-    leftCanvas = new Canvas(document.getElementById("leftCanvas"), 500, 500, {
+    rightCanvas = new Canvas(document.getElementById("rightCanvas"), 300, 300, {
         fill: 'black'
     });
 
@@ -14,10 +14,29 @@ window.addEventListener("load", function() {
 
     imageLib.loadAll();
 
-    net = new NetrekConnection(location.hostname, location.port||80, function() {
-        net.connectToServer("continuum.us.netrek.org",2592,function(){ //continuum.us.netrek.org
-            net.sendArray(CP_LOGIN.data(0,"guest","","hello world"));
-            outfitting.draw();
-        })
+    $("#overlay").height($("html").height());
+    $("#overlay").width($("html").width());
+    $("#login-box").css("left", ($("html").width() - $("#login-box").width()) / 2);
+    $(window).resize(function() {
+        $("#overlay").height($("html").height());
+        $("#login-box").css("left", ($("html").width() - $("#login-box").width()) / 2);
+    });
+
+
+    $("#connect-button").click(function() {
+        var nt_host = $("#nt-host-input").val(),
+            user = $("#username-input").val(),
+            pass = $("#pass-input").val();
+
+        net = new NetrekConnection(location.hostname, location.port||80, function() {
+            console.log("proxy connection formed");
+            net.connectToServer(nt_host,2592,function(){ //continuum.us.netrek.org
+                console.log("NT server connection formed");
+                net.sendArray(CP_LOGIN.data(0,user,pass,"hello world"));
+                $("#overlay").hide();
+                $("#login-box").hide();
+                outfitting.draw();
+            })
+        });
     });
 });

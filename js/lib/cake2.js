@@ -4952,6 +4952,7 @@ Canvas.prototype = {
     var types = [
       'mousemove', 'mouseover', 'mouseout',
       'click', 'dblclick',
+      'touchstart', 'touchend', 'touchmove',
       'mousedown', 'mouseup',
       'keypress', 'keydown', 'keyup',
       'DOMMouseScroll', 

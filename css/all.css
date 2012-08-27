@@ -1,0 +1,94 @@
+html * {
+    outline: none;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
+}
+
+#overlay {
+    background-image: url(../data/diag.png);
+    position: absolute;
+    z-index: 5;
+    width: 100%;
+    height: 100%; /* this actually gets expanded to the full document height by JS */
+    top:0;
+    left:0;
+    opacity: 0.7;
+}
+
+#login-box {
+    width: 400px;
+    background-color: #ace;
+    padding: 7px 0;
+    text-align: center;
+
+    z-index: 10;
+    position: absolute;
+    top: 100px;
+}
+
+#login-inner {
+    float: left;
+    position: relative;
+    left: 50%;
+}
+
+#login-inner-inner {
+    position: relative;
+    left: -50%;
+}
+
+#login-title {
+    font-weight: bold;
+    font-size: 20px;
+    text-decoration: underline;
+    padding-bottom: 5px;
+}
+
+.login-row {
+    font-size: 16px;
+    height: 25px;
+    padding: 5px 0 0 5px;
+}
+
+.login-label {
+    text-align: right;
+    font-weight: bold;
+}
+
+.login-row input {
+    width: 200px;
+    height: 25px;
+    font-size: 12px;
+    position: relative;
+    top: -3px;
+    padding: 0 5px;
+}
+
+.login-row select {
+    width: 200px;
+    height: 25px;
+    font-size: 12px;
+    position: relative;
+    top: -3px;
+    padding: 0 3px;
+}
+
+#connect-button {
+    width:150px;
+    height: 50px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    margin-top: 7px;
+}
+
+#login-tips {
+    font-size: 12px;
+    width: 300px;
+    padding: 10px 5px;
+}
+
+#inbox {
+    font-size: 14px;
+}
