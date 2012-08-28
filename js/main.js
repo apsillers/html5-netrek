@@ -22,6 +22,11 @@ window.addEventListener("load", function() {
         $("#login-box").css("left", ($("html").width() - $("#login-box").width()) / 2);
     });
 
+    // if this is a dev server, default to localhost
+    if(location.hostname == "localhost" || location.hostname == "127.0.0.1") {
+        $("#nt-host-input").val("localhost");
+    }
+
 
     $("#connect-button").click(function() {
         var nt_host = $("#nt-host-input").val(),
