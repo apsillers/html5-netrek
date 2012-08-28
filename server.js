@@ -45,6 +45,8 @@ server.listen(port);
 
 var io = require('socket.io').listen(server);
 io.set('log level', 1);
+io.set("transports", ["xhr-polling"]); 
+io.set("polling duration", 10); 
 
 // new browser client is connecting to the WS server
 io.sockets.on('connection', function (socket) {
