@@ -14,11 +14,11 @@ window.addEventListener("load", function() {
 
     imageLib.loadAll();
 
-    $("#overlay").height($("html").height());
-    $("#overlay").width($("html").width());
+    $("#overlay").height($(document).height());
+    $("#overlay").width("100%");
     $("#login-box").css("left", ($("html").width() - $("#login-box").width()) / 2);
     $(window).resize(function() {
-        $("#overlay").height($("html").height());
+        $("#overlay").height($(window).height());
         $("#login-box").css("left", ($("html").width() - $("#login-box").width()) / 2);
     });
 
@@ -40,7 +40,6 @@ window.addEventListener("load", function() {
                 net.sendArray(CP_LOGIN.data(0,user,pass,"hello world"));
                 $("#overlay").hide();
                 $("#login-box").hide();
-                outfitting.draw();
             })
         });
     });

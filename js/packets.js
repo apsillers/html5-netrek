@@ -111,16 +111,37 @@ CP_TORP = {
         return packer.pack(this.format, [this.code, direction & 255]);
     }
 }
+
 CP_CLOAK = {
     code: 19,
     format: '!bbxx',
 
-    data: function(self, state) {
+    data: function(state) {
         if(net_logging) console.log("CP_CLOAK state=",state);
         return packer.pack(this.format, [this.code, state])
     }
 }
 
+
+CP_REPAIR = {
+    code: 13,
+    format: '!bbxx',
+
+    data: function(state) {
+        if(net_logging) console.log("CP_REPAIR state=",state);
+        return packer.pack(this.format, this.code, state);
+    }
+}
+
+CP_SHIELD = {
+    code: 12,
+    format: '!bbxx',
+
+    data: function(state) {
+        if(net_logging) console.log("CP_SHIELD state=",state);
+        return packer.pack(this.format, this.code, state);
+    }
+}
 /*************************************************************************
  All server packet types listed below
 
@@ -150,7 +171,7 @@ serverPackets = [
             flags = uvars.next(),   damage = uvars.next(), shield = uvars.next(),
             fuel = uvars.next(),    etemp = uvars.next(),  wtemp = uvars.next(),
             whydead = uvars.next(), whodead = uvars.next();
-        if(net_logging || whydead) console.log("SP_YOU pnum=",pnum,"hostile=",team_decode(hostile),"swar=",team_decode(swar),
+        if(net_logging && false) console.log("SP_YOU pnum=",pnum,"hostile=",team_decode(hostile),"swar=",team_decode(swar),
                     "armies=",armies,"tractor=",tractor,"flags=",flags.toString(2),"damage=",
                     damage,"shield=",shield,"fuel=",fuel,"etemp=",etemp,"wtemp=",
                     wtemp,"whydead=",whydead,"whodead=",whodead);
@@ -213,7 +234,7 @@ team:team[0]||1, number:pnum.toString() }));
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.next(), pnum = uvars.next(), status = uvars.next();
         if(net_logging) console.log("SP_PSTATUS pnum=",pnum,"status=",status);
-        if(status == 1) {
+        if(world.player && pnum == world.player.number && status == 1) {
             world.undraw();
             outfitting.draw(leftCanvas);
         }
@@ -416,6 +437,43 @@ team:team[0]||1, number:pnum.toString() }));
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.next(), message = uvars.next();
         console.log("SP_WARNING message=", message);
+    }
+  },
+  SP_FEATURE = {
+    code: 60,
+    format: "!bcbbi80s",
+
+    handler: function(data) {
+        var uvars = packer.unpack(this.format, data);
+        var ignored = uvars.next(), type  = uvars.next(), arg1 = uvars.next(),
+            arg2 = uvars.next(), value = uvars.next(), name = uvars.next();
+        
+            if(net_logging) console.log("SP_FEATURE type=%s arg1=%d arg2=%d value=%d name=%s", type, arg1, arg2, value, name);
+
+/*        if (type, arg1, arg2, value, name) == ('S', 0, 0, 1, 'FEATURE_PACKETS'):
+            # server says features packets are okay to send,
+            # so send this client's features
+            if rcd.cp_feature: # we want binary RCDs in SP_MESSAGE packets
+                nt.send(cp_feature.data('S', 0, 0, 1, 'RC_DISTRESS'))
+            nt.send(cp_feature.data('S', 0, 0, 1, 'SHIP_CAP'))
+            nt.send(cp_feature.data('S', 2, 0, 1, 'SP_GENERIC_32'))
+            nt.send(cp_feature.data('S', 0, 0, 1, 'TIPS'))
+            nt.send(cp_feature.data('S', 0, 0, 1, 'SHOW_ALL_TRACTORS'))
+
+        if name == 'UPS':
+            galaxy.ups = value
+        # FIXME: process the other feature packets received
+*/
+    }
+  },
+  SP_QUEUE = {
+    code: 13,
+    format: '!bxh',
+
+    handler: function(data) {
+        var uvars = packer.unpack(this.format, data);
+        var ignored = uvars.next(), pos = uvars.next();
+        if(net_logging) console.log("SP_QUEUE pos=",pos);
     }
   }
 ]

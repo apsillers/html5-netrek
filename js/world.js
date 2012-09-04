@@ -102,6 +102,10 @@ world = {
             } else {
                 if(e.keyCode == 67) {
                     net.sendArray(CP_CLOAK.data(_self.player.cloaked?0:1));
+                } else if(e.keyCode == 82) {
+                    net.sendArray(CP_REPAIR.data(1));
+                } else if(e.keyCode == 83) {
+                    net.sendArray(CP_SHIELD.data(_self.player.shields?0:1));
                 }
             }
         });
@@ -197,6 +201,7 @@ world = {
     },
 
     Planet: function(placeX, placeY, name, features, includingWorld) {
+        var planet_self = this;
         var world_xy = world.netrek2world(placeX, placeY);
         var cir = new Circle(18,
         {
@@ -239,6 +244,12 @@ world = {
         //this.includingWorld.addPlanet(this);
         this.gfxRoot = world.wGroup;
         this.isOnCanvas = true;
+
+        setInterval(function() {
+            //var world_xy = world.netrek2world(placeX, placeY);
+            //planet_self.x = world_xy[0];
+            //planet_self.y = world_xy[0];
+        }, 1000);
     }
 }
 world.Planet.prototype = {

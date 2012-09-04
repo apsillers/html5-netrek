@@ -22,6 +22,7 @@ var Ship = function(options) {
     this.targetHeading = options.targetHeading || null;
     this.targetSpeed = options.targetSpeed || 0;
     this.cloaked = false;
+    this.shields = true;
 
     this.isOnCanvas = true;
 
@@ -51,18 +52,17 @@ var Ship = function(options) {
     this.gfx.append(new TextNode(this.number, {
         x: 15,
         y: -3,
-        fill: teamLib.getRaceColor(options.team),
-        font: "bold"
+        fill: teamLib.getRaceColor(options.team)
     }));
 
     if(typeof options.galGfx != "object") {
         var tac_xy = world.netrek2tac(options.x, options.y);
-        this.galGfx = new Circle(this.radius,
+        this.galGfx = new TextNode(this.number,
         {
             y: tac_xy[0],
             x: tac_xy[1],
             fill: teamLib.getRaceColor(options.team),
-            radius: 4,
+            font:"bold 13px courier",
             zIndex:10000000
         })
     } else {
@@ -120,9 +120,17 @@ Ship.prototype = {
         this.gfx.needMatrixUpdate = true;
 
         this.galGfx.fill = isVis?teamLib.getRaceColor(this.team):"#666";
+        this.galGfx.text = isVis?this.number:"?";
         this.galGfx.needMatrixUpdate = true;
 
         this.cloaked = !isVis;
+    },
+
+    setShields: function(shieldsUp) {
+        this.gfx.stroke = shieldsUp?teamLib.getRaceColor(this.team):"none";
+        this.gfx.needMatrixUpdate = true;
+
+        this.shields = shieldsUp;
     },
 
     setOnCanvas: function(setOn) {
@@ -137,6 +145,7 @@ Ship.prototype = {
 
     handleFlags: function(flags) {
         //console.log(flags.toString(2))
+        this.setShields(flags & 0x01);
         this.setVisible(!(flags & 0x10));
     }
 }
