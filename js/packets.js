@@ -118,28 +118,34 @@ CP_CLOAK = {
 
     data: function(state) {
         if(net_logging) console.log("CP_CLOAK state=",state);
-        return packer.pack(this.format, [this.code, state])
+        return packer.pack(this.format, [this.code, state]);
     }
 }
-
-
 CP_REPAIR = {
     code: 13,
     format: '!bbxx',
 
     data: function(state) {
         if(net_logging) console.log("CP_REPAIR state=",state);
-        return packer.pack(this.format, this.code, state);
+        return packer.pack(this.format, [this.code, state]);
     }
 }
-
 CP_SHIELD = {
     code: 12,
     format: '!bbxx',
 
     data: function(state) {
         if(net_logging) console.log("CP_SHIELD state=",state);
-        return packer.pack(this.format, this.code, state);
+        return packer.pack(this.format, [this.code, state]);
+    }
+}
+CP_ORBIT = {
+    code: 14,
+    format: '!bbxx',
+
+    data: function(state) {
+        if(net_logging) console.log("CP_ORBIT =",state);
+        return packer.pack(this.format, [this.code, state]);
     }
 }
 /*************************************************************************
@@ -212,7 +218,7 @@ serverPackets = [
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.next(), pnum = uvars.next(), shiptype = uvars.next(), team = team_decode(uvars.next());
-        if(net_logging) console.log("SP_PLAYER_INFO pnum=",pnum,"shiptype=",shiptype,"team=",team);
+        if(net_logging || true) console.log("SP_PLAYER_INFO pnum=",pnum,"shiptype=",shiptype,"team=",team);
         var img = imageLib.images[team.length?team[0]:FED][shiptype];
         if(world.ships[pnum] == undefined) world.addShip(pnum, new Ship({ img: img, galImg: imageLib.images[1][shiptype], 
 team:team[0]||1, number:pnum.toString() }));

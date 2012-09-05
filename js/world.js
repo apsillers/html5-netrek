@@ -106,6 +106,8 @@ world = {
                     net.sendArray(CP_REPAIR.data(1));
                 } else if(e.keyCode == 83) {
                     net.sendArray(CP_SHIELD.data(_self.player.shields?0:1));
+                } else if(e.keyCode == 79) {
+                    net.sendArray(CP_ORBIT.data(_self.player.orbitting?0:1));
                 }
             }
         });

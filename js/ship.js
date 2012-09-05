@@ -23,6 +23,7 @@ var Ship = function(options) {
     this.targetSpeed = options.targetSpeed || 0;
     this.cloaked = false;
     this.shields = true;
+    this.orbitting = false;
 
     this.isOnCanvas = true;
 
@@ -145,7 +146,8 @@ Ship.prototype = {
 
     handleFlags: function(flags) {
         //console.log(flags.toString(2))
-        this.setShields(flags & 0x01);
-        this.setVisible(!(flags & 0x10));
+        this.setShields(flags & PFSHIELD);
+        this.setVisible(!(flags & PFCLOAK));
+        this.orbitting = flags & PFORBIT;
     }
 }
