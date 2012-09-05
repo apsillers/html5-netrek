@@ -37,6 +37,12 @@ hud = {
         this.fuelBox.append(this.fuelText);
         this.uiGfx.append(this.fuelBox);
 
+
+        this.speedMeter = new Polygon([0,0, 0,-300, 45,-300], {x:20, y:350, fill:"none", stroke: "white", strokeWidth:1});
+        this.meter = new Rectangle(0,0);
+        this.speedMeter.append(this.meter);
+        this.uiGfx.append(this.speedMeter);
+
         this.uiGfx.opacity = "0.9";
     },
 
@@ -62,5 +68,12 @@ hud = {
         percent = Math.max(0,Math.min(100,percent));
         this.fuelMeter.width = percent/100 * 300;
         this.fuelText.text = Math.floor(percent).toString() + "%";
+    },
+    showSpeed: function(speed) {
+        var frac = Math.pow(speed/12, 0.75);
+        this.speedMeter.remove(this.meter);
+        this.meter = new Polygon([0,0, 0,-frac*300,frac*45, -frac*300], {fill:"green", strokeWidth:0});
+        this.speedMeter.appendChild(this.meter);
     }
+
 }

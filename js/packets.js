@@ -164,6 +164,7 @@ serverPackets = [
         var unpacked = packer.unpack(this.format, data);
         if(unpacked) message = unpacked[1];
         if(net_logging) console.log(message);
+        outfitting.motdLine(message);
     }
   },
   { // SP_YOU
@@ -177,7 +178,7 @@ serverPackets = [
             flags = uvars.next(),   damage = uvars.next(), shield = uvars.next(),
             fuel = uvars.next(),    etemp = uvars.next(),  wtemp = uvars.next(),
             whydead = uvars.next(), whodead = uvars.next();
-        if(net_logging && false) console.log("SP_YOU pnum=",pnum,"hostile=",team_decode(hostile),"swar=",team_decode(swar),
+        if(net_logging) console.log("SP_YOU pnum=",pnum,"hostile=",team_decode(hostile),"swar=",team_decode(swar),
                     "armies=",armies,"tractor=",tractor,"flags=",flags.toString(2),"damage=",
                     damage,"shield=",shield,"fuel=",fuel,"etemp=",etemp,"wtemp=",
                     wtemp,"whydead=",whydead,"whodead=",whodead);
@@ -242,7 +243,7 @@ team:team[0]||1, number:pnum.toString() }));
         if(net_logging) console.log("SP_PSTATUS pnum=",pnum,"status=",status);
         if(world.player && pnum == world.player.number && status == 1) {
             world.undraw();
-            outfitting.draw(leftCanvas);
+            outfitting.draw(leftCanvas, rightCanvas);
         }
     }
   },
@@ -256,6 +257,10 @@ team:team[0]||1, number:pnum.toString() }));
         world.ships[pnum].setRotation(dir);
         world.ships[pnum].setPosition(x, y);
         world.ships[pnum].speed = speed;
+
+        if(world.player && pnum == world.player.number) {
+            hud.showSpeed(speed);
+        }
     }
   },
   { // SP_FLAGS
@@ -400,6 +405,7 @@ team:team[0]||1, number:pnum.toString() }));
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.next(), pnum = uvars.next(), owner = uvars.next(), info = uvars.next(), flags = uvars.next(), armies = uvars.next();
         if(net_logging) console.log("SP_PLANET pnum=",pnum,"owner=",owner,"info=",info,"flags=",flags.toString(2),"armies=",armies);
+        //world.planets[pnum]
     }
   },
   { // SP_MESSAGE

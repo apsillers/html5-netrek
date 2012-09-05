@@ -33,7 +33,7 @@ outfitting = {
                 world.player.setTeam(racenum);
                 net.sendArray(CP_UPDATES.data(100000));
                 net.sendArray(CP_OUTFIT.data(teamLib.teamNumber(racenum), _self.selectedShip));
-                //alert("sent data");
+                alert("sent data");
             }
         });
         return button;
@@ -50,8 +50,12 @@ outfitting = {
         return button;
     },
    
-    init: function(canvas) {
+    init: function(canvas, rcanvas) {
         this.oCanvas = canvas;
+        this.mCanvas = rcanvas;
+
+        this.motdLines = [];
+        this.motdLineNum = 0;
 
         // add race buttons
         var bufferPx = 10;
@@ -144,10 +148,18 @@ outfitting = {
 
         this.showInfoText(this.defaultInfoText);
         this.oCanvas.append(this.infoBox);
+
+        this.motdLineNum = 0;
+        if(this.motdLines.length != 0) {
+            for(var i=0; i<this.motdLines; ++i) {
+                this.motdLine(this.motdLines[i]);
+            }
+        }
     },
 
     undraw: function() {
         this.oCanvas.removeAllChildren();
+        this.mCanvas.removeAllChildren();
     },
 
     /* respond to SP_MASK packets */
@@ -186,6 +198,12 @@ outfitting = {
         newButton.stroke = "#F0F";
         newButton.strokeWidth = 4;
         newButton.fill = "#404";
+    },
+
+    motdLine: function(line) {
+        this.mCanvas.appendChild(new TextNode(line, {x: 3, y: this.motdLineNum*12 + 12, fill:"white", font:"9pt Courier"}));
+        this.motdLines[this.motdLineNum] = line;
+        this.motdLineNum++;
     }
 }
 

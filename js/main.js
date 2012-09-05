@@ -4,22 +4,26 @@ window.addEventListener("load", function() {
     leftCanvas = new Canvas(document.getElementById("leftCanvas"), 500, 500, {
         fill: 'black'
     });
-    rightCanvas = new Canvas(document.getElementById("rightCanvas"), 300, 300, {
+    rightCanvas = new Canvas(document.getElementById("rightCanvas"), 500, 500, {
         fill: 'black'
     });
 
-    outfitting.init(leftCanvas);
+    outfitting.init(leftCanvas, rightCanvas);
     world.init(leftCanvas, rightCanvas);
     hud.init(leftCanvas);
 
     imageLib.loadAll();
 
-    $("#overlay").height($(document).height());
+    //$("#overlay").height($(document).height());
     $("#overlay").width("100%");
     $("#login-box").css("left", ($("html").width() - $("#login-box").width()) / 2);
     $(window).resize(function() {
         $("#overlay").height($(window).height());
         $("#login-box").css("left", ($("html").width() - $("#login-box").width()) / 2);
+    });
+    $(window).scroll(function() {
+        $("#overlay").css("top",$(window).scrollTop()+"px");
+        $("#login-box").css("top",$(window).scrollTop()+100+"px");
     });
 
     // if this is a dev server, default to localhost
@@ -37,7 +41,7 @@ window.addEventListener("load", function() {
             console.log("proxy connection formed");
             net.connectToServer(nt_host,2592,function(){ //continuum.us.netrek.org
                 console.log("NT server connection formed");
-                net.sendArray(CP_LOGIN.data(0,user,pass,"hello world"));
+                net.sendArray(CP_LOGIN.data(0,user,pass,"webtest"));
                 $("#overlay").hide();
                 $("#login-box").hide();
             })
