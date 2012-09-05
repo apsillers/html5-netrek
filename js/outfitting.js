@@ -53,7 +53,7 @@ outfitting = {
                 world.player.setTeam(racenum);
                 net.sendArray(CP_UPDATES.data(100000));
                 net.sendArray(CP_OUTFIT.data(teamLib.teamNumber(racenum), _self.selectedShip));
-                alert("sent data");
+                //alert("sent data");
             }
         });
         return button;
