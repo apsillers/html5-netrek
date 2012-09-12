@@ -60,7 +60,8 @@ var express = require("express"),
 // serve files
 app.use(express.static(__dirname));
 
-var port = process.env.PORT || process.argv[2] || 16446;
+// get the port from either: heroku port var, nodester port var, command-line arg, or use 16446
+var port = process.env.PORT || process.env.app_port || process.argv[2] || 16446;
 server.listen(port);
 
 var io = require('socket.io').listen(server);
@@ -87,54 +88,53 @@ io.sockets.on('connection', function (socket) {
     // the client has picked a server to join and passed info about which one
     socket.on('joinServer', function (hostInfo) {
         // make a new connection to the Netrek server
-        try {
-            var serverConn = net.connect(hostInfo.port, hostInfo.host, function() {
-			    console.log("connected to NT server!");
-                /* PROXY BEHAVIOR */
-                // forward all data from the server to the browser client
-                serverConn.on('data', function(sp_data) {
-                    // base64-encode the Buffer of bytes and send it to the client
-                    //console.log("FROM SERVER", sp_data);
-				    socket.send(sp_data.toString("base64"));
-                });
-
-			    serverConn.on('end', function() {
-                    console.log("server connection finished");
-                    socket.emit("serverClosure");
-                    socket.disconnect();
-                });
-
-			    serverConn.on('close', function() {
-                    console.log("server connection died");
-                    socket.disconnect();
-                });
-
-			    serverConn.on('error', function(e) {
-                    console.log("socket error",e);
-                });
-
-                // foward all data from the browser client to the server
-                // data is a base64-encoded string
-                socket.on('message', function(cp_data) {
-                    cp_data = new Buffer(cp_data, "base64");
-				    //console.log("FROM CLIENT", cp_data);
-                    serverConn.write(cp_data);
-                });
-
-                socket.on('disconnect', function() {
-                    console.log("DISCONNECT");
-                    serverConn.end();
-                    // TODO: clean up connection
-	                // send CP_QUIT/CP_BYE message? (unless the client never picked a
-                    // server or already exited gracefully)
-                });
-                /* END PROXY BEHAVIOR */
-                
-                // connection made to real server; browser can now send data
-                socket.emit('serverConnected');
+        var serverConn = net.connect(hostInfo.port, hostInfo.host, function() {
+            console.log("joined")
+		    console.log("connected to NT server!");
+            /* PROXY BEHAVIOR */
+            // forward all data from the server to the browser client
+            serverConn.on('data', function(sp_data) {
+                // base64-encode the Buffer of bytes and send it to the client
+                //console.log("FROM SERVER", sp_data);
+			    socket.send(sp_data.toString("base64"));
             });
-        } catch(err) {
-                socket.emit('connectionFailed');
-        }
+
+		    serverConn.on('end', function() {
+                console.log("server connection finished");
+                socket.emit("serverClosure");
+                socket.disconnect();
+            });
+
+		    serverConn.on('close', function() {
+                console.log("server connection died");
+                socket.disconnect();
+            });
+
+		    serverConn.on('error', function(e) {
+                console.log("socket error",e);
+            });
+
+            // foward all data from the browser client to the server
+            // data is a base64-encoded string
+            socket.on('message', function(cp_data) {
+                cp_data = new Buffer(cp_data, "base64");
+			    //console.log("FROM CLIENT", cp_data);
+                serverConn.write(cp_data);
+            });
+
+            socket.on('disconnect', function() {
+                console.log("DISCONNECT");
+                serverConn.end();
+                // TODO: clean up connection
+                // send CP_QUIT/CP_BYE message? (unless the client never picked a
+                // server or already exited gracefully)
+            });
+            /* END PROXY BEHAVIOR */
+            
+            // connection made to real server; browser can now send data
+            socket.emit('serverConnected');
+        }).on('error', function(e) {
+           console.log("Connect error: " + e.message);
+        });
     });
 });
