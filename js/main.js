@@ -46,6 +46,8 @@ window.addEventListener("load", function() {
         $("#login-box").css("top",$(window).scrollTop()+100+"px");
     });
 
+    document.getElementById("connect-button").focus()
+
     // if this is a dev server, default to localhost
     if(location.hostname == "localhost" || location.hostname == "127.0.0.1") {
         $("#nt-host-input").val("localhost");

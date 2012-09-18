@@ -205,7 +205,10 @@ serverPackets = [
                     damage,"shield=",shield,"fuel=",fuel,"etemp=",etemp,"wtemp=",
                     wtemp,"whydead=",whydead,"whodead=",whodead);
         if(world.playerNum == null) { world.playerNum = pnum; }
-        else { world.ships[world.playerNum].handleFlags(flags); }
+        else {
+            world.ships[world.playerNum].handleFlags(flags);
+            hud.showEngineTemp(etemp/10);
+        }
 
         // FIXME: actually use shipwise maximums
         hud.showFuelLevel(fuel/100);

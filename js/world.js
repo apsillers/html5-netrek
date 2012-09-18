@@ -98,7 +98,7 @@ world = {
             var offset = $(this).offset();
             var offsetX = e.pageX - offset.left;
             var offsetY = e.pageY - offset.top;
-            net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY))));
+            _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 4);
             e.preventDefault();
         });
         
