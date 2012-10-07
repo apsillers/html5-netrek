@@ -22,6 +22,7 @@ world = {
     gCanvas: null,       // galactic canvas
     wGroup: new CanvasNode(),        // world group
     gGroup: new CanvasNode(),        // galactic group
+    planetGroup: new CanvasNode(),
     redrawInterval: null,
     objects: [],         // all objects in the world (which are doubly recorded in the arrays below)
     ships: [],           // array of ships, indexed by ship id
@@ -46,6 +47,7 @@ world = {
     draw: function() {
         this.wCanvas.append(this.wGroup);
         this.gCanvas.append(this.gGroup);
+        this.wGroup.append(this.planetGroup);
         var _self = this;        
         _self.redrawInterval = setInterval(function recenter(){
             var centerX = _self.player.x, centerY = _self.player.y,
@@ -58,7 +60,7 @@ world = {
             // for all objects in the world
             for(var i = 0; i < _self.objects.length; ++i) {
                 var obj = _self.objects[i];
-                
+
                 // update display of object in world
                 var coords = _self.netrek2world(obj.x, obj.y);
                 obj.gfx.x = coords[0];
@@ -101,8 +103,8 @@ world = {
             _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 4);
             e.preventDefault();
         });
-        
-        //UI: fire phasers via middle-click
+
+        // UI: fire phasers via middle-click
         $(this.wCanvas.canvas).mousedown(function firePhasersWithMiddleClick(e) {
             if(e.which==2) {
                 var offset = $(this).offset();
@@ -116,8 +118,9 @@ world = {
         $(document).bind("keyup", function handleKeys(e) {
             // set speed with number keys
             if(e.which >= 48 && e.which <= 57) {
-                net.sendArray(CP_SPEED.data(e.which - 48));
-                //player.targetSpeed = (e.which - 48) / 2;
+                var speed = e.which - 48;
+                net.sendArray(CP_SPEED.data(speed));
+                hud.showSpeedPointer(speed);
             } else {
                 if(e.keyCode == 67) {
                     net.sendArray(CP_CLOAK.data(_self.player.cloaked?0:1));
@@ -127,6 +130,8 @@ world = {
                     net.sendArray(CP_SHIELD.data(_self.player.shields?0:1));
                 } else if(e.keyCode == 79) {
                     net.sendArray(CP_ORBIT.data(_self.player.orbitting?0:1));
+                } else if(e.keyCode == 66) {
+                    net.sendArray(CP_BOMB.data(_self.player.bombing?0:1));
                 }
             }
         });
@@ -145,6 +150,7 @@ world = {
 
     add: function(obj) {
         this.wGroup.append(obj.gfx);
+
         if(obj.galGfx) this.gGroup.append(obj.galGfx);
         this.objects.push(obj);
     },
@@ -237,19 +243,19 @@ world = {
                                  font:"bold 9px courier"});
         cir.append(text);
         
-        if(features.indexOf(this.FUEL)!=-1) {
-            var tank = new Polygon([0,0,5,0,8,2,8,13,0,13], {x:cir.radius-12,y:-7});
-            tank.append(new Polygon([2,3,5,6]));
-            tank.append(new Polygon([2,6,5,3]));
-            cir.append(tank);
-        }
-        //if(this.REPAIR in features) {
-            //TODO: draw wrench
-        //}
-        
         this.x = placeX;
         this.y = placeY;
         this.gfx = cir;
+        this.name = name;
+        this.fuel = false;
+        this.repair = false;
+        this.agri = false;
+
+        this.armyGfx = new Polygon([0,0, 0,6, 6,6, 6,0],{stroke:"none", fill:"#00F", x:-14, y:2, opacity:0});
+        this.armyGfx.append(new Circle(3,{stroke:"none", fill:"#00F", x:3, y:0}));
+        this.armyGfx.append(new Circle(3,{stroke:"none", fill:"#00F", x:3, y:-6}));
+        this.gfx.append(this.armyGfx);
+
 
         var tac_xy = world.netrek2tac(placeX, placeY);
         this.galGfx = new Circle(this.radius,
@@ -257,9 +263,15 @@ world = {
             y: tac_xy[0],
             x: tac_xy[1],
             stroke: "#FF0",
-            radius: 4,
+            radius: 7,
             zIndex:1
         });
+
+        var text = new TextNode(name.replace(/\x00/g,"").substring(0,3),
+                                {y:this.galGfx.radius+7, textAlign:"center",
+                                 fill:'yellow', scale:1.2,
+                                 font:"bold 9px courier"});
+        this.galGfx.append(text);
 
         this.includingWorld = includingWorld;
         //this.includingWorld.addPlanet(this);
@@ -274,8 +286,49 @@ world = {
     }
 }
 world.Planet.prototype = {
-    FUEL:0,
-    REPAIR:1,
+    applyFlags: function(flags) {
+        this.showRepair(!!(flags & PLREPAIR));
+        this.showFuel(!!(flags & PLFUEL));
+        this.showAgri(!!(flags & PLAGRI));
+    },
+
+    showRepair: function(doShow) {
+        if(!this.repair && doShow) {
+            this.gfx.append(new Polygon([0,0, -3,3, -3,8, 0,11, 0,19, -3,22, -3,26, 0,29, 0,23, 4,23, 4,29, 7,26, 7,22, 4,19, 4,11, 7,8, 7,3, 4,0, 4,6, 0,6],{stroke:"#4F0", fill:"#0F0", x:0, y:-this.gfx.radius+3, x:-3}));
+            this.galGfx.append(new Circle(2, {x:-3, fill:"#0F0", stroke:"none"}));
+        }
+        this.repair = doShow;
+    },
+
+    showFuel: function(doShow) {
+        if(!this.fuel && doShow) {
+            var tank = new Polygon([0,0,5,0,8,2,8,13,0,13], {x:this.gfx.radius-12,y:-7, stroke:"#FF0", fill:"#F70"});
+            tank.append(new Polygon([2,3,5,6], {stroke:"#FF0"}));
+            tank.append(new Polygon([2,6,5,3], {stroke:"#FF0"}));
+            this.gfx.append(tank);
+            this.galGfx.append(new Circle(2, {x:3, fill:"#F70", stroke:"none"}));
+        }
+        this.fuel = doShow;
+    },
+
+    showAgri: function(doShow) {
+        if(!this.agri && doShow) {
+            this.galGfx.stroke = "#0FF";
+            this.gfx.stroke = "#0FF";
+            this.gfx.strokeWidth = 2;
+        }
+        this.agri = doShow;
+    },
+
+    showArmies: function(num) {
+        if(num == 5) {
+            this.armyGfx.opacity = 1;
+        }
+        if(num < 5) {
+            this.armyGfx.opacity = 0;
+        }
+    },
+
     setOnCanvas: function(setOn) {
         if(setOn && !this.isOnCanvas) {
             this.gfxRoot.append(this.gfx);

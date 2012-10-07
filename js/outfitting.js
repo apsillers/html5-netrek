@@ -169,6 +169,7 @@ outfitting = {
         this.showInfoText(this.defaultInfoText);
         this.oCanvas.append(this.infoBox);
 
+        // draw message of the day
         this.motdLineNum = 0;
         if(this.motdLines.length != 0) {
             for(var i=0; i<this.motdLines; ++i) {

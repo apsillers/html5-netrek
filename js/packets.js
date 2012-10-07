@@ -44,6 +44,19 @@ CP_SOCKET = {
         return packer.pack(this.format,[this.code,4,tcpVersion,0]);
     }
 }  
+CP_PING_RESPONSE = {
+    code: 42,
+    format: "!bBbxll",
+
+    data: function(number, pingme, cp_sent, cp_recv) {
+        if(net_logging || true) console.log("CP_PING_RESPONSE pingme=", pingme);
+        return packer.pack(this.format, [this.code, number, pingme, cp_sent, cp_recv]);
+        // From James Cameron's pygame file (this may or may not apply to the JS version):
+        // FIXME: bug #1215317195 reported by Zach, pinging the player
+        // using "!" results in O0 PING stats: Avg: 364 ms, Stdv: 19
+        // ms, Loss: ^@100.0%/nan% s->c/c->s
+    }
+}
 CP_LOGIN = {
     code: 8,
     format: '!bbxx16s16s16s',
@@ -170,6 +183,15 @@ CP_ORBIT = {
         return packer.pack(this.format, [this.code, state]);
     }
 }
+CP_BOMB = {
+    code: 17,
+    format: '!bbxx',
+
+    data: function(state) {
+        if(net_logging) console.log("CP_BOMB state=",state);
+        return packer.pack(this.format, this.code, state)
+    }
+}
 /*************************************************************************
  All server packet types listed below
 
@@ -195,11 +217,11 @@ serverPackets = [
     handler: function(data) {
         // unpack all the data into variables
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), pnum = uvars.next(),   hostile = uvars.next(),
-            swar = uvars.next(),    armies = uvars.next(), tractor = uvars.next(),
-            flags = uvars.next(),   damage = uvars.next(), shield = uvars.next(),
-            fuel = uvars.next(),    etemp = uvars.next(),  wtemp = uvars.next(),
-            whydead = uvars.next(), whodead = uvars.next();
+        var ignored = uvars.shift(), pnum = uvars.shift(),   hostile = uvars.shift(),
+            swar = uvars.shift(),    armies = uvars.shift(), tractor = uvars.shift(),
+            flags = uvars.shift(),   damage = uvars.shift(), shield = uvars.shift(),
+            fuel = uvars.shift(),    etemp = uvars.shift(),  wtemp = uvars.shift(),
+            whydead = uvars.shift(), whodead = uvars.shift();
         if(net_logging) console.log("SP_YOU pnum=",pnum,"hostile=",team_decode(hostile),"swar=",team_decode(swar),
                     "armies=",armies,"tractor=",tractor,"flags=",flags.toString(2),"damage=",
                     damage,"shield=",shield,"fuel=",fuel,"etemp=",etemp,"wtemp=",
@@ -221,11 +243,25 @@ serverPackets = [
     format: "!bbbx16s16s16s",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), pnum = uvars.next(), rank = uvars.next(),
-            name = uvars.next(), monitor = uvars.next(), login  = uvars.next();
+        var ignored = uvars.shift(), pnum = uvars.shift(), rank = uvars.shift(),
+            name = uvars.shift(), monitor = uvars.shift(), login  = uvars.shift();
         if(net_logging) console.log("SP_PL_LOGIN pnum=",pnum,"rank=",rank,"name=",name,"monitor=",monitor,"login=",login)
         //ship = galaxy.ship(pnum)
         //ship.sp_pl_login(rank, name, monitor, login)
+    }
+  },
+  { // SP_PING - only received if client sends CP_PING_RESPONSE after SP_LOGIN
+    // ...doesn't seem to work
+    code: 46,
+    format: "!bBHBBBB",
+
+    handler: function(data) {
+        var uvars = packer.unpack(this.format, data);
+        var ignored = uvars.shift(), number = uvars.shift(), lag = uvars.shift(),
+            tloss_sc = uvars.shift(), tloss_cs = uvars.shift(), iloss_sc  = uvars.shift(),
+            iloss_cs = uvars.shift();
+        if(net_logging || true) { console.log("SP_PING"); }
+        net.send(CP_PING_RESPONSE.data(0, 1, 0, 0));
     }
   },
   { // SP_HOSTILE
@@ -233,8 +269,8 @@ serverPackets = [
     format: "!bbbb",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), pnum = uvars.next(), war = uvars.next(),
-            hostile = uvars.next();
+        var ignored = uvars.shift(), pnum = uvars.shift(), war = uvars.shift(),
+            hostile = uvars.shift();
         if(net_logging) console.log("SP_HOSTILE pnum=",pnum,"war=",team_decode(war),"hostile=",team_decode(hostile));
     }
   },
@@ -243,11 +279,20 @@ serverPackets = [
     format:"!bbbb",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), pnum = uvars.next(), shiptype = uvars.next(), team = team_decode(uvars.next());
-        if(net_logging || true) console.log("SP_PLAYER_INFO pnum=",pnum,"shiptype=",shiptype,"team=",team);
+        var ignored = uvars.shift(), pnum = uvars.shift(), shiptype = uvars.shift(), team = team_decode(uvars.shift());
+        if(net_logging) console.log("SP_PLAYER_INFO pnum=",pnum,"shiptype=",shiptype,"team=",team);
         var img = imageLib.images[team.length?team[0]:FED][shiptype];
-        if(world.ships[pnum] == undefined) world.addShip(pnum, new Ship({ img: img, galImg: imageLib.images[1][shiptype], 
-team:team[0]||1, number:pnum.toString() }));
+        if(world.ships[pnum] == undefined) {
+            world.addShip(pnum, new Ship({
+                img: img,
+                galImg: imageLib.images[1][shiptype], 
+                team:team[0],
+                number:pnum.toString()
+            }));
+        }
+
+        world.ships[pnum].setImage(img);
+        world.ships[pnum].setTeam(team[0]);
     }
   },
   { // SP_KILLS
@@ -255,7 +300,7 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bbxxI",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), pnum = uvars.next(), kills = uvars.next();
+        var ignored = uvars.shift(), pnum = uvars.shift(), kills = uvars.shift();
         if(net_logging) console.log("SP_KILLS pnum=",pnum,"kills=",kills);
     }
   },
@@ -264,7 +309,7 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bbbx",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), pnum = uvars.next(), status = uvars.next();
+        var ignored = uvars.shift(), pnum = uvars.shift(), status = uvars.shift();
         if(net_logging) console.log("SP_PSTATUS pnum=",pnum,"status=",status);
         if(world.player && pnum == world.player.number && status == 1) {
             world.undraw();
@@ -277,7 +322,7 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bbBbll",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), pnum = uvars.next(), dir = uvars.next(), speed = uvars.next(), x = uvars.next(), y = uvars.next();
+        var ignored = uvars.shift(), pnum = uvars.shift(), dir = uvars.shift(), speed = uvars.shift(), x = uvars.shift(), y = uvars.shift();
         if(net_logging) console.log("SP_PLAYER pnum=",pnum,"dir=",dir,"speed=",speed,"x=",x,"y=",y);
         world.ships[pnum].setRotation(dir);
         world.ships[pnum].setPosition(x, y);
@@ -293,7 +338,7 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bbbxI",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), pnum = uvars.next(), tractor = uvars.next(), flags = uvars.next();
+        var ignored = uvars.shift(), pnum = uvars.shift(), tractor = uvars.shift(), flags = uvars.shift();
         if(net_logging) console.log("SP_FLAGS pnum=",pnum,"tractor=",tractor,"flags=",flags);
 
         world.ships[pnum].handleFlags(flags);
@@ -304,7 +349,7 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bbxxll16s",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), pnum = uvars.next(), x = uvars.next(), y = uvars.next(), name = uvars.next();
+        var ignored = uvars.shift(), pnum = uvars.shift(), x = uvars.shift(), y = uvars.shift(), name = uvars.shift();
         if(net_logging) console.log("SP_PLANET_LOC pnum=",pnum,"x=",x,"y=",y,"name=",name);
         if(world.planets[pnum] == undefined) {
             world.addPlanet(pnum, new world.Planet(x, y, name, [], world));
@@ -316,8 +361,9 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bbxxl96s",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), accept = uvars.next(), flags = uvars.next(), keymap = uvars.next();
+        var ignored = uvars.shift(), accept = uvars.shift(), flags = uvars.shift(), keymap = uvars.shift();
         if(net_logging) console.log("SP_LOGIN accept=",accept,"flags=",flags.toString(2));
+        //net.sendArray(CP_PING_RESPONSE.data(0, 1, 0, 0));
     }
   },
   { // SP_MASK
@@ -325,7 +371,7 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bbxx",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), mask = uvars.next();
+        var ignored = uvars.shift(), mask = uvars.shift();
         if(net_logging) console.log("SP_MASK mask=",team_decode(mask));
         outfitting.applyMask(team_decode(mask))
     }
@@ -335,7 +381,7 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bbxx",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), state = uvars.next();
+        var ignored = uvars.shift(), state = uvars.shift();
         if(net_logging) console.log("SP_PICKOK state=", state);
         if(state == 1) {
             outfitting.undraw();
@@ -349,7 +395,7 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bxxx16s",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), data = uvars.next();
+        var ignored = uvars.shift(), data = uvars.shift();
         var text = packer.unpack('16b', data)
         if(net_logging) console.log("SP_RESERVED data=",text);
     }
@@ -359,13 +405,13 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bbbxhxx",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), war = uvars.next(), status = uvars.next(), tnum = uvars.next();
-        if(net_logging) console.log("SP_TORP_INFO war=",team_decode(war)," status=",status," tnum=",tnum);
+        var ignored = uvars.shift(), war = uvars.shift(), status = uvars.shift(), tnum = uvars.shift();
+        if(net_logging || true) console.log("SP_TORP_INFO war=",team_decode(war)," status=",status," tnum=",tnum);
 
         if(world.torps[tnum] == undefined && status == 1) {
-            world.addTorp(tnum, new Torp(-10000, -10000, 0, war));
+            world.addTorp(tnum, new Torp(-10000, -10000, 0, team_decode(war), world));
         }
-        else if(world.torps[tnum] != undefined && (status == 0 || status == 2 || status == 3)) {
+        else if(world.torps[tnum] != undefined && (status == PTFREE || status == PTEXPLODE || status == PTDET)) {
             world.removeTorp(tnum);
         }
     }
@@ -375,7 +421,7 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bBhll",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), dir = uvars.next(), tnum = uvars.next(), x = uvars.next(), y = uvars.next();
+        var ignored = uvars.shift(), dir = uvars.shift(), tnum = uvars.shift(), x = uvars.shift(), y = uvars.shift();
         if(net_logging) console.log("SP_TORP dir=",dir," tnum=",tnum," x=",x," y=",y);
         if(world.torps[tnum] != undefined) {
             world.torps[tnum].dir = dir;
@@ -389,7 +435,7 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bbbxhxx",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), war = uvars.next(), status = uvars.next(), pnum = uvars.next();
+        var ignored = uvars.shift(), war = uvars.shift(), status = uvars.shift(), pnum = uvars.shift();
         if(net_logging) console.log("SP_PLASMA_INFO war=",team_decode(war),"status=",status,"pnum=",pnum);
     }
   },
@@ -398,7 +444,7 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bxhll",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), pnum = uvars.next(), x = uvars.next(), y = uvars.next();
+        var ignored = uvars.shift(), pnum = uvars.shift(), x = uvars.shift(), y = uvars.shift();
         if(net_logging) console.log("SP_PLASMA pnum=",pnum,"x=",x,"y=",y);
     }
   },
@@ -407,10 +453,10 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bbxxIIIIIL",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), tourn = uvars.next(),
-            armsbomb = uvars.next(), planets = uvars.next(),
-            kills = uvars.next(), losses = uvars.next(), time = uvars.next(),
-            timeprod = uvars.next();
+        var ignored = uvars.shift(), tourn = uvars.shift(),
+            armsbomb = uvars.shift(), planets = uvars.shift(),
+            kills = uvars.shift(), losses = uvars.shift(), time = uvars.shift(),
+            timeprod = uvars.shift();
         if(net_logging) console.log("SP_STATUS tourn=",tourn,"armsbomb=",armsbomb,"planets=",planets,"kills=",kills,"losses=",losses,"time=",time,"timepro=",timeprod);
     }
   },
@@ -419,8 +465,9 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bbbBlll",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), pnum = uvars.next(), status = uvars.next(), dir = uvars.next(), x = uvars.next(), y = uvars.next(), target = uvars.next();
+        var ignored = uvars.shift(), pnum = uvars.shift(), status = uvars.shift(), dir = uvars.shift(), x = uvars.shift(), y = uvars.shift(), target = uvars.shift();
         if(net_logging) console.log("SP_PHASER pnum=",pnum,"status=",status,"dir=",dir,"x=",x,"y=",y,"target=",target);
+        //world
     }
   },
   { // SP_PLANET
@@ -428,9 +475,10 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bbbbhxxl",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), pnum = uvars.next(), owner = uvars.next(), info = uvars.next(), flags = uvars.next(), armies = uvars.next();
+        var ignored = uvars.shift(), pnum = uvars.shift(), owner = uvars.shift(), info = uvars.shift(), flags = uvars.shift(), armies = uvars.shift();
         if(net_logging) console.log("SP_PLANET pnum=",pnum,"owner=",owner,"info=",info,"flags=",flags.toString(2),"armies=",armies);
-        //world.planets[pnum]
+        world.planets[pnum].applyFlags(flags);
+        world.planets[pnum].showArmies(armies);
     }
   },
   { // SP_MESSAGE
@@ -438,8 +486,8 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bBBB80s",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), m_flags = uvars.next(),
-            m_recpt = uvars.next(), m_from = uvars.next(), mesg = uvars.next();
+        var ignored = uvars.shift(), m_flags = uvars.shift(),
+            m_recpt = uvars.shift(), m_from = uvars.shift(), mesg = uvars.shift();
         if(net_logging) console.log("SP_MESSAGE m_flags=",m_flags.toString(2),"m_recpt=",m_recpt,"m_from=",m_from,"mesg=",mesg);
 
         $("#inbox").append(mesg + "<br />");
@@ -451,13 +499,13 @@ team:team[0]||1, number:pnum.toString() }));
     format:"!bbxx13l",
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), pnum = uvars.next(), tkills = uvars.next(),
-            tlosses = uvars.next(), kills = uvars.next(),
-            losses = uvars.next(), tticks = uvars.next(),
-            tplanets = uvars.next(), tarmies = uvars.next(),
-            sbkills = uvars.next(), sblosses = uvars.next(),
-            armies = uvars.next(), planets = uvars.next(),
-            maxkills = uvars.next(), sbmaxkills = uvars.next();
+        var ignored = uvars.shift(), pnum = uvars.shift(), tkills = uvars.shift(),
+            tlosses = uvars.shift(), kills = uvars.shift(),
+            losses = uvars.shift(), tticks = uvars.shift(),
+            tplanets = uvars.shift(), tarmies = uvars.shift(),
+            sbkills = uvars.shift(), sblosses = uvars.shift(),
+            armies = uvars.shift(), planets = uvars.shift(),
+            maxkills = uvars.shift(), sbmaxkills = uvars.shift();
         if(net_logging) console.log("SP_STATS pnum=",pnum, "tkills=",tkills,
                     "tlosses=",tlosses, "kills=",kills, "losses=",losses,
                     "tticks=",tticks, "tplanets=",tplanets, "tarmies=",tarmies,
@@ -472,7 +520,7 @@ team:team[0]||1, number:pnum.toString() }));
 
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), message = uvars.next();
+        var ignored = uvars.shift(), message = uvars.shift();
         console.log("SP_WARNING message=", message);
     }
   },
@@ -482,8 +530,8 @@ team:team[0]||1, number:pnum.toString() }));
 
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), type  = uvars.next(), arg1 = uvars.next(),
-            arg2 = uvars.next(), value = uvars.next(), name = uvars.next();
+        var ignored = uvars.shift(), type  = uvars.shift(), arg1 = uvars.shift(),
+            arg2 = uvars.shift(), value = uvars.shift(), name = uvars.shift();
         
             if(net_logging) console.log("SP_FEATURE type=%s arg1=%d arg2=%d value=%d name=%s", type, arg1, arg2, value, name);
 
@@ -509,7 +557,7 @@ team:team[0]||1, number:pnum.toString() }));
 
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.next(), pos = uvars.next();
+        var ignored = uvars.shift(), pos = uvars.shift();
         if(net_logging) console.log("SP_QUEUE pos=",pos);
     }
   }

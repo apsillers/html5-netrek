@@ -24,7 +24,7 @@ var Torp = function(placeX, placeY, dir, team, includingWorld) {
     {
         y: world_xy[0],
         x: world_xy[1],
-        fill: teamLib.getRaceColor(team)
+        fill: team.indexOf(includingWorld.player.team)?"#FFF":"#FF0"//teamLib.getRaceColor(team)
 
     });
     this.x = placeX;

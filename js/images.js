@@ -25,12 +25,18 @@ var imageLib = {
 
     images:[],
 
-    loadAll: function() {
+    // load all images and fire callback
+    loadAll: function(callback) {
+        var total = this.races.length * this.ships.length;
+
         for(var i = 0; i < this.races.length; ++i) {
             this.images[this.raceIds[i]] = [];
             for(var j = 0; j < this.ships.length; ++j) {
                 var img = new Image();
                 this.images[this.raceIds[i]][j] = img;
+                img.onload = function() {
+                    if(--total == 0) { callback(); }
+                }
                 img.src = "/data/img/"+this.races[i]+"/"+this.ships[j]+"0.png";
             }
         }

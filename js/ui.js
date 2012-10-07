@@ -73,9 +73,8 @@ hud = {
         this.speedMeter.addEventListener("click", function(e) {
             var y = -e.clientY + $(e.target).offset().top + hud.speedMeter.y;
             var speed = Math.ceil(12 * Math.pow(y/300,1/0.75));
-            hud.speedPointer.y = -300 * Math.pow(speed/12, 0.75);
-            hud.speedPointer.needMatrixUpdate = true;
             net.sendArray(CP_SPEED.data(speed));
+            hud.showSpeedPointer(speed);
             e.stopPropagation();
             clearTimeout(world.torpFireTimeout);
         });
@@ -123,6 +122,10 @@ hud = {
         this.meter = new Polygon([0,0, 0,-frac*300,frac*50, -frac*300], {fill:"green", strokeWidth:0});
         this.speedMeter.appendChild(this.meter);
         this.speedMeter.needMatrixUpdate = true;
+    },
+    showSpeedPointer: function(speed) {
+        this.speedPointer.y = -300 * Math.pow(speed/12, 0.75);
+        this.speedPointer.needMatrixUpdate = true;
     },
     showEngineTemp: function(percent) {
         percent = Math.max(0,Math.min(100,percent));

@@ -169,5 +169,10 @@ Ship.prototype = {
         this.setShields(flags & PFSHIELD);
         this.setVisible(!(flags & PFCLOAK));
         this.orbitting = flags & PFORBIT;
+        this.bombing = flags & PFBOMB;
+
+        if(this === world.player) {
+            if(this.orbitting) { hud.showSpeedPointer(0); }
+        }
     }
 }
