@@ -59,22 +59,25 @@ var Ship = function(options) {
             radius: 12,
             zIndex:10000000
         });
-        this.gfx.append(new ImageNode(options.img,
+        this.hullGfx = new ImageNode(options.img,
         {
           x: 0,
           y: 0,
           centered: true,
           stroke: 'none',
           zIndex: -1
-        }));
+        });
+        this.gfx.append(this.hullGfx);
+        //this.setImage(options.img);
     } else {
         this.gfx = options.gfx;
     }
-    this.gfx.append(new TextNode(this.number, {
+    this.numberGfx = new TextNode(this.number, {
         x: 15,
         y: -3,
         fill: teamLib.getRaceColor(options.team)
-    }));
+    });
+    this.gfx.append(this.numberGfx);
 
     if(typeof options.galGfx != "object") {
         var tac_xy = world.netrek2tac(options.x, options.y);
@@ -92,24 +95,6 @@ var Ship = function(options) {
 
     this.includingWorld = options.world;
     this.gfxRoot = world.wGroup;
-
-    /*this.gfx.addFrameListener(function() {
-        var viewBuffer = 150,
-            cnvHalfHgt = world.wCanvas.height / 2 * world.subgalacticFactor + viewBuffer,
-            cnvHalfWid = world.wCanvas.width / 2 * world.subgalacticFactor + viewBuffer;
-
-        var coords = world.netrek2world(_self.x, _self.y);
-        _self.gfx.x = coords[0];
-        _self.gfx.y = coords[1];
-
-        // update display of Object in tactical
-        if(_self.galGfx) {
-            var tac_coords = world.netrek2tac(_self.x, _self.y);
-            _self.galGfx.x = tac_coords[0];
-            _self.galGfx.y = tac_coords[1];
-        }
-        if(_self == world.player) console.log(world.viewY, _self.y, world.viewY - _self.y);
-    });*/
 }
 Ship.prototype = {
     setPosition: function(x,y) {
@@ -120,18 +105,31 @@ Ship.prototype = {
     // convert 0-255 rotation to radians and set
     setRotation: function(byteRot) {
         var rads = Math.PI*2 * byteRot/255;
-        this.gfx.childNodes[0].rotation = [rads,0,0];
-        this.gfx.childNodes[0].changed = true;
+        this.hullGfx.rotation = [rads,0,0];
+        this.hullGfx.changed = true;
         this.gfx.changed = true;
     },
 
     setImage: function(img) {
-        this.gfx.childNodes[0].image = img;
+        if(this.hullGfx) { this.gfx.remove(this.hullGfx); }
+        this.hullGfx = new ImageNode(img,
+        {
+          x: 0,
+          y: 0,
+          centered: true,
+          stroke: 'none',
+          zIndex: -1
+        });
+        this.gfx.append(this.hullGfx);
         this.gfx.changed = true;
     },
 
     setTeam: function(team) {
         this.team = team;
+        
+        this.numberGfx.fill = teamLib.getRaceColor(team);
+        this.numberGfx.changed = true;
+
         this.galGfx.fill = teamLib.getRaceColor(team);
         this.galGfx.changed = true;
     },

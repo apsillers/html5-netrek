@@ -293,7 +293,6 @@ serverPackets = [
 
         world.ships[pnum].setImage(img);
         world.ships[pnum].setTeam(team[0]);
-        alert(img.src);
     }
   },
   { // SP_KILLS
