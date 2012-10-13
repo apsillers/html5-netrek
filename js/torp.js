@@ -19,6 +19,7 @@
 
 */
 var Torp = function(placeX, placeY, dir, team, includingWorld) {
+    var self = this;
     var world_xy = world.netrek2world(placeX, placeY);
     var cir = new Circle(2,
     {
@@ -27,6 +28,8 @@ var Torp = function(placeX, placeY, dir, team, includingWorld) {
         fill: team.indexOf(includingWorld.player.team)?"#FFF":"#FF0"//teamLib.getRaceColor(team)
 
     });
+
+
     this.x = placeX;
     this.y = placeY;
     this.team = team;
@@ -35,6 +38,9 @@ var Torp = function(placeX, placeY, dir, team, includingWorld) {
     this.includingWorld = includingWorld;
     this.gfxRoot = world.wGroup;
     this.isOnCanvas = true;
+    //this.boundRedraw = function() { self.redrawSelf(); };
+
+    //this.redrawInterval = setInterval(this.boundRedraw, 150);
 }
 Torp.prototype = {
     setOnCanvas: function(setOn) {
@@ -45,5 +51,22 @@ Torp.prototype = {
             this.gfx.removeSelf();
             this.isOnCanvas = false;
         }
-    }
+    },
+
+    setXYDir: function(placeX, placeY, dir) {
+        this.x = placeX;
+        this.y = placeY;
+        this.dir = dir;
+        this.gfx.fill = "white";
+        //clearInterval(this.redrawInterval);
+        //this.redrawInterval = setInterval(this.boundRedraw, 150);
+    }/*,
+
+    redrawSelf: function() {
+        var radDir = world.byte2rad(this.dir);
+        var dx = 12 * Math.cos(radDir);
+        var dy = 12 * Math.sin(radDir);
+        this.x -= 10;
+        this.y -= 10;
+    }*/
 }

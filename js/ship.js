@@ -121,35 +121,35 @@ Ship.prototype = {
     setRotation: function(byteRot) {
         var rads = Math.PI*2 * byteRot/255;
         this.gfx.childNodes[0].rotation = [rads,0,0];
-        this.gfx.childNodes[0].needMatrixUpdate = true;
-        this.gfx.needMatrixUpdate = true;
+        this.gfx.childNodes[0].changed = true;
+        this.gfx.changed = true;
     },
 
     setImage: function(img) {
         this.gfx.childNodes[0].image = img;
-        this.gfx.needMatrixUpdate = true;
+        this.gfx.changed = true;
     },
 
     setTeam: function(team) {
         this.team = team;
         this.galGfx.fill = teamLib.getRaceColor(team);
-        this.galGfx.needMatrixUpdate = true;
+        this.galGfx.changed = true;
     },
 
     setVisible: function(isVis) {
         this.gfx.visible = isVis;
-        this.gfx.needMatrixUpdate = true;
+        this.gfx.changed = true;
 
         this.galGfx.fill = isVis?teamLib.getRaceColor(this.team):"#666";
         this.galGfx.text = isVis?this.number:"?";
-        this.galGfx.needMatrixUpdate = true;
+        this.galGfx.changed = true;
 
         this.cloaked = !isVis;
     },
 
     setShields: function(shieldsUp) {
         this.gfx.stroke = shieldsUp?teamLib.getRaceColor(this.team):"none";
-        this.gfx.needMatrixUpdate = true;
+        this.gfx.changed = true;
 
         this.shields = shieldsUp;
     },

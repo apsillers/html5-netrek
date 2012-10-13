@@ -50,6 +50,9 @@ world = {
         this.wGroup.append(this.planetGroup);
         var _self = this;        
         _self.redrawInterval = setInterval(function recenter(){
+
+            var debugStr = _self.objects.length+"<br/>";
+
             var centerX = _self.player.x, centerY = _self.player.y,
                 viewBuffer = 150,
                 cnvHalfHgt = _self.wCanvas.height / 2 * _self.subgalacticFactor + viewBuffer,
@@ -66,20 +69,24 @@ world = {
                 obj.gfx.x = coords[0];
                 obj.gfx.y = coords[1];
 
+                if(obj instanceof Torp) debugStr+="Torp</br>";
+
                 // update display of object in tactical
                 if(obj.galGfx) { 
                     var tac_coords = _self.netrek2tac(obj.x, obj.y);
                     obj.galGfx.x = tac_coords[0];
                     obj.galGfx.y = tac_coords[1];
-                    obj.galGfx.needMatrixUpdate = true;
+                    obj.galGfx.changed = true;
                 }
 
                 // objects not on canvas shouldn't get drawn
                 obj.setOnCanvas(Math.abs(centerX - obj.x) < cnvHalfWid && Math.abs(centerY - obj.y) < cnvHalfHgt);
 
                 // let Cake know this should get redrawn
-                obj.gfx.needMatrixUpdate = true;
+                obj.gfx.changed = true;
             }
+
+            //$("#debug").html(debugStr);
         }, 100);
 
         hud.draw();
@@ -155,7 +162,7 @@ world = {
         this.objects.push(obj);
     },
     remove: function(obj) {
-        this.objects.splice(this.objects.indexOf(obj,1));
+        var r = this.objects.splice(this.objects.indexOf(obj),1);
         obj.gfx.removeSelf();
         if(obj.galGfx) { obj.galGfx.removeSelf(); }
     },
@@ -173,13 +180,14 @@ world = {
     addTorp: function(num, torpObj) {
         this.torps[num] = torpObj;
         this.add(torpObj);
-        torpObj.vanishTimeout = setTimeout(function() {
-            if(world.torps[num]) { world.torps[num].gfx.visible = false; }
-        }, 7000);
+        //torpObj.vanishTimeout = setTimeout(function() {
+        //    if(world.torps[num]) { world.torps[num].gfx.visible = false; }
+        //}, 7000);
     },
     removeTorp: function(num) {
         this.remove(this.torps[num]);
-        clearTimeout(this.torps[num].vanishTimeout);
+        //clearTimeout(this.torps[num].vanishTimeout);
+        //clearTimeout(this.torps[num].redrawInterval);
         this.torps[num] = undefined;
     },
     centerView: function(x,y) {
@@ -337,5 +345,10 @@ world.Planet.prototype = {
             this.gfx.removeSelf();
             this.isOnCanvas = false;
         }
+    },
+
+    setXY: function(x,y) {
+        this.x = x;
+        this.y = y;
     }
 }

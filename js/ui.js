@@ -99,13 +99,13 @@ hud = {
         percent = Math.max(0,Math.min(100,percent));
         this.shieldMeter.startAngle = (100-percent)/100 * Math.PI;
         this.shieldText.text = Math.floor(percent).toString();
-        this.shieldMeter.needMatrixUpdate = true;
+        this.shieldMeter.changed = true;
     },
     showHullLevel: function(percent) {
         percent = Math.max(0,Math.min(100,percent))
         this.damageMeter.endAngle = (100-percent)/100 * Math.PI;
         this.damageText.text = Math.floor(percent).toString();
-        this.healthMeter.needMatrixUpdate = true;
+        this.healthMeter.changed = true;
     },
     showFuelLevel: function(percent) {
         percent = Math.max(0,Math.min(100,percent));
@@ -114,18 +114,18 @@ hud = {
         this.fuelMeter = new Polygon([0,0,0,-level,60-level,-level,60,0], {fill:"#F70", stroke:"none", zIndex:-50});
         this.fuelBox.appendChild(this.fuelMeter);
         this.fuelText.text = Math.floor(percent).toString() + "%";
-        this.fuelMeter.needMatrixUpdate = true;
+        this.fuelMeter.changed = true;
     },
     showSpeed: function(speed) {
         var frac = Math.pow(speed/12, 0.75);
         this.speedMeter.remove(this.meter);
         this.meter = new Polygon([0,0, 0,-frac*300,frac*50, -frac*300], {fill:"green", strokeWidth:0});
         this.speedMeter.appendChild(this.meter);
-        this.speedMeter.needMatrixUpdate = true;
+        this.speedMeter.changed = true;
     },
     showSpeedPointer: function(speed) {
         this.speedPointer.y = -300 * Math.pow(speed/12, 0.75);
-        this.speedPointer.needMatrixUpdate = true;
+        this.speedPointer.changed = true;
     },
     showEngineTemp: function(percent) {
         percent = Math.max(0,Math.min(100,percent));
@@ -134,7 +134,7 @@ hud = {
         this.etempMeter.remove(this.etempBar);
         this.etempBar = new Polygon([0,0, 20,0, 20,-y, x,-y], {fill:new Gradient({colorStops:[[0, "#FFFF00"], [1, "#FF0000"]], startX:0, startY:0, endX:0, endY:-100}), stroke:"none", zIndex:-50});
         this.etempMeter.appendChild(this.etempBar);
-        this.etempMeter.needMatrixUpdate = true;
+        this.etempMeter.changed = true;
     }
 
 }

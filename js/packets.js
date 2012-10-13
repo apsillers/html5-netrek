@@ -280,7 +280,7 @@ serverPackets = [
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.shift(), pnum = uvars.shift(), shiptype = uvars.shift(), team = team_decode(uvars.shift());
-        if(net_logging) console.log("SP_PLAYER_INFO pnum=",pnum,"shiptype=",shiptype,"team=",team);
+        if(net_logging || true) console.log("SP_PLAYER_INFO pnum=",pnum,"shiptype=",shiptype,"team=",team);
         var img = imageLib.images[team.length?team[0]:FED][shiptype];
         if(world.ships[pnum] == undefined) {
             world.addShip(pnum, new Ship({
@@ -293,6 +293,7 @@ serverPackets = [
 
         world.ships[pnum].setImage(img);
         world.ships[pnum].setTeam(team[0]);
+        alert(img.src);
     }
   },
   { // SP_KILLS
@@ -353,6 +354,8 @@ serverPackets = [
         if(net_logging) console.log("SP_PLANET_LOC pnum=",pnum,"x=",x,"y=",y,"name=",name);
         if(world.planets[pnum] == undefined) {
             world.addPlanet(pnum, new world.Planet(x, y, name, [], world));
+        } else {
+            world.planets[pnum].setXY(x,y);
         }
     }
   },
@@ -406,7 +409,7 @@ serverPackets = [
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.shift(), war = uvars.shift(), status = uvars.shift(), tnum = uvars.shift();
-        if(net_logging || true) console.log("SP_TORP_INFO war=",team_decode(war)," status=",status," tnum=",tnum);
+        if(net_logging) console.log("SP_TORP_INFO war=",team_decode(war)," status=",status," tnum=",tnum);
 
         if(world.torps[tnum] == undefined && status == 1) {
             world.addTorp(tnum, new Torp(-10000, -10000, 0, team_decode(war), world));
@@ -424,9 +427,7 @@ serverPackets = [
         var ignored = uvars.shift(), dir = uvars.shift(), tnum = uvars.shift(), x = uvars.shift(), y = uvars.shift();
         if(net_logging) console.log("SP_TORP dir=",dir," tnum=",tnum," x=",x," y=",y);
         if(world.torps[tnum] != undefined) {
-            world.torps[tnum].dir = dir;
-            world.torps[tnum].x = x;
-            world.torps[tnum].y = y;
+            world.torps[tnum].setXYDir(x,y, dir);
         }
     }
   },
