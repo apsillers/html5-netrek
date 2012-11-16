@@ -152,7 +152,7 @@ CP_DET_TORPS = {
 
     data: function() {
         if(net_logging) console.log("CP_DET_TORPS");
-        return struct.pack(this.format, [this.code])
+        return packer.pack(this.format, [this.code])
     }
 }
 CP_DET_MYTORP = {
@@ -161,7 +161,7 @@ CP_DET_MYTORP = {
 
     data: function(tnum) {
         if(net_logging) console.log("CP_DET_MYTORP");
-        return struct.pack(this.format, [this.code, tnum])
+        return packer.pack(this.format, [this.code, tnum])
     }
 }
 CP_CLOAK = {
