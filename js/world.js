@@ -28,6 +28,7 @@ world = {
     ships: [],           // array of ships, indexed by ship id
     planets: [],         // array of planets, indexed by planet id
     torps: [],           // array of torps
+    phasers: [],           // array of torps
     stepPeriod: 50,      // time between steps
     stepInterval: null,  // interval identifier, used for clearInterval
     stepListeners: [],   // list of functions called immediately after each step
@@ -62,14 +63,19 @@ world = {
 
             // for all objects in the world
             for(var i = 0; i < _self.objects.length; ++i) {
+
                 var obj = _self.objects[i];
 
-                // update display of object in world
-                var coords = _self.netrek2world(obj.x, obj.y);
-                obj.gfx.x = coords[0];
-                obj.gfx.y = coords[1];
+                //if(!(obj instanceof Phaser)) { 
 
-                if(obj instanceof Torp) debugStr+="Torp</br>";
+                    // update display of object in world
+                    var coords = _self.netrek2world(obj.x, obj.y);
+                    obj.gfx.x = coords[0];
+                    obj.gfx.y = coords[1];
+     
+                //}
+
+                if(obj instanceof Phaser) { debugStr+="Phaser</br>"; console.log(obj.gfx); }
 
                 // update display of object in tactical
                 if(obj.galGfx) { 
@@ -131,14 +137,22 @@ world = {
             } else {
                 if(e.keyCode == 67) {
                     net.sendArray(CP_CLOAK.data(_self.player.cloaked?0:1));
-                } else if(e.keyCode == 82) {
+                } else if(e.keyCode == 82 && e.shiftKey) { // R - repair
                     net.sendArray(CP_REPAIR.data(1));
-                } else if(e.keyCode == 83) {
+                } else if(e.keyCode == 83) { // s - toggle shields
                     net.sendArray(CP_SHIELD.data(_self.player.shields?0:1));
-                } else if(e.keyCode == 79) {
+                } else if(e.keyCode == 79) { // o - orbit planet
                     net.sendArray(CP_ORBIT.data(_self.player.orbitting?0:1));
-                } else if(e.keyCode == 66) {
+                } else if(e.keyCode == 66) { // b bomb planet
                     net.sendArray(CP_BOMB.data(_self.player.bombing?0:1));
+                } else if(e.keyCode == 68) { // d - det enemy torps
+                    net.sendArray(CP_DET_TORPS.data());
+                } else if(e.keyCode == 88) { // x - beam down
+                    net.sendArray(CP_BEAM.data(1));
+                } else if(e.keyCode == 90) { // z - beam up
+                    net.sendArray(CP_BEAM.data(2));
+                } else if(e.keyCode == 80) { // p - phaser
+                    net.sendArray(CP_BEAM.data(2));
                 }
             }
         });
@@ -189,6 +203,14 @@ world = {
         //clearTimeout(this.torps[num].vanishTimeout);
         //clearTimeout(this.torps[num].redrawInterval);
         this.torps[num] = undefined;
+    },
+    addPhaser: function(num, phasObj) {
+        this.phasers[num] = phasObj;
+        this.add(phasObj);
+    },
+    removePhaser: function(num) {
+        this.remove(this.phasers[num]);
+        this.phasers[num] = undefined;
     },
     centerView: function(x,y) {
         this.viewX = x;
@@ -331,9 +353,11 @@ world.Planet.prototype = {
     showArmies: function(num) {
         if(num == 5) {
             this.armyGfx.opacity = 1;
+            this.galGfx.fill = "#44F";
         }
         if(num < 5) {
             this.armyGfx.opacity = 0;
+            this.galGfx.fill = "none";
         }
     },
 

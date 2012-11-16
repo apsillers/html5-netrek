@@ -27,7 +27,7 @@
  See http://james.tooraweenah.com/darcs/netrek-server/Vanilla/include/packets.h
  for an explanation of how the netrek protocol works
 */
-net_logging = 0;
+net_logging = true;
 
 
 /*
@@ -146,7 +146,24 @@ CP_TORP = {
         return packer.pack(this.format, [this.code, direction & 255]);
     }
 }
+CP_DET_TORPS = {
+    code: 20,
+    format: '!bxxx',
 
+    data: function() {
+        if(net_logging) console.log("CP_DET_TORPS");
+        return struct.pack(this.format, [this.code])
+    }
+}
+CP_DET_MYTORP = {
+    code: 21,
+    format: '!bxh',
+
+    data: function(tnum) {
+        if(net_logging) console.log("CP_DET_MYTORP");
+        return struct.pack(this.format, [this.code, tnum])
+    }
+}
 CP_CLOAK = {
     code: 19,
     format: '!bbxx',
@@ -189,7 +206,16 @@ CP_BOMB = {
 
     data: function(state) {
         if(net_logging) console.log("CP_BOMB state=",state);
-        return packer.pack(this.format, this.code, state)
+        return packer.pack(this.format, [this.code, state]);
+    }
+}
+CP_BEAM = {
+    code: 18,
+    format: '!bbxx',
+
+    data: function(state) {
+        if(net_logging) console.log("CP_BEAM state=",state);
+        return packer.pack(this.format, [this.code, state]);
     }
 }
 /*************************************************************************
@@ -467,7 +493,9 @@ serverPackets = [
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.shift(), pnum = uvars.shift(), status = uvars.shift(), dir = uvars.shift(), x = uvars.shift(), y = uvars.shift(), target = uvars.shift();
         if(net_logging) console.log("SP_PHASER pnum=",pnum,"status=",status,"dir=",dir,"x=",x,"y=",y,"target=",target);
-        //world
+
+        if(status != PHFREE) { world.addPhaser(pnum, new Phaser(x+world.player.x, y+world.player.y, dir, status, target, world)); }
+        else { if(world.phasers[pnum] != undefined) world.removePhaser(pnum); }
     }
   },
   { // SP_PLANET

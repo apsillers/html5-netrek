@@ -95,7 +95,7 @@ io.sockets.on('connection', function (socket) {
             // forward all data from the server to the browser client
             serverConn.on('data', function(sp_data) {
                 // base64-encode the Buffer of bytes and send it to the client
-                //console.log("FROM SERVER", sp_data);
+                if(process.argv.indexOf("--verbose-server") != -1) { console.log("FROM SERVER", sp_data); }
 			    socket.send(sp_data.toString("base64"));
             });
 
@@ -118,7 +118,7 @@ io.sockets.on('connection', function (socket) {
             // data is a base64-encoded string
             socket.on('message', function(cp_data) {
                 cp_data = new Buffer(cp_data, "base64");
-			    //console.log("FROM CLIENT", cp_data);
+			    if(process.argv.indexOf("--verbose-client") != -1) { console.log("FROM CLIENT", cp_data); }
                 serverConn.write(cp_data);
             });
 
