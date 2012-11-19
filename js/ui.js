@@ -57,7 +57,7 @@ hud = {
         this.fuelBox.append(this.fuelText);
         this.uiGfx.append(this.fuelBox);
 
-
+        this.maxSpeed = 12;
         this.speedMeter = new Polygon([0,0, 0,-300, 50,-300], {x:20, y:350, fill:"none", stroke: "white", strokeWidth:2});
         this.meter = new Rectangle(0,0);
         this.speedPointer = new Polygon([-2,0, -9,-3, -9,3], {fill:"none", stroke: "white", strokeWidth:1});
@@ -65,9 +65,11 @@ hud = {
         this.speedMeter.append(this.speedPointer);
         this.uiGfx.append(this.speedMeter);
 
+        this.speedNotches = [];
         for(var i=0; i<12; ++i) {
             var frac = Math.pow(i/12, 0.75);
-            this.speedMeter.append(new Line(0,-frac*300, frac*50,-frac*300, { opacity:0.4}));
+            this.speedNotches[i] = new Line(0,-frac*300, frac*50,-frac*300, { opacity:0.4});
+            this.speedMeter.append(this.speedNotches[i]);
         }
 
         this.speedMeter.addEventListener("click", function(e) {
@@ -84,6 +86,17 @@ hud = {
         this.etempMeter.append(this.etempBar);
         this.uiGfx.append(this.etempMeter);
 
+        this.armyStatNode = new CanvasNode({x:100, y:480});
+        this.uiGfx.append(this.armyStatNode);
+
+        this.armyGfx = new Polygon([0,0, 0,10, 10,10, 10,0],{stroke:"none", fill:"#00F", opacity:1});
+        this.armyGfx.append(new Circle(5,{stroke:"none", fill:"#00F", x:5, y:0}));
+        this.armyGfx.append(new Circle(5,{stroke:"none", fill:"#00F", x:5, y:-10}));
+        this.armyStatNode.append(this.armyGfx);
+
+        this.armyText = new TextNode("", {fill:"white", x:16, font:"bold 12pt courier" });
+        this.armyStatNode.append(this.armyText);
+
         //this.uiGfx.opacity = "0.3";
     },
 
@@ -93,6 +106,12 @@ hud = {
 
     undraw: function() {
         this.hCanvas.removeChild(this.uiGfx);
+    },
+
+    setSpeedHeight: function(maxSpeed) {
+        this.maxSpeed = maxSpeed;
+        
+
     },
 
     showShieldLevel: function(percent) {
@@ -135,6 +154,17 @@ hud = {
         this.etempBar = new Polygon([0,0, 20,0, 20,-y, x,-y], {fill:new Gradient({colorStops:[[0, "#FFFF00"], [1, "#FF0000"]], startX:0, startY:0, endX:0, endY:-100}), stroke:"none", zIndex:-50});
         this.etempMeter.appendChild(this.etempBar);
         this.etempMeter.changed = true;
-    }
+    },
+    showArmies: function(armies, kills) {
+        var maxArmies = Math.min(Math.floor(kills * 2), shipStats[world.player.shipType].maxArmies);
 
+        this.armyText.text = armies + " / " + maxArmies;
+
+        if(maxArmies == 0) {
+            this.armyText.opacity = 0;
+            this.armyText.changed = true;
+            this.armyGfx.opacity = 0;
+            this.armyGfx.changed = true;
+        }
+    }
 }

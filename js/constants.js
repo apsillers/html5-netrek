@@ -261,3 +261,50 @@ PTFREE = 0
 PTMOVE = 1
 PTEXPLODE = 2
 PTDET = 3
+
+// ship stats
+shipStats = {};
+shipStats[SCOUT] = {
+    speed: 12,
+    maxArmies: 2,
+    shields: 75,
+    hull: 75,
+    fuel: 5000 
+}
+shipStats[DESTROYER] = {
+    speed: 10,
+    maxArmies: 5,
+    shields: 85,
+    hull: 85,
+    fuel: 7000 
+}
+shipStats[CRUISER] = {
+    speed: 9,
+    maxArmies: 10,
+    shields: 100,
+    hull: 100,
+    fuel: 10000 
+}
+shipStats[BATTLESHIP] = {
+    speed: 8,
+    maxArmies: 6,
+    shields: 130,
+    hull: 130,
+    fuel: 14000 
+}
+shipStats[ASSAULT] = {
+    speed: 8,
+    maxArmies: 20,
+    shields: 80,
+    hull: 200,
+    fuel: 6000 
+}
+shipStats[STARBASE] = {
+    speed: 2,
+    maxArmies: 25,
+    shields: 500,
+    hull: 600,
+    fuel: 60000 
+}
+
+

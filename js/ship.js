@@ -44,6 +44,7 @@ var Ship = function(options) {
     this.cloaked = false;
     this.shields = true;
     this.orbitting = false;
+    this.shipType = options.shipType;
 
     this.isOnCanvas = true;
 

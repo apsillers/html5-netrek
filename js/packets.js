@@ -27,7 +27,7 @@
  See http://james.tooraweenah.com/darcs/netrek-server/Vanilla/include/packets.h
  for an explanation of how the netrek protocol works
 */
-net_logging = true;
+net_logging = false;
 
 
 /*
@@ -258,10 +258,12 @@ serverPackets = [
             hud.showEngineTemp(etemp/10);
         }
 
-        // FIXME: actually use shipwise maximums
-        hud.showFuelLevel(fuel/100);
-        hud.showHullLevel(100 - Math.max(damage, 0));
-        hud.showShieldLevel(Math.min(shield, 100));
+        if(world.player != null) {
+            hud.showFuelLevel(100 * fuel / shipStats[world.player.shipType].fuel);
+            hud.showHullLevel(100 * (shipStats[world.player.shipType].hull - damage) / shipStats[world.player.shipType].hull);
+            hud.showShieldLevel(100 * shield / shipStats[world.player.shipType].shields);
+            hud.showArmies(armies, world.player.kills || 0);
+        }
     }
   },
   { // SP_PL_LOGIN
@@ -306,19 +308,21 @@ serverPackets = [
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.shift(), pnum = uvars.shift(), shiptype = uvars.shift(), team = team_decode(uvars.shift());
-        if(net_logging || true) console.log("SP_PLAYER_INFO pnum=",pnum,"shiptype=",shiptype,"team=",team);
+        if(net_logging) console.log("SP_PLAYER_INFO pnum=",pnum,"shiptype=",shiptype,"team=",team);
         var img = imageLib.images[team.length?team[0]:FED][shiptype];
         if(world.ships[pnum] == undefined) {
             world.addShip(pnum, new Ship({
                 img: img,
                 galImg: imageLib.images[1][shiptype], 
                 team:team[0],
-                number:pnum.toString()
+                number:pnum.toString(),
+                shipType: shiptype
             }));
         }
 
         world.ships[pnum].setImage(img);
         world.ships[pnum].setTeam(team[0]);
+        world.ships[pnum].shipType = shiptype;
     }
   },
   { // SP_KILLS
@@ -328,6 +332,7 @@ serverPackets = [
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.shift(), pnum = uvars.shift(), kills = uvars.shift();
         if(net_logging) console.log("SP_KILLS pnum=",pnum,"kills=",kills);
+        if(world.ships[pnum]) world.ships[pnum].kills = kills;
     }
   },
   { // SP_PSTATUS
