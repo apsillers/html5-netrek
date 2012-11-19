@@ -18,13 +18,16 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+        var connected_yet = false;
+        var creds = {};
+
 // used to start the game
 window.addEventListener("load", function() {
     // make canvas and world
     leftCanvas = new Canvas(document.getElementById("leftCanvas"), 500, 500, {
         fill: 'black'
     });
-    rightCanvas = new Canvas(document.getElementById("rightCanvas"), 500, 500, {
+    rightCanvas = new Canvas(document.getElementById("rightCanvas"), 300, 300, {
         fill: 'black'
     });
 
@@ -61,18 +64,17 @@ window.addEventListener("load", function() {
 
 
         $("#connect-button").click(function() {
-            var nt_host = $("#nt-host-input").val(),
-                user = $("#username-input").val(),
-                pass = $("#pass-input").val();
+            creds.nt_host = $("#nt-host-input").val();
+            creds.user = $("#username-input").val();
+            creds.pass = $("#pass-input").val();
 
             net = new NetrekConnection(location.hostname, location.port||80, function() {
                 console.log("proxy connection formed");
-                net.connectToServer(nt_host,2592,function(){ //continuum.us.netrek.org
+                net.connectToServer(creds.nt_host,2592,function(){ //continuum.us.netrek.org
                     console.log("NT server connection formed");
-                    net.sendArray(CP_LOGIN.data(0,user,pass,"html5test"));
+                    net.sendArray(CP_LOGIN.data(0,creds.user,creds.pass,"html5test"));
 
-                    $("#overlay").hide();
-                    $("#login-box").hide();
+                    $("#login-box").html("<h2>Connecting...</h2>");
                 })
             });
         });

@@ -342,9 +342,14 @@ serverPackets = [
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.shift(), pnum = uvars.shift(), status = uvars.shift();
         if(net_logging) console.log("SP_PSTATUS pnum=",pnum,"status=",status);
-        if(world.player && pnum == world.player.number && status == 1) {
+        if(connected_yet && world.player && pnum == world.player.number && status == 1) {
             world.undraw();
             outfitting.draw(leftCanvas, rightCanvas);
+        }
+
+        // first connection
+        if(!connected_yet) {
+            
         }
     }
   },
@@ -407,6 +412,13 @@ serverPackets = [
         var ignored = uvars.shift(), mask = uvars.shift();
         if(net_logging) console.log("SP_MASK mask=",team_decode(mask));
         outfitting.applyMask(team_decode(mask))
+
+        if(!connected_yet) {
+            $("#overlay").hide();
+            $("#login-box").hide();
+
+            outfitting.draw(leftCanvas, rightCanvas);
+        }
     }
   },
   { // SP_PICKOK

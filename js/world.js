@@ -38,6 +38,7 @@ world = {
     subgalacticFactor: 40,
     playerNum: null,
     player: null,
+    drawn: false,
 
     init: function(wCanvas, gCanvas) {
         this.wCanvas = wCanvas;
@@ -156,6 +157,8 @@ world = {
                 }
             }
         });
+
+        this.drawn = true;
     },
 
     undraw: function() {
@@ -167,6 +170,8 @@ world = {
         $(this.wCanvas.canvas).unbind("contextmenu", this.setCourseWithRightClick);
         $(this.wCanvas.canvas).unbind("mousedown", this.firePhasersWithMIddleClick);
         $(this.wCanvas.canvas).unbind("keyup", this.handleKeys);
+
+        this.drawn = false;
     },
 
     add: function(obj) {

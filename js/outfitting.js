@@ -35,6 +35,7 @@ outfitting = {
     selectedShip: CA,
     mask: [],
     defaultInfoText: ["Select a ship, then choose a race to","enter the game.","","","","New players should try a Cruiser first."],
+    drawn: false,
 
     /* Add a race button to the canvas and return its cake.js object. */
     makeRaceButton: function(txt, longtxt, racenum, x, y, fg, bg) {
@@ -52,7 +53,7 @@ outfitting = {
                 world.player.setImage(imageLib.images[racenum][_self.selectedShip]); 
                 world.player.setTeam(racenum);
                 net.sendArray(CP_UPDATES.data(100000));
-                net.sendArray(CP_OUTFIT.data(teamLib.teamNumber(racenum), _self.selectedShip));
+                setTimeout(function() { net.sendArray(CP_OUTFIT.data(teamLib.teamNumber(racenum), _self.selectedShip)) }, 500);
                 //alert("sent data");
             }
         });
@@ -176,11 +177,14 @@ outfitting = {
                 this.motdLine(this.motdLines[i]);
             }
         }
+
+        this.drawn = true;
     },
 
     undraw: function() {
         this.oCanvas.removeAllChildren();
         this.mCanvas.removeAllChildren();
+        this.drawn = false;
     },
 
     /* respond to SP_MASK packets */
