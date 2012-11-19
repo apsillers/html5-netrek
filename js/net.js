@@ -13,7 +13,10 @@ NetrekConnection = function(webhost, webport, callback) {
     this.serverPort = null;
 
 	this.conn = io.connect("ws://"+this.host+":"+this.port);
-	this.conn.once("connect",callback);
+	this.conn.once("connect",function() {
+        callback();
+        setTimeout(function() { if(!connected_yet) callback(); }, 5000);
+    });
 	
     // the stream of Netrek messages we haven't resolved yet
     this.buffer = "";

@@ -346,11 +346,6 @@ serverPackets = [
             world.undraw();
             outfitting.draw(leftCanvas, rightCanvas);
         }
-
-        // first connection
-        if(!connected_yet) {
-            
-        }
     }
   },
   { // SP_PLAYER
@@ -413,7 +408,10 @@ serverPackets = [
         if(net_logging) console.log("SP_MASK mask=",team_decode(mask));
         outfitting.applyMask(team_decode(mask))
 
+        // when first connecting, delay showing outfitting until the first SP_MASK is seen
         if(!connected_yet) {
+            connected_yet = true;
+
             $("#overlay").hide();
             $("#login-box").hide();
 

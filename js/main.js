@@ -75,6 +75,9 @@ window.addEventListener("load", function() {
                     net.sendArray(CP_LOGIN.data(0,creds.user,creds.pass,"html5test"));
 
                     $("#login-box").html("<h2>Connecting...</h2>");
+
+                    // send an idempotent CP_UPDATES request every 10 seconds to save us from being ghostbusted when the player idles
+                    setInterval(function() { net.sendArray(CP_UPDATES.data(100000)); }, 10000);
                 })
             });
         });
