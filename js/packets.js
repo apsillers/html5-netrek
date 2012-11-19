@@ -534,7 +534,7 @@ serverPackets = [
         if(net_logging) console.log("SP_MESSAGE m_flags=",m_flags.toString(2),"m_recpt=",m_recpt,"m_from=",m_from,"mesg=",mesg);
 
         $("#inbox").append(mesg + "<br />");
-        $("#inbox").scrollTop($("#inbox").height())
+        $("#inbox").scrollTop($("#inbox")[0].scrollHeight)
     }
   },
   { // SP_STATS
