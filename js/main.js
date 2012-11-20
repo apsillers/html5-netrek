@@ -24,7 +24,7 @@
 // used to start the game
 window.addEventListener("load", function() {
     // make canvas and world
-    leftCanvas = new Canvas(document.getElementById("leftCanvas"), 500, 500, {
+    leftCanvas = new Canvas(document.getElementById("leftCanvas"), 600, 500, {
         fill: 'black'
     });
     rightCanvas = new Canvas(document.getElementById("rightCanvas"), 300, 300, {
@@ -52,7 +52,9 @@ window.addEventListener("load", function() {
         });
         $(window).scroll(function() {
             $("#overlay").css("top",$(window).scrollTop()+"px");
+            $("#overlay").css("left",$(window).scrollLeft()+"px");
             $("#login-box").css("top",$(window).scrollTop()+100+"px");
+            $("#login-box").css("left",($("html").width() - $("#login-box").width()) / 2 + $(window).scrollLeft());
         });
 
         document.getElementById("connect-button").focus()

@@ -263,6 +263,7 @@ serverPackets = [
             hud.showHullLevel(100 * (shipStats[world.player.shipType].hull - damage) / shipStats[world.player.shipType].hull);
             hud.showShieldLevel(100 * shield / shipStats[world.player.shipType].shields);
             hud.showArmies(armies, world.player.kills || 0);
+            hud.showMaxSpeed(shipStats[world.player.shipType].speed);
         }
     }
   },
@@ -565,6 +566,7 @@ serverPackets = [
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.shift(), message = uvars.shift();
         console.log("SP_WARNING message=", message);
+        hud.showWarning(message);
     }
   },
   SP_FEATURE = {

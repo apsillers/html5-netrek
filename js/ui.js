@@ -68,7 +68,7 @@ hud = {
         this.speedNotches = [];
         for(var i=0; i<12; ++i) {
             var frac = Math.pow(i/12, 0.75);
-            this.speedNotches[i] = new Line(0,-frac*300, frac*50,-frac*300, { opacity:0.4});
+            this.speedNotches[i] = new Line(0,-frac*300, frac*50,-frac*300, { opacity:0.4 });
             this.speedMeter.append(this.speedNotches[i]);
         }
 
@@ -97,7 +97,11 @@ hud = {
         this.armyText = new TextNode("", {fill:"white", x:16, font:"bold 12pt courier" });
         this.armyStatNode.append(this.armyText);
 
-        //this.uiGfx.opacity = "0.3";
+        this.warning = new Rectangle(this.hCanvas.width-50,25, {x: 25, y: 15, stroke:"#F00", fill: "#F44", opacity:0 });
+        this.warningText = new TextNode("", {fill:"white", y:15, x:5, font:"bold 10pt courier"});
+        this.warning.append(this.warningText);
+        this.uiGfx.append(this.warning);
+        this.warningTimeout = null;
     },
 
     draw: function() {
@@ -108,12 +112,38 @@ hud = {
         this.hCanvas.removeChild(this.uiGfx);
     },
 
-    setSpeedHeight: function(maxSpeed) {
+    showMaxSpeed: function(maxSpeed) {
         this.maxSpeed = maxSpeed;
         
+        for(var i=0; i<this.speedNotches.length; ++i) {
+            this.speedNotches[i].stroke = "white";
+            this.speedNotches[i].changed = true;
+        }
 
+        // if the max speed is less than the max possible, max the current max
+        if(this.speedNotches.length > maxSpeed) {
+            this.speedNotches[maxSpeed].stroke = "red";
+            this.speedNotches[maxSpeed].changed = true;
+        }
     },
 
+    showWarning: function(msg) {
+        if(msg == "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13\x0FB") return;
+
+        msg = msg.replace(/Helmsman:\s+/, "");
+
+        var self = this;
+        this.warning.opacity = 0.7;
+        this.warningText.text = msg;
+        this.warning.changed = true;
+        if(this.warningTimeout) { clearTimeout(this.warningTimeout); }
+        this.warningTimeout = setTimeout(function() { self.hideWarning(); }, 4000);
+    },
+    hideWarning: function(msg) {
+        this.warning.opacity = 0;
+        this.warning.changed = true;
+        this.warningTimeout = null;
+    },
     showShieldLevel: function(percent) {
         percent = Math.max(0,Math.min(100,percent));
         this.shieldMeter.startAngle = (100-percent)/100 * Math.PI;
@@ -138,11 +168,12 @@ hud = {
     showSpeed: function(speed) {
         var frac = Math.pow(speed/12, 0.75);
         this.speedMeter.remove(this.meter);
-        this.meter = new Polygon([0,0, 0,-frac*300,frac*50, -frac*300], {fill:"green", strokeWidth:0});
+        this.meter = new Polygon([0,0, 0,-frac*300,frac*50, -frac*300], {fill:"green", strokeWidth:0, zIndex:-5});
         this.speedMeter.appendChild(this.meter);
         this.speedMeter.changed = true;
     },
     showSpeedPointer: function(speed) {
+        if(speed > this.maxSpeed) { speed = this.maxSpeed; }
         this.speedPointer.y = -300 * Math.pow(speed/12, 0.75);
         this.speedPointer.changed = true;
     },

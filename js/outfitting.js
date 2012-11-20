@@ -23,8 +23,8 @@
 */
 var SC=0, DD=1, CA=2, BB=3, AS=4, SB=5;
 outfitting = {
-    canvasWidth: 500,
-    canvasHeight: 500,
+    canvasWidth: 0,
+    canvasHeight: 0,
     raceButtonDim: 96,
     shipButtonDim: 70,
     oCanvas: null,
@@ -74,6 +74,9 @@ outfitting = {
     init: function(canvas, rcanvas) {
         this.oCanvas = canvas;
         this.mCanvas = rcanvas;
+
+        this.canvasWidth = this.oCanvas.width;
+        this.canvasHeight = this.oCanvas.height;
 
         this.motdLines = [];
         this.motdLineNum = 0;

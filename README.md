@@ -1,10 +1,10 @@
 #HTML5 Netrek Client#
 
-This is a HTML5 browser-based client for the game [Netrek](http://www.netrek.org/).  It includes:
+This is a HTML5 browser-based client for the game [Netrek](http://www.netrek.org/).  The project includes:
 
   1. client-side files, including JavaScript code that uses socket.io
 
-  2. `server.node.js`, a Socket.io-to-TCP proxy which can also serve content.  (This may be replaced with websockify, since it does nearly the same thing, and might handle errors more gracefully.)  The proxy is necessary for the client to connect, since a browser cannot directly connect to a raw Netrek TCP server/socket.
+  2. `server.node.js`, a Socket.io-to-TCP proxy which can also serve Web content.  The proxy is necessary for the client to connect, since a browser cannot directly connect to a raw Netrek TCP server/socket.
 
 **To see a live demo, visit http://trekproxy.nodester.com/**
 
@@ -12,12 +12,16 @@ This is a HTML5 browser-based client for the game [Netrek](http://www.netrek.org
 
 The code is mainly in /js at the moment:
 
-* **world** - handles user input and manages all objects in the game
-* **outfitting** - draws the outfitting screen and sends/receives relevant net info
-* **ui** - draws and updates the UI meters for the player (shields, fuel, etc)
-* **ship** - represents a ship; information sent to a ship object is used to update its local and tactical graphics
-* **net** - makes connections (through the proxy), reads the data stream, and delegates work to message objects, which performs virtually all server-driven action; e.g., when a `SP_YOU` message comes in, the net object should read it and send the data to the `SP_YOU` handler, which should update the UI with info about the player
-* **packets** - contains a class for each message type, which includes the message's ID code, data fields, and function to run when the packet is recieved
+* **main.js** - handles startup logic (mostly login screen logic)
+* **world.js** - handles user input (key presses, mouse clicks) and manages all objects in the game
+* **outfitting.js** - draws the outfitting screen and sends/receives relevant net info
+* **ui.js** - draws and updates the UI meters for the player (shields, fuel, etc)
+* **ship.js** - represents a ship; information sent to a ship object is used to update its local and tactical graphics
+* **phaser.js**, **torp.js** - representations of phasers and torpedoes
+* **net.js** - makes connections (through the proxy), reads the data stream, and delegates work to message objects, which performs virtually all server-driven action; e.g., when a `SP_YOU` message comes in, the net object should read it and send the data to the `SP_YOU` handler, which should update the UI with info about the player
+* **packets.js** - contains a class for each message type, which includes the message's ID code, data fields, and function to run when the packet is recieved
+* **images.js** - simple image preloader and image array
+* **constants.js** - global constants used in Netrek protocol and ship max stats (max fuel, max hull, etc.)
 
 Each file (except for a few, like `ship.js`) includes a singleton.  The code is built around a few powerful singletons that each handle a single aspect of the program (world, net, outfitting...).  These are namespaces that allow the code to be read/used in a sane way that doesn't polute the global namespace.
 

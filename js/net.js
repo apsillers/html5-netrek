@@ -15,6 +15,7 @@ NetrekConnection = function(webhost, webport, callback) {
 	this.conn = io.connect("ws://"+this.host+":"+this.port);
 	this.conn.once("connect",function() {
         callback();
+        // if there was a one-time error talking to server, start the protocol over again
         setTimeout(function() { if(!connected_yet) callback(); }, 5000);
     });
 	
