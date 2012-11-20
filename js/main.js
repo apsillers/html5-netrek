@@ -72,7 +72,7 @@ window.addEventListener("load", function() {
 
             net = new NetrekConnection(location.hostname, location.port||80, function() {
                 console.log("proxy connection formed");
-                net.connectToServer(creds.nt_host,2592,function(){ //continuum.us.netrek.org
+                net.connectToServer(creds.nt_host,2592,function(){
                     console.log("NT server connection formed");
                     net.sendArray(CP_LOGIN.data(0,creds.user,creds.pass,"html5test"));
 
