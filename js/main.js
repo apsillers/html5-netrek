@@ -74,20 +74,27 @@ window.addEventListener("load", function() {
 
 
         $("#connect-button").click(function() {
-            creds.nt_host = $("#nt-host-input").val();
-            creds.user = $("#username-input").val();
-            creds.pass = $("#pass-input").val();
+            var nt_host = $("#nt-host-input").val(),
+                user = $("#username-input").val(),
+                pass = $("#pass-input").val();
 
             net = new NetrekConnection(location.hostname, location.port||80, function() {
                 console.log("proxy connection formed");
-                net.connectToServer(creds.nt_host,2592,function(){
+                net.connectToServer(nt_host,2592,function(){
                     console.log("NT server connection formed");
-                    net.sendArray(CP_LOGIN.data(0,creds.user,creds.pass,"html5test"));
+                    net.sendArray(CP_LOGIN.data(0,user,pass,"html5test"));
 
                     $("#login-box").html("<h2>Connecting...</h2>");
 
                     // send an idempotent CP_UPDATES request every 10 seconds to save us from being ghostbusted when the player idles
                     setInterval(function() { net.sendArray(CP_UPDATES.data(100000)); }, 10000);
+
+                    // if there was a one-time error talking to server, start the protocol over again
+                    setTimeout(function() {
+                        if(!connected_yet) {
+                            net.sendArray(CP_LOGIN.data(0,user,pass,"html5test"));
+                        }
+                    }, 5000);
                 })
             });
         });
