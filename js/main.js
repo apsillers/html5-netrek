@@ -23,13 +23,21 @@
 
 // used to start the game
 window.addEventListener("load", function() {
+    var lCanvas = document.getElementById("leftCanvas"),
+        rCanvas = document.getElementById("rightCanvas")
+
     // make canvas and world
-    leftCanvas = new Canvas(document.getElementById("leftCanvas"), 600, 500, {
+    leftCanvas = new Canvas(lCanvas, $(lCanvas).data("width"), $(lCanvas).data("height"), {
         fill: 'black'
     });
-    rightCanvas = new Canvas(document.getElementById("rightCanvas"), 300, 300, {
+    rightCanvas = new Canvas(rCanvas, $(rCanvas).data("width"), $(rCanvas).data("height"), {
         fill: 'black'
     });
+
+    $(lCanvas).width('');
+    $(lCanvas).height('');
+    $(rCanvas).width('');
+    $(rCanvas).height('');
 
     outfitting.init(leftCanvas, rightCanvas);
     world.init(leftCanvas, rightCanvas);

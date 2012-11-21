@@ -229,7 +229,7 @@ outfitting = {
     },
 
     motdLine: function(line) {
-        this.mCanvas.appendChild(new TextNode(line, {x: 3, y: this.motdLineNum*12 + 12, fill:"white", font:"9pt Courier"}));
+        this.mCanvas.appendChild(new TextNode(line, {x: 3, y: this.motdLineNum*12 + 12, fill:"white", font:"8pt Courier"}));
         this.motdLines[this.motdLineNum] = line;
         this.motdLineNum++;
     }

@@ -164,6 +164,15 @@ CP_DET_MYTORP = {
         return packer.pack(this.format, [this.code, tnum])
     }
 }
+CP_TRACTOR(CP) = {
+    code: 24,
+    format: '!bbbx',
+
+    data: faunction(state, pnum):
+        if(net_logging) console.log("CP_TRACTOR state=",state,"pnum=",pnum);
+        return packer.pack(this.format, [this.code, state, pnum]);
+    }
+}
 CP_CLOAK = {
     code: 19,
     format: '!bbxx',
@@ -275,8 +284,6 @@ serverPackets = [
         var ignored = uvars.shift(), pnum = uvars.shift(), rank = uvars.shift(),
             name = uvars.shift(), monitor = uvars.shift(), login  = uvars.shift();
         if(net_logging) console.log("SP_PL_LOGIN pnum=",pnum,"rank=",rank,"name=",name,"monitor=",monitor,"login=",login)
-        //ship = galaxy.ship(pnum)
-        //ship.sp_pl_login(rank, name, monitor, login)
     }
   },
   { // SP_PING - only received if client sends CP_PING_RESPONSE after SP_LOGIN

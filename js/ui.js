@@ -38,10 +38,10 @@ hud = {
         this.uiGfx = new CanvasNode();
  
         this.healthMeter = new CanvasNode();
-        this.healthCircle = new Circle(29, {x:45, y:470, fill:"#0A0", stroke:"none", rotation:-3*Math.PI/4, startAngle:0, endAngle:Math.PI});
+        this.healthCircle = new Circle(29, {x:45, y:this.hCanvas.height-30, fill:"#0A0", stroke:"none", rotation:-3*Math.PI/4, startAngle:0, endAngle:Math.PI});
         this.damageMeter = new Circle(15, {stroke:"#A00", fill:"none", strokeWidth:30, startAngle:0, endAngle:Math.PI});
         this.damageText = new TextNode("100",{fill:"white", rotation:-this.healthCircle.rotation, textAlign:"center", font:"bold 9pt courier", x:0, y:12});
-        this.shieldMeter =  new Circle(28, {x:38, y:463, strokeWidth:30, fill:"none", stroke:"#3AF", rotation:-3*Math.PI/4, startAngle:0, endAngle:Math.PI});
+        this.shieldMeter =  new Circle(28, {x:38, y:this.hCanvas.height-37, strokeWidth:30, fill:"none", stroke:"#3AF", rotation:-3*Math.PI/4, startAngle:0, endAngle:Math.PI});
         this.shieldText = new TextNode("100",{fill:"white", rotation:-this.shieldMeter.rotation, textAlign:"center", font:"bold 9pt courier", x:20, y:20});
         this.healthMeter.append(this.shieldMeter);
         this.healthMeter.append(this.healthCircle);
@@ -50,7 +50,7 @@ hud = {
         this.shieldMeter.append(this.shieldText);
         this.uiGfx.append(this.healthMeter);
 
-        this.fuelBox = new Polygon([0,0,0,-60,60,0],{x:4,y:495,stroke:"#FFF",strokeWidth:0, fill:"none", borderRadius:5});
+        this.fuelBox = new Polygon([0,0,0,-60,60,0],{x:4,y:this.hCanvas.height-5,stroke:"#FFF",strokeWidth:0, fill:"none", borderRadius:5});
         this.fuelMeter = new Polygon([0,0,0,-60,60,0], {fill:"#F70", stroke:"none"});
         this.fuelText = new TextNode("100",{y:-10,x:15,textAlign:"center",fill:"white",font:"bold 9pt courier"});
         this.fuelBox.append(this.fuelMeter);
