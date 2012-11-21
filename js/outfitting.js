@@ -34,7 +34,7 @@ outfitting = {
     otherElems: [],
     selectedShip: CA,
     mask: [],
-    defaultInfoText: ["Select a ship, then choose a race to","enter the game.","","","","New players should try a Cruiser first."],
+    defaultInfoText: ["Select a ship, then choose a race to","enter the game.","","New players should try a Cruiser first.","","Press Tab for a quick start guide."],
     drawn: false,
 
     /* Add a race button to the canvas and return its cake.js object. */
@@ -174,12 +174,7 @@ outfitting = {
         this.oCanvas.append(this.infoBox);
 
         // draw message of the day
-        this.motdLineNum = 0;
-        if(this.motdLines.length != 0) {
-            for(var i=0; i<this.motdLines; ++i) {
-                this.motdLine(this.motdLines[i]);
-            }
-        }
+        this.writeMotd();
 
         this.drawn = true;
     },
@@ -229,9 +224,29 @@ outfitting = {
     },
 
     motdLine: function(line) {
-        this.mCanvas.appendChild(new TextNode(line, {x: 3, y: this.motdLineNum*12 + 12, fill:"white", font:"8pt Courier"}));
-        this.motdLines[this.motdLineNum] = line;
-        this.motdLineNum++;
+        this.motdDataMode = this.motdDataMode || line.match("@@@");
+
+        if(!this.motdDataMode) {
+            this.motdString = this.motdString || [];
+            this.motdString.push(line/*.replace(/\x00/g, "")*/);
+        } else {
+            this.motdData = this.motdData || "";
+            this.motdData += line;
+        }
+    },
+    writeMotd: function() {
+        var motdLineNum = 0;
+        while(motdLineNum < this.motdString.length) {
+            var line = this.motdString[motdLineNum];
+            this.mCanvas.appendChild(new TextNode(line, {x: 3, y: motdLineNum*12 + 12, fill:"white", font:"7pt Courier"}));
+            motdLineNum++;
+        }
+        while(this.motdData.length > 0) {
+            var line = this.motdData.substr(0,80);
+            this.mCanvas.appendChild(new TextNode(line, {x: 3, y: motdLineNum*12 + 12, fill:"white", font:"7pt Courier"}));
+            this.motdData = this.motdData.substr(80);
+            motdLineNum++;
+        }
     }
 }
 

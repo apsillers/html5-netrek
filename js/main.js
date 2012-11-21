@@ -86,8 +86,21 @@ window.addEventListener("load", function() {
 
                     $("#login-box").html("<h2>Connecting...</h2>");
 
+                    $(document).bind("keyup", function (e) {
+                            if(e.keyCode == 9) {
+                                $("#quickstart").hide();
+                            }
+                    });
+
+                    $(document).bind("keydown", function (e) {
+                            if(e.keyCode == 9) {
+                                $("#quickstart").show();
+                                e.preventDefault();
+                            }
+                    });
+
                     // send an idempotent CP_UPDATES request every 10 seconds to save us from being ghostbusted when the player idles
-                    setInterval(function() { net.sendArray(CP_UPDATES.data(100000)); }, 10000);
+                    setInterval(function() { net.sendArray(CP_UPDATES.data(10000)); }, 10000);
 
                     // if there was a one-time error talking to server, start the protocol over again
                     setTimeout(function() {
