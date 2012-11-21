@@ -168,7 +168,7 @@ CP_TRACTOR(CP) = {
     code: 24,
     format: '!bbbx',
 
-    data: faunction(state, pnum):
+    data: faunction(state, pnum) {
         if(net_logging) console.log("CP_TRACTOR state=",state,"pnum=",pnum);
         return packer.pack(this.format, [this.code, state, pnum]);
     }
