@@ -164,7 +164,7 @@ CP_DET_MYTORP = {
         return packer.pack(this.format, [this.code, tnum])
     }
 }
-CP_TRACTOR(CP) = {
+CP_TRACTOR = {
     code: 24,
     format: '!bbbx',
 
