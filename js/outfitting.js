@@ -34,7 +34,7 @@ outfitting = {
     otherElems: [],
     selectedShip: CA,
     mask: [],
-    defaultInfoText: ["Select a ship, then choose a race to","enter the game.","","New players should try a Cruiser first.","","Press Tab for a quick start guide."],
+    defaultInfoText: ["Select a ship, then choose a race to","enter the game.","","New players should try a Cruiser first.","",""],
     drawn: false,
 
     /* Add a race button to the canvas and return its cake.js object. */
@@ -152,7 +152,9 @@ outfitting = {
                                                 rx:10, ry:10, strokeWidth:2,
                                                 stroke: "#5FF", fill:"#033"});
         
-        //this.otherElems.push(new TextNode("http://www.netrek.com", {textAlign:"center", x:this.canvasWidth/2, y:this.canvasHeight-8, fill:"#FFF", font:"16px Courier"}));       
+        //this.otherElems.push(new TextNode("http://www.netrek.org", {textAlign:"center", x:this.canvasWidth/2, y:this.canvasHeight-8, fill:"#FFF", font:"16px Courier"}));
+        this.otherElems.push(new TextNode("Press Tab for a Quick Start guide", {textAlign:"center", x:this.canvasWidth/2, y:18, fill:"#FFF", font:"16px Courier"}));
+
 
         this.selectShip(CA);
     },

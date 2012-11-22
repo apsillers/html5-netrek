@@ -138,6 +138,23 @@ hud = {
             clearTimeout(world.torpFireTimeout);
         });
         this.uiGfx.append(this.orbitButton);
+
+        this.dropButton = new Rectangle(45,45, { stroke:"#ffd700", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-100, y: this.hCanvas.height-50 });
+        this.dropButton.append(new TextNode("x", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
+        this.dropButton.append(new TextNode("Drop", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
+        this.dropButton.addEventListener("click",function(){
+            net.sendArray(CP_BEAM.data(2));
+            clearTimeout(world.torpFireTimeout);
+        });
+
+        this.pickupButton = new Rectangle(45,45, { stroke:"#ffd700", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-100, y: this.hCanvas.height-100 });
+        this.pickupButton.append(new TextNode("z", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
+        this.pickupButton.append(new TextNode("Pickup", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
+        this.pickupButton.addEventListener("click",function(){
+            net.sendArray(CP_BEAM.data(1));
+            clearTimeout(world.torpFireTimeout);
+        });
+        this.uiGfx.append(this.pickupButton);
     },
 
     draw: function() {
@@ -159,6 +176,13 @@ hud = {
     },
     setOrbitIndic: function(orbit) {
         this.orbitButton.fill = orbit?"#ffd700":"black";
+        if(orbit) {
+            this.uiGfx.append(this.dropButton);
+            this.uiGfx.append(this.pickupButton);
+        } else {
+            this.uiGfx.remove(this.dropButton);
+            this.uiGfx.remove(this.pickupButton);
+       }
     },
 
     showMaxSpeed: function(maxSpeed) {
