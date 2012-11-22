@@ -374,7 +374,7 @@ world.Planet.prototype = {
             this.armyGfx.opacity = 1;
             this.galGfx.fill = "#44F";
         }
-        else if(num < 5) {
+        else if(num < 5 && num > 0) {
             this.armyGfx.opacity = 0.4;
             this.galGfx.fill = "none";
         }
