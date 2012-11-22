@@ -102,6 +102,42 @@ hud = {
         this.warning.append(this.warningText);
         this.uiGfx.append(this.warning);
         this.warningTimeout = null;
+
+        this.shieldButton = new Rectangle(45,45, { stroke:"green", fill:"black", opacity:0.8, x:this.hCanvas.width-50, y: this.hCanvas.height-50 });
+        this.shieldButton.append(new TextNode("s", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
+        this.shieldButton.append(new TextNode("Shield", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
+        this.shieldButton.addEventListener("click",function(){
+            net.sendArray(CP_SHIELD.data(world.player.shields?0:1));
+            clearTimeout(world.torpFireTimeout);
+        });
+        this.uiGfx.append(this.shieldButton);
+
+        this.cloakButton = new Rectangle(45,45, { stroke:"red", fill:"black", opacity:0.8, x:this.hCanvas.width-50, y: this.hCanvas.height-100 });
+        this.cloakButton.append(new TextNode("c", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
+        this.cloakButton.append(new TextNode("Cloak", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
+        this.cloakButton.addEventListener("click",function(){
+            net.sendArray(CP_CLOAK.data(world.player.cloaked?0:1));
+            clearTimeout(world.torpFireTimeout);
+        });
+        this.uiGfx.append(this.cloakButton);
+
+        this.repairButton = new Rectangle(45,45, { stroke:"orange", fill:"black", opacity:0.8, x:this.hCanvas.width-50, y: this.hCanvas.height-150 });
+        this.repairButton.append(new TextNode("Sft+R", {fill:"white", font:"bold 10pt courier", y:17, x:22, align:"center"}));
+        this.repairButton.append(new TextNode("Repair", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
+        this.repairButton.addEventListener("click",function(){
+            net.sendArray(CP_REPAIR.data(world.player.repairing?0:1));
+            clearTimeout(world.torpFireTimeout);
+        });
+        this.uiGfx.append(this.repairButton);
+
+        this.orbitButton = new Rectangle(45,45, { stroke:"#ffd700", fill:"black", opacity:0.8, x:this.hCanvas.width-50, y: this.hCanvas.height-200 });
+        this.orbitButton.append(new TextNode("o", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
+        this.orbitButton.append(new TextNode("Orbit", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
+        this.orbitButton.addEventListener("click",function(){
+            net.sendArray(CP_ORBIT.data(world.player.orbitting?0:1));
+            clearTimeout(world.torpFireTimeout);
+        });
+        this.uiGfx.append(this.orbitButton);
     },
 
     draw: function() {
@@ -110,6 +146,19 @@ hud = {
 
     undraw: function() {
         this.hCanvas.removeChild(this.uiGfx);
+    },
+
+    setShieldIndic: function(shieldsUp) {
+        this.shieldButton.fill = shieldsUp?"green":"black";
+    },
+    setCloakIndic: function(cloakUp) {
+        this.cloakButton.fill = cloakUp?"red":"black";
+    },
+    setRepairIndic: function(repairUp) {
+        this.repairButton.fill = repairUp?"orange":"black";
+    },
+    setOrbitIndic: function(orbit) {
+        this.orbitButton.fill = orbit?"#ffd700":"black";
     },
 
     showMaxSpeed: function(maxSpeed) {

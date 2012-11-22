@@ -48,9 +48,11 @@
   <div id="leftCanvas" style="float:left;" data-width="600" data-height="500"></div>
   <div id="rightCanvas" style="margin-left:1px;" data-width="300" data-height="300"></div>
 
-  <div id="chatbox" style="width: 298px; height:198px; border: thin solid black; float:left">
+  <div style="float:left; position: relative;">
+  <div id="chatbox" style="width: 298px; height:198px; position: absolute; top: 0px; left: 0px; background-color: white; border: thin solid black;">
     <div id="inbox" style=" height:170px; overflow-y: scroll; font-family: monospace;"></div>
     <input id="chatInput" type="text" style=" height: 20px; font-size: 12px; width: 290px; font-family: monospace;" />
+  </div>
   </div>
 </div>
 
@@ -61,7 +63,7 @@
         <ul>
           <li><b>Right click:</b> Set ship heading</li>
           <li><b>Left click:</b> Fire torpedo</li>
-          <li><b>Middle click:</b> Fire phaser</li>
+          <li><b>Shift+click</b> or <b>Middle click:</b> Fire phaser</li>
           <br />
           <li><b>0-9:</b> Set warp speed (can also be set by clicking speed meter)</li>
           <li><b>c:</b> Toggle cloaking</li>
@@ -107,7 +109,6 @@
             <div class="login-row"><select id="nt-host-input">
               <option>continuum.us.netrek.org</option>
               <option>pickled.netrek.org</option>
-              <option>localhost</option>
             </select></div>
             <div class="login-row"><input id="username-input" type="text" value="guest" /></div>
             <div class="login-row"><input id="pass-input" type="password" /></div>

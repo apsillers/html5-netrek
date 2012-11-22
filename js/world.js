@@ -114,7 +114,11 @@ world = {
             var offset = $(this).offset();
             var offsetX = e.pageX - offset.left;
             var offsetY = e.pageY - offset.top;
-            _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 4);
+            if(!e.shiftKey) {
+                _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 4);
+            } else {
+                net.sendArray(CP_PHASER.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY))));
+            }
             e.preventDefault();
         });
 
@@ -135,25 +139,32 @@ world = {
                 var speed = e.which - 48;
                 net.sendArray(CP_SPEED.data(speed));
                 hud.showSpeedPointer(speed);
+                e.preventDefault();
             } else {
                 if(e.keyCode == 67) {
                     net.sendArray(CP_CLOAK.data(_self.player.cloaked?0:1));
+                    e.preventDefault();
                 } else if(e.keyCode == 82 && e.shiftKey) { // R - repair
                     net.sendArray(CP_REPAIR.data(1));
+                    e.preventDefault();
                 } else if(e.keyCode == 83) { // s - toggle shields
                     net.sendArray(CP_SHIELD.data(_self.player.shields?0:1));
+                    e.preventDefault();
                 } else if(e.keyCode == 79) { // o - orbit planet
                     net.sendArray(CP_ORBIT.data(_self.player.orbitting?0:1));
+                    e.preventDefault();
                 } else if(e.keyCode == 66) { // b bomb planet
                     net.sendArray(CP_BOMB.data(_self.player.bombing?0:1));
+                    e.preventDefault();
                 } else if(e.keyCode == 68) { // d - det enemy torps
                     net.sendArray(CP_DET_TORPS.data());
+                    e.preventDefault();
                 } else if(e.keyCode == 88) { // x - beam down
-                    net.sendArray(CP_BEAM.data(1));
+                    net.sendArray(CP_BEAM.data(2));
+                    e.preventDefault();
                 } else if(e.keyCode == 90) { // z - beam up
-                    net.sendArray(CP_BEAM.data(2));
-                } else if(e.keyCode == 80) { // p - phaser
-                    net.sendArray(CP_BEAM.data(2));
+                    net.sendArray(CP_BEAM.data(1));
+                    e.preventDefault();
                 }
             }
         });
@@ -286,11 +297,13 @@ world = {
         this.repair = false;
         this.agri = false;
 
-        this.armyGfx = new Polygon([0,0, 0,6, 6,6, 6,0],{stroke:"none", fill:"#00F", x:-14, y:2, opacity:0});
-        this.armyGfx.append(new Circle(3,{stroke:"none", fill:"#00F", x:3, y:0}));
+        this.armyGfx = new Polygon([0,0, 0,6, 6,6, 6,0],{stroke:"none", fill:"#00F", x:-14, y:2, opacity:0.4});
+        this.armyGfx.append(new Circle(3,{stroke:"none", fill:"#00F", x:3, y:0, startAngle: Math.PI}));
         this.armyGfx.append(new Circle(3,{stroke:"none", fill:"#00F", x:3, y:-6}));
         this.gfx.append(this.armyGfx);
 
+        this.armyCountGfx = new TextNode("0", {fill:"white", font:"bold 8px courier", y:2});
+        this.armyGfx.append(this.armyCountGfx);
 
         var tac_xy = world.netrek2tac(placeX, placeY);
         this.galGfx = new Circle(this.radius,
@@ -356,14 +369,16 @@ world.Planet.prototype = {
     },
 
     showArmies: function(num) {
-        if(num == 5) {
+        this.armyCountGfx.text = num;
+        if(num >= 5) {
             this.armyGfx.opacity = 1;
             this.galGfx.fill = "#44F";
         }
         if(num < 5) {
-            this.armyGfx.opacity = 0;
+            this.armyGfx.opacity = 0.4;
             this.galGfx.fill = "none";
         }
+        this.armyGfx.changed = true;
     },
 
     setOnCanvas: function(setOn) {

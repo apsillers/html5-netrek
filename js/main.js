@@ -69,9 +69,20 @@ window.addEventListener("load", function() {
 
         // if this is a dev server, default to localhost
         if(location.hostname == "localhost" || location.hostname == "127.0.0.1") {
-            $("#nt-host-input").val("localhost");
+            $("#nt-host-input").append("<option>localhost</option>").val("localhost");
         }
 
+
+        $("#chatbox").bind("mouseover", function() {
+            $("#chatbox").css("top","-200px").height(398);
+            $("#inbox").height(370);
+        });
+
+        $("#chatbox").bind("mouseout", function() {
+            $("#chatbox").css("top","0px").height(198);
+            $("#inbox").height(170);
+            $("#inbox").scrollTop($("#inbox")[0].scrollHeight);
+        });
 
         $("#connect-button").click(function() {
             var nt_host = $("#nt-host-input").val(),

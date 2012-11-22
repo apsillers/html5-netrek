@@ -173,6 +173,15 @@ CP_TRACTOR = {
         return packer.pack(this.format, [this.code, state, pnum]);
     }
 }
+CP_REPRESS = {
+    code: 25,
+    format: '!bbbx',
+
+    data: function(state, pnum) {
+        if(net_logging) console.log("CP_REPRESS state=",state,"pnum=",pnum);
+        return packer.pack(this.format, [this.code, state, pnum]);
+    }
+}
 CP_CLOAK = {
     code: 19,
     format: '!bbxx',
@@ -542,7 +551,7 @@ serverPackets = [
         if(net_logging) console.log("SP_MESSAGE m_flags=",m_flags.toString(2),"m_recpt=",m_recpt,"m_from=",m_from,"mesg=",mesg);
 
         $("#inbox").append(mesg + "<br />");
-        $("#inbox").scrollTop($("#inbox")[0].scrollHeight)
+        $("#inbox").scrollTop($("#inbox")[0].scrollHeight);
     }
   },
   { // SP_STATS
