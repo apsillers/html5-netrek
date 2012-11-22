@@ -154,7 +154,14 @@ hud = {
             net.sendArray(CP_BEAM.data(1));
             clearTimeout(world.torpFireTimeout);
         });
-        this.uiGfx.append(this.pickupButton);
+
+        this.bombButton = new Rectangle(45,45, { stroke:"blue", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-100, y: this.hCanvas.height-150 });
+        this.bombButton.append(new TextNode("b", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
+        this.bombButton.append(new TextNode("Bomb", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
+        this.bombButton.addEventListener("click",function(){
+            net.sendArray(CP_BOMB.data(world.player.bombinging?0:1));
+            clearTimeout(world.torpFireTimeout);
+        });
     },
 
     draw: function() {
@@ -179,10 +186,15 @@ hud = {
         if(orbit) {
             this.uiGfx.append(this.dropButton);
             this.uiGfx.append(this.pickupButton);
+            this.uiGfx.append(this.bombButton);
         } else {
             this.uiGfx.remove(this.dropButton);
             this.uiGfx.remove(this.pickupButton);
+            this.uiGfx.remove(this.bombButton);
        }
+    },
+    setBombIndic: function(bomb) {
+        this.bombButton.fill = bomb?"blue":"black";
     },
 
     showMaxSpeed: function(maxSpeed) {

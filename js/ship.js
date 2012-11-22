@@ -177,6 +177,7 @@ Ship.prototype = {
             hud.setCloakIndic(this.cloaked);
             hud.setRepairIndic(this.repairing);
             hud.setOrbitIndic(this.orbitting);
+            hud.setBombIndic(this.bombing);
         }
     }
 }
