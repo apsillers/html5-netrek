@@ -550,6 +550,7 @@ serverPackets = [
             m_recpt = uvars.shift(), m_from = uvars.shift(), mesg = uvars.shift();
         if(net_logging) console.log("SP_MESSAGE m_flags=",m_flags.toString(2),"m_recpt=",m_recpt,"m_from=",m_from,"mesg=",mesg);
 
+        mesg = mesg.replace(/^.*\-\>/,"<b>$&</b>>").replace(/>(El Nath)|>(Beta Crucis)|>(\S+)/, "<b>$1$2$3</b>");
         $("#inbox").append(mesg + "<br />");
         $("#inbox").scrollTop($("#inbox")[0].scrollHeight);
     }
