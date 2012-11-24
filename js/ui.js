@@ -61,8 +61,11 @@ hud = {
         this.speedMeter = new Polygon([0,0, 0,-300, 50,-300], {x:20, y:350, fill:"none", stroke: "white", strokeWidth:2});
         this.meter = new Rectangle(0,0);
         this.speedPointer = new Polygon([-2,0, -9,-3, -9,3], {fill:"none", stroke: "white", strokeWidth:1});
+        this.speedNumber = new TextNode("0", { fill: "white", font:"bold 12pt courier", y:25 });
         this.speedMeter.append(this.meter);
         this.speedMeter.append(this.speedPointer);
+        this.speedMeter.append(this.speedNumber);
+        
         this.uiGfx.append(this.speedMeter);
 
         this.speedNotches = [];
@@ -256,6 +259,9 @@ hud = {
         this.meter = new Polygon([0,0, 0,-frac*300,frac*50, -frac*300], {fill:"green", strokeWidth:0, zIndex:-5});
         this.speedMeter.appendChild(this.meter);
         this.speedMeter.changed = true;
+
+        if(speed) this.speedNumber.text = "Warp " + speed;
+        else this.speedNumber.text = "";
     },
     showSpeedPointer: function(speed) {
         if(speed > this.maxSpeed) { speed = this.maxSpeed; }

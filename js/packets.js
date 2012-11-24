@@ -282,6 +282,17 @@ serverPackets = [
             hud.showShieldLevel(100 * shield / shipStats[world.player.shipType].shields);
             hud.showArmies(armies, world.player.kills || 0);
             hud.showMaxSpeed(shipStats[world.player.shipType].speed);
+
+            if(tractor & 0x40) {
+                if(world.tractors[pnum] == undefined) {
+                    world.addTractor(pnum, new Tractor(pnum, flags));
+                }
+                world.tractors[pnum].sp_tractor(flags, tractor)
+            } else {
+                if(world.tractors[pnum] != undefined) {
+                    world.removeTractor(pnum);
+                }
+            }
         }
     }
   },
@@ -390,6 +401,17 @@ serverPackets = [
         if(net_logging) console.log("SP_FLAGS pnum=",pnum,"tractor=",tractor,"flags=",flags);
 
         world.ships[pnum].handleFlags(flags);
+
+        if(tractor & 0x40) {
+            if(world.tractors[pnum] == undefined) {
+                world.addTractor(pnum, new Tractor(pnum, flags));
+            }
+            world.tractors[pnum].sp_tractor(flags, tractor);
+        } else {
+            if(world.tractors[pnum] != undefined) {
+                world.removeTractor(pnum);
+            }
+        }
     }
   },
   { // SP_PLANET_LOC
@@ -550,7 +572,7 @@ serverPackets = [
             m_recpt = uvars.shift(), m_from = uvars.shift(), mesg = uvars.shift();
         if(net_logging) console.log("SP_MESSAGE m_flags=",m_flags.toString(2),"m_recpt=",m_recpt,"m_from=",m_from,"mesg=",mesg);
 
-        mesg = mesg.replace(/^.*\-\>/,"<b>$&</b>>").replace(/>(El Nath)|>(Beta Crucis)|>(\S+)/, "<b>$1$2$3</b>");
+        mesg = mesg.replace(/^(El Nath|Beta Crucis|[^\-]+)->(\S+)/,"<b>$1->$2</b> ")
         $("#inbox").append(mesg + "<br />");
         $("#inbox").scrollTop($("#inbox")[0].scrollHeight);
     }
@@ -611,6 +633,9 @@ serverPackets = [
             galaxy.ups = value
         # FIXME: process the other feature packets received
 */
+
+        net.sendArray(CP_FEATURE.data('S', 0, 0, 1, 'SHOW_ALL_TRACTORS'));
+        //net.sendArray(CP_FEATURE.data('S', 0, 0, 1, 'TIPS'));
     }
   },
   SP_QUEUE = {

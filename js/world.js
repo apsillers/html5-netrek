@@ -28,7 +28,8 @@ world = {
     ships: [],           // array of ships, indexed by ship id
     planets: [],         // array of planets, indexed by planet id
     torps: [],           // array of torps
-    phasers: [],           // array of torps
+    phasers: [],         // array of phasers
+    tractors: [],        // array of tractors
     stepPeriod: 50,      // time between steps
     stepInterval: null,  // interval identifier, used for clearInterval
     stepListeners: [],   // list of functions called immediately after each step
@@ -67,14 +68,10 @@ world = {
 
                 var obj = _self.objects[i];
 
-                //if(!(obj instanceof Phaser)) { 
-
-                    // update display of object in world
-                    var coords = _self.netrek2world(obj.x, obj.y);
-                    obj.gfx.x = coords[0];
-                    obj.gfx.y = coords[1];
-     
-                //}
+                // update display of object in world
+                var coords = _self.netrek2world(obj.x, obj.y);
+                obj.gfx.x = coords[0];
+                obj.gfx.y = coords[1];
 
                 if(obj instanceof Phaser) { debugStr+="Phaser</br>"; console.log(obj.gfx); }
 
@@ -210,14 +207,9 @@ world = {
     addTorp: function(num, torpObj) {
         this.torps[num] = torpObj;
         this.add(torpObj);
-        //torpObj.vanishTimeout = setTimeout(function() {
-        //    if(world.torps[num]) { world.torps[num].gfx.visible = false; }
-        //}, 7000);
     },
     removeTorp: function(num) {
         this.remove(this.torps[num]);
-        //clearTimeout(this.torps[num].vanishTimeout);
-        //clearTimeout(this.torps[num].redrawInterval);
         this.torps[num] = undefined;
     },
     addPhaser: function(num, phasObj) {
@@ -228,6 +220,16 @@ world = {
         this.remove(this.phasers[num]);
         this.phasers[num] = undefined;
     },
+
+    addTractor: function(num, tracObj) {
+        this.tractors[num] = tracObj;
+        this.add(tracObj);
+    },
+    removeTractor: function(num) {
+        this.remove(this.tractors[num]);
+        this.tractors[num] = undefined;
+    },
+
     centerView: function(x,y) {
         this.viewX = x;
         this.viewY = y;
@@ -370,16 +372,16 @@ world.Planet.prototype = {
 
     showArmies: function(num) {
         this.armyCountGfx.text = num;
-        if(num >= 5) {
+        if(num == 0) {
+            this.armyGfx.opacity = 0;
+            this.galGfx.fill = "none";
+        }
+        else if(num >= 5) {
             this.armyGfx.opacity = 1;
             this.galGfx.fill = "#44F";
         }
         else if(num < 5 && num > 0) {
             this.armyGfx.opacity = 0.4;
-            this.galGfx.fill = "none";
-        }
-        else if(num == 0) {
-            this.armyGfx.opacity = 0;
             this.galGfx.fill = "none";
         }
         this.armyGfx.changed = true;
