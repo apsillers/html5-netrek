@@ -96,6 +96,17 @@ var Ship = function(options) {
 
     this.includingWorld = options.world;
     this.gfxRoot = world.wGroup;
+
+    this.gfx.addEventListener("click", function() {
+        if(world.tractorCursor) {
+            if(world.isPressor) {
+                net.sendArray(CP_REPRESS.data(1, parseInt(_self.number)));
+            } else {
+                net.sendArray(CP_TRACTOR.data(1, parseInt(_self.number)));
+            }
+            world.setTractorCursor(false);
+        }
+    });
 }
 Ship.prototype = {
     setPosition: function(x,y) {
@@ -170,6 +181,8 @@ Ship.prototype = {
         this.orbitting = flags & PFORBIT;
         this.bombing = flags & PFBOMB;
         this.repairing = flags & PFREPAIR;
+        this.tractoring = flags & PFTRACT && !(flags & PFPRESS);
+        this.pressing = flags & PFPRESS;
 
         if(this === world.player) {
             if(this.orbitting || this.repairing) { hud.showSpeedPointer(0); }
@@ -178,6 +191,8 @@ Ship.prototype = {
             hud.setRepairIndic(this.repairing);
             hud.setOrbitIndic(this.orbitting);
             hud.setBombIndic(this.bombing);
+hud.setTractorIndic(this.tractoring);
+hud.setPressorIndic(this.pressing);
         }
     }
 }

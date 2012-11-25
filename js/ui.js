@@ -106,7 +106,7 @@ hud = {
         this.uiGfx.append(this.warning);
         this.warningTimeout = null;
 
-        this.shieldButton = new Rectangle(45,45, { stroke:"green", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-50, y: this.hCanvas.height-50 });
+        this.shieldButton = new Rectangle(45,45, { stroke:"blue", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-50, y: this.hCanvas.height-50 });
         this.shieldButton.append(new TextNode("s", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
         this.shieldButton.append(new TextNode("Shield", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
         this.shieldButton.addEventListener("click",function(){
@@ -115,7 +115,7 @@ hud = {
         });
         this.uiGfx.append(this.shieldButton);
 
-        this.cloakButton = new Rectangle(45,45, { stroke:"red", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-50, y: this.hCanvas.height-100 });
+        this.cloakButton = new Rectangle(45,45, { stroke:"#797", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-50, y: this.hCanvas.height-100 });
         this.cloakButton.append(new TextNode("c", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
         this.cloakButton.append(new TextNode("Cloak", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
         this.cloakButton.addEventListener("click",function(){
@@ -142,7 +142,7 @@ hud = {
         });
         this.uiGfx.append(this.orbitButton);
 
-        this.dropButton = new Rectangle(45,45, { stroke:"#ffd700", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-100, y: this.hCanvas.height-50 });
+        this.dropButton = new Rectangle(45,45, { stroke:"#ffd700", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-100, y: this.hCanvas.height-100 });
         this.dropButton.append(new TextNode("x", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
         this.dropButton.append(new TextNode("Drop", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
         this.dropButton.addEventListener("click",function(){
@@ -150,7 +150,7 @@ hud = {
             clearTimeout(world.torpFireTimeout);
         });
 
-        this.pickupButton = new Rectangle(45,45, { stroke:"#ffd700", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-100, y: this.hCanvas.height-100 });
+        this.pickupButton = new Rectangle(45,45, { stroke:"#ffd700", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-100, y: this.hCanvas.height-150 });
         this.pickupButton.append(new TextNode("z", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
         this.pickupButton.append(new TextNode("Pickup", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
         this.pickupButton.addEventListener("click",function(){
@@ -158,13 +158,39 @@ hud = {
             clearTimeout(world.torpFireTimeout);
         });
 
-        this.bombButton = new Rectangle(45,45, { stroke:"blue", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-100, y: this.hCanvas.height-150 });
+        this.bombButton = new Rectangle(45,45, { stroke:"red", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-100, y: this.hCanvas.height-200 });
         this.bombButton.append(new TextNode("b", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
         this.bombButton.append(new TextNode("Bomb", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
         this.bombButton.addEventListener("click",function(){
-            net.sendArray(CP_BOMB.data(world.player.bombinging?0:1));
+            net.sendArray(CP_BOMB.data(world.player.bombing?0:1));
             clearTimeout(world.torpFireTimeout);
         });
+
+        this.tractorButton = new Rectangle(45,45, { stroke:"green", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-100, y: this.hCanvas.height-50 });
+        this.tractorButton.append(new TextNode("Sft+T", {fill:"white", font:"bold 10pt courier", y:17, x:22, align:"center"}));
+        this.tractorButton.append(new TextNode("Tractor", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
+        this.tractorButton.addEventListener("click",function(){
+            if(world.player.tractoring) {
+                net.sendArray(CP_TRACTOR.data(0,0));
+            } else {
+                world.setTractorCursor(true, false);
+            }
+            clearTimeout(world.torpFireTimeout);
+        });
+        this.uiGfx.append(this.tractorButton);
+
+        this.pressorButton = new Rectangle(45,45, { stroke:"purple", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-150, y: this.hCanvas.height-50 });
+        this.pressorButton.append(new TextNode("y", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
+        this.pressorButton.append(new TextNode("Pressor", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
+        this.pressorButton.addEventListener("click",function(){
+            if(world.player.pressing) {
+                net.sendArray(CP_REPRESS.data(0,0));
+            } else {
+                world.setTractorCursor(true, true);
+            }
+            clearTimeout(world.torpFireTimeout);
+        });
+        this.uiGfx.append(this.pressorButton);
     },
 
     draw: function() {
@@ -176,10 +202,10 @@ hud = {
     },
 
     setShieldIndic: function(shieldsUp) {
-        this.shieldButton.fill = shieldsUp?"green":"black";
+        this.shieldButton.fill = shieldsUp?"blue":"black";
     },
     setCloakIndic: function(cloakUp) {
-        this.cloakButton.fill = cloakUp?"red":"black";
+        this.cloakButton.fill = cloakUp?"#797":"black";
     },
     setRepairIndic: function(repairUp) {
         this.repairButton.fill = repairUp?"orange":"black";
@@ -198,6 +224,12 @@ hud = {
     },
     setBombIndic: function(bomb) {
         this.bombButton.fill = bomb?"blue":"black";
+    },
+    setPressorIndic: function(pressor) {
+        this.pressorButton.fill = pressor?"purple":"black";
+    },
+    setTractorIndic: function(tractor) {
+        this.tractorButton.fill = tractor?"green":"black";
     },
 
     showMaxSpeed: function(maxSpeed) {

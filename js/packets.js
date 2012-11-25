@@ -595,6 +595,10 @@ serverPackets = [
                     "sbkills=",sbkills, "sblosses=",sblosses, "armies=",armies,
                     "planets=",planets, "maxkills=",maxkills, "sbmaxkills=",
                     sbmaxkills);
+
+        if(world.player != null && pnum == world.player.number) {
+            hud.showArmies(armies, kills);
+        }
     }
   },
   { // SP_WARNING
@@ -608,7 +612,7 @@ serverPackets = [
         hud.showWarning(message);
     }
   },
-  SP_FEATURE = {
+  { // SP_FEATURE
     code: 60,
     format: "!bcbbi80s",
 
@@ -638,7 +642,7 @@ serverPackets = [
         //net.sendArray(CP_FEATURE.data('S', 0, 0, 1, 'TIPS'));
     }
   },
-  SP_QUEUE = {
+  { // SP_QUEUE
     code: 13,
     format: '!bxh',
 

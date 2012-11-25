@@ -40,6 +40,14 @@ world = {
     playerNum: null,
     player: null,
     drawn: false,
+    tractorCursor: false, // is the next click to use tractor
+    isPressor: false,     // when tractorCursor is true: pressor or tractor
+
+    setTractorCursor: function(cursor, pressor) {
+        this.tractorCursor = cursor;
+        this.isPressor = pressor;
+        this.wCanvas.cursor = cursor?"crosshair":"default";
+    },
 
     init: function(wCanvas, gCanvas) {
         this.wCanvas = wCanvas;
@@ -108,13 +116,17 @@ world = {
         
         // UI: fire torps via left-click
         $(this.wCanvas.canvas).click(function fireTorpWithLeftClick(e) {
-            var offset = $(this).offset();
-            var offsetX = e.pageX - offset.left;
-            var offsetY = e.pageY - offset.top;
-            if(!e.shiftKey) {
-                _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 4);
+            if(!_self.tractorCursor) {
+                var offset = $(this).offset();
+                var offsetX = e.pageX - offset.left;
+                var offsetY = e.pageY - offset.top;
+                if(!e.shiftKey) {
+                    _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 4);
+                } else {
+                    net.sendArray(CP_PHASER.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY))));
+                }
             } else {
-                net.sendArray(CP_PHASER.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY))));
+                setTimeout(function(){ _self.setTractorCursor(false) }, 100);
             }
             e.preventDefault();
         });
@@ -162,6 +174,14 @@ world = {
                 } else if(e.keyCode == 90) { // z - beam up
                     net.sendArray(CP_BEAM.data(1));
                     e.preventDefault();
+                } else if(e.keyCode == 89) { // y - pressor
+                    _self.tractorCursor = true;
+                    _self.isPressor = true;
+                    _self.wCanvas.cursor = "crosshair";
+                } else if(e.keyCode == 84  && e.shiftKey) { // T - tractor
+                    _self.tractorCursor = true;
+                    _self.isPressor = false;
+                    _self.wCanvas.cursor = "crosshair";
                 }
             }
         });
