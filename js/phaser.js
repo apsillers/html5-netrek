@@ -25,7 +25,7 @@ Phaser = function(placeX, placeY, dir, status, target, includingWorld) {
     var world_xy = world.netrek2world(this.x, this.y);
     this.dir = dir;
 
-//alert(target);
+//$("#debug").append(target+"<br/>");
     if(status == PHHIT) {
         var shipHit = world.ships[target];
         //var shipCoords = world.netrek2world(shipHit.x, shipHit.y);
@@ -44,8 +44,8 @@ Phaser = function(placeX, placeY, dir, status, target, includingWorld) {
 
     var line = new Line(0, 0, destX, destY,
     {
-        y: world_xy[0],
-        x: world_xy[1],
+        x: world_xy[0],
+        y: world_xy[1],
         fill: status==PHHIT?"#F00":"#FFF",
         stroke: status==PHHIT?"#F00":"#FFF"
     });

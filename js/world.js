@@ -121,6 +121,7 @@ world = {
                 var offsetX = e.pageX - offset.left;
                 var offsetY = e.pageY - offset.top;
                 if(!e.shiftKey) {
+                    // maybe this click was intended for a UI element, which may cancel the torp fire
                     _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 4);
                 } else {
                     net.sendArray(CP_PHASER.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY))));
@@ -175,13 +176,21 @@ world = {
                     net.sendArray(CP_BEAM.data(1));
                     e.preventDefault();
                 } else if(e.keyCode == 89) { // y - pressor
-                    _self.tractorCursor = true;
-                    _self.isPressor = true;
-                    _self.wCanvas.cursor = "crosshair";
+                    if(!_self.tractorCursor || (_self.tractorCursor && !_self.isPressor)) {
+                        if(!_self.player.pressing) { _self.setTractorCursor(true, true); }
+                        else { net.sendArray(CP_TRACTOR.data(0,0)); }
+                    }
+                    else {
+                        _self.setTractorCursor(false);
+                    }
                 } else if(e.keyCode == 84  && e.shiftKey) { // T - tractor
-                    _self.tractorCursor = true;
-                    _self.isPressor = false;
-                    _self.wCanvas.cursor = "crosshair";
+                    if(!_self.tractorCursor || (_self.tractorCursor && _self.isPressor)) {
+                        if(!_self.player.tractoring) { _self.setTractorCursor(true, false); }
+                        else { net.sendArray(CP_TRACTOR.data(0,0)); }
+                    }
+                    else {
+                        _self.setTractorCursor(false);
+                    }
                 }
             }
         });
@@ -303,7 +312,8 @@ world = {
             y: world_xy[0],
             x: world_xy[1],
             fill: 'none',
-            stroke: '#FF0'
+            stroke: '#FF0',
+            align: "center"
         });
         var text = new TextNode(name.replace(/\x00/g,""),
                                 {y:cir.radius+15, textAlign:"center",
@@ -334,8 +344,11 @@ world = {
             x: tac_xy[1],
             stroke: "#FF0",
             radius: 7,
-            zIndex:1
+            zIndex:1,
+            align: "center"
         });
+        this.galGfx.x -= this.galGfx.radius;
+        this.galGfx.y += this.galGfx.radius;
 
         var text = new TextNode(name.replace(/\x00/g,"").substring(0,3),
                                 {y:this.galGfx.radius+7, textAlign:"center",
