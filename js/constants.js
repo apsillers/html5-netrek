@@ -54,6 +54,10 @@
 // planets are 30 x 30 on regular client tactical
 // planets are 60 x 60 on this tactical
 
+// set for 20 fps
+UPDATE_RATE = 50000 // how frequently we get updates from the server (in us)
+REDRAW_RATE = 50 // how frequently the display is redrawn (in ms)
+
 GWIDTH=100000
 TWIDTH=20000
 

@@ -99,7 +99,7 @@ world = {
             }
 
             //$("#debug").html(debugStr);
-        }, 100);
+        }, REDRAW_RATE);
 
         hud.draw();
 
