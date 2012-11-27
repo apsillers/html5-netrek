@@ -106,6 +106,15 @@ hud = {
         this.uiGfx.append(this.warning);
         this.warningTimeout = null;
 
+        this.directionWheel = new Circle(40, { x: this.hCanvas.width / 2,
+                                               y: this.hCanvas.height / 2,
+                                               stroke: "white", fill: "none",
+                                               opacity: 0.5, strokeWidth:20 });
+        this.directionNeedle = new Line(0, this.directionWheel.radius - this.directionWheel.strokeWidth / 2,
+                                        0, this.directionWheel.radius + this.directionWheel.strokeWidth / 2,
+                                        { x:0, y:0, stroke:"red", strokeWidth:2 });
+        this.directionWheel.append(this.directionNeedle);
+
         this.shieldButton = new Rectangle(45,45, { stroke:"blue", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-50, y: this.hCanvas.height-50 });
         this.shieldButton.append(new TextNode("s", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
         this.shieldButton.append(new TextNode("Shield", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
@@ -199,6 +208,15 @@ hud = {
 
     undraw: function() {
         this.hCanvas.removeChild(this.uiGfx);
+    },
+
+    showDirectionWheel: function(show) {
+        if(show) { this.uiGfx.append(this.directionWheel); }
+        else { this.uiGfx.remove(this.directionWheel); }
+    },
+    showDirectionAngle: function(rads) {
+        this.directionNeedle.rotation = [rads+Math.PI,0,0];
+        this.directionNeedle.changed = true;
     },
 
     setShieldIndic: function(shieldsUp) {
