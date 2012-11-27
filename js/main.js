@@ -111,7 +111,7 @@ window.addEventListener("load", function() {
                     });
 
                     // send an idempotent CP_UPDATES request every 10 seconds to save us from being ghostbusted when the player idles
-                    setInterval(function() { net.sendArray(CP_UPDATES.data(10000)); }, 10000);
+                    setInterval(function() { net.sendArray(CP_UPDATES.data(UPDATE_RATE)); }, 10000);
 
                     // if there was a one-time error talking to server, start the protocol over again
                     setTimeout(function() {

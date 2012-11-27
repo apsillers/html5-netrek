@@ -52,7 +52,7 @@ outfitting = {
             if(!this._netrekDisabled) {
                 world.player.setImage(imageLib.images[racenum][_self.selectedShip]); 
                 world.player.setTeam(racenum);
-                net.sendArray(CP_UPDATES.data(100000));
+                net.sendArray(CP_UPDATES.data(UPDATE_RATE));
                 setTimeout(function() { net.sendArray(CP_OUTFIT.data(teamLib.teamNumber(racenum), _self.selectedShip)) }, 500);
                 //alert("sent data");
             }
