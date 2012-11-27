@@ -69,7 +69,7 @@ window.addEventListener("load", function() {
 
         // if this is a dev server, default to localhost
         if(location.hostname == "localhost" || location.hostname == "127.0.0.1") {
-            $("#nt-host-input").append("<option>localhost</option>").val("localhost");
+            $("#nt-host-input").append("<option>10.0.2.2</option>").val("10.0.2.2");
         }
 
 
@@ -89,7 +89,7 @@ window.addEventListener("load", function() {
                 user = $("#username-input").val(),
                 pass = $("#pass-input").val();
 
-            net = new NetrekConnection(location.hostname, location.port||80, function() {
+            net = new NetrekConnection(function() {
                 console.log("proxy connection formed");
                 net.connectToServer(nt_host,2592,function(){
                     console.log("NT server connection formed");
