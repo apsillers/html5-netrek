@@ -37,7 +37,7 @@ var imageLib = {
                 img.onload = function() {
                     if(--total == 0) { callback(); }
                 }
-                img.src = "../data/img/"+this.races[i]+"/"+this.ships[j]+"0.png";
+                img.src = "data/img/"+this.races[i]+"/"+this.ships[j]+"0.png";
             }
         }
     }

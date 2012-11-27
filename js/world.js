@@ -42,11 +42,18 @@ world = {
     drawn: false,
     tractorCursor: false, // is the next click to use tractor
     isPressor: false,     // when tractorCursor is true: pressor or tractor
+    directing: false,     // is the touch-directional UI up
+    directingAngle: 0,    // last directed angle (in radians)
 
     setTractorCursor: function(cursor, pressor) {
         this.tractorCursor = cursor;
         this.isPressor = pressor;
         this.wCanvas.cursor = cursor?"crosshair":"default";
+    },
+
+    showDirecting: function(directing) {
+        this.directing = directing;
+        hud.showDirectionWheel(directing);
     },
 
     init: function(wCanvas, gCanvas) {
@@ -195,6 +202,36 @@ world = {
             }
         });
 
+        $(this.wCanvas.canvas).bind("touchstart", function(e) {
+            if(!_self.tractorCursor && !_self.directing) {
+                var offset = $(this).offset();
+                var offsetX = e.targetTouches[0].pageX - offset.left;
+                var offsetY = e.targetTouches[0].pageY - offset.top;
+                if(Math.abs(offsetX - parseInt(this.width) / 2) < 20 &&
+                   Math.abs(offsetY - parseInt(this.height) / 2) < 20) {
+                    _self.showDirecting(true);
+                }
+            }
+        });
+
+        $(this.wCanvas.canvas).bind("touchmove", function(e) {
+            if(_self.directing) {
+                var offset = $(this).offset();
+                var offsetX = e.targetTouches[0].pageX - offset.left;
+                var offsetY = e.targetTouches[0].pageY - offset.top;
+                _self.directingAngle = _self.getAngleFromCenter(offsetX, offsetY);
+                hud.showDirectionAngle(_self.directingAngle);
+                e.preventDefault();
+            }
+        });
+
+        $(this.wCanvas.canvas).bind("touchend", function(e) {
+            if(_self.directing) {
+                net.sendArray(CP_DIRECTION.data(_self.rad2byte(_self.directingAngle)));
+                _self.showDirecting(false);
+            }
+        });
+
         this.drawn = true;
     },
 
@@ -207,6 +244,10 @@ world = {
         $(this.wCanvas.canvas).unbind("contextmenu", this.setCourseWithRightClick);
         $(this.wCanvas.canvas).unbind("mousedown", this.firePhasersWithMIddleClick);
         $(this.wCanvas.canvas).unbind("keyup", this.handleKeys);
+
+        $(this.wCanvas.canvas).unbind("touchstart", this.startDirectingOnTouch);
+        $(this.wCanvas.canvas).unbind("touchmove", this.changeDirectingOnMove);
+        $(this.wCanvas.canvas).unbind("touchend", this.sendDirectionOnEnd);
 
         this.drawn = false;
     },
