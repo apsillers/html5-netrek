@@ -34,14 +34,9 @@ window.addEventListener("load", function() {
         fill: 'black'
     });
 
-    $(lCanvas).width('');
-    $(lCanvas).height('');
-    $(rCanvas).width('');
-    $(rCanvas).height('');
-
     outfitting.init(leftCanvas, rightCanvas);
     world.init(leftCanvas, rightCanvas);
-    hud.init(leftCanvas);
+    hud.init(leftCanvas, rightCanvas);
 
     $("#loading-box").css("left", ($("html").width() - $("#loading-box").width()) / 2);
     $("#loading-box").html("<h1>Loading...</h1>");
@@ -51,9 +46,12 @@ window.addEventListener("load", function() {
         $("#loading-box").hide();
         $("#login-box").show();
 
-        //$("#overlay").height($(document).height());
         $("#overlay").width("100%");
-        $("#login-box").css("left", ($("html").width() - $("#login-box").width()) / 2);
+        $("#overlay").css("top",$(window).scrollTop()+"px");
+        $("#overlay").css("left",$(window).scrollLeft()+"px");
+        $("#login-box").css("top",$(window).scrollTop()+100+"px");
+        $("#login-box").css("left",($("html").width() - $("#login-box").width()) / 2 + $(window).scrollLeft());
+
         $(window).resize(function() {
             $("#overlay").height($(window).height());
             $("#login-box").css("left", ($("html").width() - $("#login-box").width()) / 2);
@@ -65,7 +63,7 @@ window.addEventListener("load", function() {
             $("#login-box").css("left",($("html").width() - $("#login-box").width()) / 2 + $(window).scrollLeft());
         });
 
-        document.getElementById("connect-button").focus()
+        document.getElementById("connect-button").focus();
 
         // if this is a dev server, default to localhost
         if(location.hostname == "localhost" || location.hostname == "127.0.0.1") {
