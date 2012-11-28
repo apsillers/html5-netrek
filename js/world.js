@@ -37,6 +37,7 @@ world = {
     viewY: 0,
     galacticFactor: 200,
     subgalacticFactor: 40,
+    galaticXOffset: 0,
     playerNum: null,
     player: null,
     drawn: false,
@@ -59,7 +60,8 @@ world = {
     init: function(wCanvas, gCanvas) {
         this.wCanvas = wCanvas;
         this.gCanvas = gCanvas;
-        this.galacticFactor = 100000 / gCanvas.width;
+        this.galacticFactor = 100000 / gCanvas.height;
+        this.galaticXOffset = gCanvas.width - gCanvas.height;
     },
 
     draw: function() {
@@ -315,7 +317,7 @@ world = {
     // the tactical map is measured in pixels; netrek returns values in units
     // the galacticFactor sets units per pixel
     netrek2tac: function(x,y) {
-        return [x / this.galacticFactor,
+        return [x / this.galacticFactor + this.galaticXOffset,
                 y / this.galacticFactor];
     },
     
