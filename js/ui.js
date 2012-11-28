@@ -25,6 +25,7 @@
 hud = {
     inited: false,
     hCanvas: null,
+    rCanvas: null,
     shieldMeter: null,
     shieldText: null,
     damageMeter: null,
@@ -33,9 +34,11 @@ hud = {
     fuelText: null,
     uiGfx: null,
 
-    init: function(canvas) {
+    init: function(canvas, rcanvas) {
         this.hCanvas = canvas;
+        this.rCanvas = rcanvas;
         this.uiGfx = new CanvasNode();
+        this.uiGfxRight = new CanvasNode({x:1, y:4});
  
         this.healthMeter = new CanvasNode();
         this.healthCircle = new Circle(29, {x:45, y:this.hCanvas.height-30, fill:"#0A0", stroke:"none", rotation:-3*Math.PI/4, startAngle:0, endAngle:Math.PI});
@@ -115,43 +118,43 @@ hud = {
                                         { x:0, y:0, stroke:"red", strokeWidth:2 });
         this.directionWheel.append(this.directionNeedle);
 
-        this.shieldButton = new Rectangle(45,45, { stroke:"blue", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-50, y: this.hCanvas.height-50 });
+        this.shieldButton = new Rectangle(45,45, { stroke:"blue", cursor: "pointer", fill:"black", x:0, y: 0 });
         this.shieldButton.append(new TextNode("s", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
         this.shieldButton.append(new TextNode("Shield", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
         this.shieldButton.addEventListener("click",function(){
             net.sendArray(CP_SHIELD.data(world.player.shields?0:1));
             clearTimeout(world.torpFireTimeout);
         });
-        this.uiGfx.append(this.shieldButton);
+        this.uiGfxRight.append(this.shieldButton);
 
-        this.cloakButton = new Rectangle(45,45, { stroke:"#797", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-50, y: this.hCanvas.height-100 });
+        this.cloakButton = new Rectangle(45,45, { stroke:"#797", cursor: "pointer", fill:"black", x:0, y: 50 });
         this.cloakButton.append(new TextNode("c", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
         this.cloakButton.append(new TextNode("Cloak", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
         this.cloakButton.addEventListener("click",function(){
             net.sendArray(CP_CLOAK.data(world.player.cloaked?0:1));
             clearTimeout(world.torpFireTimeout);
         });
-        this.uiGfx.append(this.cloakButton);
+        this.uiGfxRight.append(this.cloakButton);
 
-        this.repairButton = new Rectangle(45,45, { stroke:"orange", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-50, y: this.hCanvas.height-150 });
+        this.repairButton = new Rectangle(45,45, { stroke:"orange", cursor: "pointer", fill:"black", x:0, y: 100 });
         this.repairButton.append(new TextNode("Sft+R", {fill:"white", font:"bold 10pt courier", y:17, x:22, align:"center"}));
         this.repairButton.append(new TextNode("Repair", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
         this.repairButton.addEventListener("click",function(){
             net.sendArray(CP_REPAIR.data(world.player.repairing?0:1));
             clearTimeout(world.torpFireTimeout);
         });
-        this.uiGfx.append(this.repairButton);
+        this.uiGfxRight.append(this.repairButton);
 
-        this.orbitButton = new Rectangle(45,45, { stroke:"#ffd700", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-50, y: this.hCanvas.height-200 });
+        this.orbitButton = new Rectangle(45,45, { stroke:"#ffd700", cursor: "pointer", fill:"black", x:50, y: 0 });
         this.orbitButton.append(new TextNode("o", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
         this.orbitButton.append(new TextNode("Orbit", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
         this.orbitButton.addEventListener("click",function(){
             net.sendArray(CP_ORBIT.data(world.player.orbitting?0:1));
             clearTimeout(world.torpFireTimeout);
         });
-        this.uiGfx.append(this.orbitButton);
+        this.uiGfxRight.append(this.orbitButton);
 
-        this.dropButton = new Rectangle(45,45, { stroke:"#ffd700", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-100, y: this.hCanvas.height-100 });
+        this.dropButton = new Rectangle(45,45, { stroke:"#ffd700", cursor: "pointer", fill:"black", x:50, y: 150 });
         this.dropButton.append(new TextNode("x", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
         this.dropButton.append(new TextNode("Drop", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
         this.dropButton.addEventListener("click",function(){
@@ -159,7 +162,7 @@ hud = {
             clearTimeout(world.torpFireTimeout);
         });
 
-        this.pickupButton = new Rectangle(45,45, { stroke:"#ffd700", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-100, y: this.hCanvas.height-150 });
+        this.pickupButton = new Rectangle(45,45, { stroke:"#ffd700", cursor: "pointer", fill:"black", x:50, y: 100 });
         this.pickupButton.append(new TextNode("z", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
         this.pickupButton.append(new TextNode("Pickup", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
         this.pickupButton.addEventListener("click",function(){
@@ -167,7 +170,7 @@ hud = {
             clearTimeout(world.torpFireTimeout);
         });
 
-        this.bombButton = new Rectangle(45,45, { stroke:"red", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-100, y: this.hCanvas.height-200 });
+        this.bombButton = new Rectangle(45,45, { stroke:"red", cursor: "pointer", fill:"black", x:50, y: 50 });
         this.bombButton.append(new TextNode("b", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
         this.bombButton.append(new TextNode("Bomb", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
         this.bombButton.addEventListener("click",function(){
@@ -175,7 +178,7 @@ hud = {
             clearTimeout(world.torpFireTimeout);
         });
 
-        this.tractorButton = new Rectangle(45,45, { stroke:"green", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-100, y: this.hCanvas.height-50 });
+        this.tractorButton = new Rectangle(45,45, { stroke:"green", cursor: "pointer", fill:"black", x:0, y: 150 });
         this.tractorButton.append(new TextNode("Sft+T", {fill:"white", font:"bold 10pt courier", y:17, x:22, align:"center"}));
         this.tractorButton.append(new TextNode("Tractor", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
         this.tractorButton.addEventListener("click",function(){
@@ -186,9 +189,9 @@ hud = {
             }
             clearTimeout(world.torpFireTimeout);
         });
-        this.uiGfx.append(this.tractorButton);
+        this.uiGfxRight.append(this.tractorButton);
 
-        this.pressorButton = new Rectangle(45,45, { stroke:"purple", cursor: "pointer", fill:"black", opacity:0.9, x:this.hCanvas.width-150, y: this.hCanvas.height-50 });
+        this.pressorButton = new Rectangle(45,45, { stroke:"purple", cursor: "pointer", fill:"black", x:0, y: 200 });
         this.pressorButton.append(new TextNode("y", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
         this.pressorButton.append(new TextNode("Pressor", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
         this.pressorButton.addEventListener("click",function(){
@@ -199,11 +202,12 @@ hud = {
             }
             clearTimeout(world.torpFireTimeout);
         });
-        this.uiGfx.append(this.pressorButton);
+        this.uiGfxRight.append(this.pressorButton);
     },
 
     draw: function() {
         this.hCanvas.append(this.uiGfx);
+        this.rCanvas.append(this.uiGfxRight);
     },
 
     undraw: function() {
@@ -231,13 +235,13 @@ hud = {
     setOrbitIndic: function(orbit) {
         this.orbitButton.fill = orbit?"#ffd700":"black";
         if(orbit) {
-            this.uiGfx.append(this.dropButton);
-            this.uiGfx.append(this.pickupButton);
-            this.uiGfx.append(this.bombButton);
+            this.uiGfxRight.append(this.dropButton);
+            this.uiGfxRight.append(this.pickupButton);
+            this.uiGfxRight.append(this.bombButton);
         } else {
-            this.uiGfx.remove(this.dropButton);
-            this.uiGfx.remove(this.pickupButton);
-            this.uiGfx.remove(this.bombButton);
+            this.uiGfxRight.remove(this.dropButton);
+            this.uiGfxRight.remove(this.pickupButton);
+            this.uiGfxRight.remove(this.bombButton);
        }
     },
     setBombIndic: function(bomb) {

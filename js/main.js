@@ -36,7 +36,7 @@ window.addEventListener("load", function() {
 
     outfitting.init(leftCanvas, rightCanvas);
     world.init(leftCanvas, rightCanvas);
-    hud.init(leftCanvas);
+    hud.init(leftCanvas, rightCanvas);
 
     $("#loading-box").css("left", ($("html").width() - $("#loading-box").width()) / 2);
     $("#loading-box").html("<h1>Loading...</h1>");
