@@ -129,11 +129,14 @@ world = {
                 var offset = $(this).offset();
                 var offsetX = e.pageX - offset.left;
                 var offsetY = e.pageY - offset.top;
-                if(!e.shiftKey) {
-                    // maybe this click was intended for a UI element, which may cancel the torp fire
-                    _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 4);
-                } else {
-                    net.sendArray(CP_PHASER.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY))));
+
+                if(!("ontouchstart" in document)) {
+                    if(!e.shiftKey) {
+                        // maybe this click was intended for a UI element, which may cancel the torp fire
+                        _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 4);
+                    } else {
+                        net.sendArray(CP_PHASER.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY))));
+                    }
                 }
             } else {
                 setTimeout(function(){ _self.setTractorCursor(false) }, 100);
@@ -231,6 +234,11 @@ world = {
             if(_self.directing) {
                 net.sendArray(CP_DIRECTION.data(_self.rad2byte(_self.directingAngle)));
                 _self.showDirecting(false);
+            } else {
+                var offset = $(this).offset();
+                var offsetX = e.changedTouches[0].pageX - offset.left;
+                var offsetY = e.changedTouches[0].pageY - offset.top;
+                _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 4);
             }
         });
 
