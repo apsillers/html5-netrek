@@ -26,7 +26,6 @@ NetrekConnection = function(callback) {
         TCPSockets.read(self.socketId, function(bufferout) {
             self.buffer += bufferout;
             self.execMessages();
-            self.readMessages();
         });
     }
     

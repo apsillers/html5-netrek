@@ -78,17 +78,14 @@ hud = {
             this.speedMeter.append(this.speedNotches[i]);
         }
 
-        this.setSpeedOnClick = function(e) {
-            var y = -e.pageY + $(e.target).offset().top + hud.speedMeter.y;
+        this.speedMeter.addEventListener("ontouchend" in document?"touchend":"click", function(e) {
+            var y = -e.clientY + $(e.target).offset().top + hud.speedMeter.y;
             var speed = Math.ceil(12 * Math.pow(y/300,1/0.75));
             net.sendArray(CP_SPEED.data(speed));
             hud.showSpeedPointer(speed);
             e.stopPropagation();
             clearTimeout(world.torpFireTimeout);
-        }
-        if("ontouchend" in document) this.speedMeter.addEventListener("touchend", this.setSpeedOnClick);
-        else this.speedMeter.addEventListener("click", this.setSpeedOnClick);
-        
+        });
 
         this.etempMeter = new Polygon([0,0, 20,0, 20,-100], {x:30, y:350, fill:"none", stroke: "#AAA", strokeWidth:2});
         this.etempBar = new Rectangle(0,0);
