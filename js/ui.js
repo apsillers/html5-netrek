@@ -86,8 +86,7 @@ hud = {
             e.stopPropagation();
             clearTimeout(world.torpFireTimeout);
         }
-        if("ontouchend" in document) this.speedMeter.addEventListener("touchend", this.setSpeedOnClick);
-        else this.speedMeter.addEventListener("click", this.setSpeedOnClick);
+        this.speedMeter.addEventListener("click", this.setSpeedOnClick);
         
 
         this.etempMeter = new Polygon([0,0, 20,0, 20,-100], {x:30, y:350, fill:"none", stroke: "#AAA", strokeWidth:2});
