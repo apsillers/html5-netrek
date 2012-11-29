@@ -78,7 +78,7 @@ hud = {
             this.speedMeter.append(this.speedNotches[i]);
         }
 
-        this.speedMeter.addEventListener("ontouchend" in document?"touchend":"click", function(e) {
+        this.speedMeter.addEventListener("click", function(e) {
             var y = -e.clientY + $(e.target).offset().top + hud.speedMeter.y;
             var speed = Math.ceil(12 * Math.pow(y/300,1/0.75));
             net.sendArray(CP_SPEED.data(speed));

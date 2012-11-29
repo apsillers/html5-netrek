@@ -238,7 +238,7 @@ world = {
                 var offset = $(this).offset();
                 var offsetX = e.changedTouches[0].pageX - offset.left;
                 var offsetY = e.changedTouches[0].pageY - offset.top;
-                _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 4);
+                _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 10);
             }
         });
 
