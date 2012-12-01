@@ -214,6 +214,7 @@ hud = {
 
     undraw: function() {
         this.hCanvas.removeChild(this.uiGfx);
+        this.hCanvas.removeChild(this.uiGfxRight);
     },
 
     showDirectionWheel: function(show) {
