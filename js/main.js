@@ -92,12 +92,11 @@ window.addEventListener("load", function() {
                         user = $("#username-input").val(),
                         pass = $("#pass-input").val();
 
-                    console.log("proxy connection formed");
+                    $("#login-box").html("<h2>Connecting...</h2>");
+
                     net.connectToServer(nt_host,2592,function(){
                         console.log("NT server connection formed");
                         net.sendArray(CP_LOGIN.data(0,user,pass,"html5test"));
-
-                        $("#login-box").html("<h2>Connecting...</h2>");
 
                         $(document).bind("keyup", function (e) {
                                 if(e.keyCode == 9) {
