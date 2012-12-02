@@ -50,7 +50,10 @@ NOTES:
 var META_HOST = "";
 var META_PORT = 0;
 var USE_REAL_META = false;
-var STATIC_HOSTS = [{host:"192.168.1.34",port:2592},{host:"127.0.0.1",port:2592}];
+var STATIC_HOSTS = [
+    {host:"continuum.us.netrek.org",port:2592},
+    {host:"pickled.netrek.org",port:2592}
+];
 
 var net = require('net');
 var express = require("express"),

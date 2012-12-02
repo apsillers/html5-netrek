@@ -42,84 +42,90 @@ window.addEventListener("load", function() {
     $("#loading-box").html("<h1>Loading...</h1>");
 
     imageLib.loadAll(function() {
+        net = new NetrekConnection(location.hostname, location.port||80, function() {
+            net.getServerList(function(serverList) {
+                $("#loading-box").hide();
+                $("#login-box").show();
 
-        $("#loading-box").hide();
-        $("#login-box").show();
+                $("#overlay").width("100%");
+                $("#overlay").css("top",$(window).scrollTop()+"px");
+                $("#overlay").css("left",$(window).scrollLeft()+"px");
+                $("#login-box").css("top",$(window).scrollTop()+100+"px");
+                $("#login-box").css("left",($("html").width() - $("#login-box").width()) / 2 + $(window).scrollLeft());
 
-        $("#overlay").width("100%");
-        $("#overlay").css("top",$(window).scrollTop()+"px");
-        $("#overlay").css("left",$(window).scrollLeft()+"px");
-        $("#login-box").css("top",$(window).scrollTop()+100+"px");
-        $("#login-box").css("left",($("html").width() - $("#login-box").width()) / 2 + $(window).scrollLeft());
+                $(window).resize(function() {
+                    $("#overlay").height($(window).height());
+                    $("#login-box").css("left", ($("html").width() - $("#login-box").width()) / 2);
+                });
+                $(window).scroll(function() {
+                    $("#overlay").css("top",$(window).scrollTop()+"px");
+                    $("#overlay").css("left",$(window).scrollLeft()+"px");
+                    $("#login-box").css("top",$(window).scrollTop()+100+"px");
+                    $("#login-box").css("left",($("html").width() - $("#login-box").width()) / 2 + $(window).scrollLeft());
+                });
 
-        $(window).resize(function() {
-            $("#overlay").height($(window).height());
-            $("#login-box").css("left", ($("html").width() - $("#login-box").width()) / 2);
-        });
-        $(window).scroll(function() {
-            $("#overlay").css("top",$(window).scrollTop()+"px");
-            $("#overlay").css("left",$(window).scrollLeft()+"px");
-            $("#login-box").css("top",$(window).scrollTop()+100+"px");
-            $("#login-box").css("left",($("html").width() - $("#login-box").width()) / 2 + $(window).scrollLeft());
-        });
+                document.getElementById("connect-button").focus();
 
-        document.getElementById("connect-button").focus();
+                for(var i = 0; i < serverList.length; ++i) {
+                    $("#nt-host-input").append($("<option></option>").text(serverList[i].host));
+                }
 
-        // if this is a dev server, default to localhost
-        if(location.hostname == "localhost" || location.hostname == "127.0.0.1") {
-            $("#nt-host-input").append("<option>localhost</option>").val("localhost");
-        }
+                // if this is a dev server, default to localhost
+                if(location.hostname == "localhost" || location.hostname == "127.0.0.1") {
+                    $("#nt-host-input").append("<option>localhost</option>").val("localhost");
+                }
 
 
-        $("#chatbox").bind("mouseover", function() {
-            $("#chatbox").css("top","-200px").height(398);
-            $("#inbox").height(370);
-        });
+                $("#chatbox").bind("mouseover", function() {
+                    $("#chatbox").css("top","-200px").height(398);
+                    $("#inbox").height(370);
+                });
 
-        $("#chatbox").bind("mouseout", function() {
-            $("#chatbox").css("top","0px").height(198);
-            $("#inbox").height(170);
-            $("#inbox").scrollTop($("#inbox")[0].scrollHeight);
-        });
+                $("#chatbox").bind("mouseout", function() {
+                    $("#chatbox").css("top","0px").height(198);
+                    $("#inbox").height(170);
+                    $("#inbox").scrollTop($("#inbox")[0].scrollHeight);
+                });
 
-        $("#connect-button").click(function() {
-            var nt_host = $("#nt-host-input").val(),
-                user = $("#username-input").val(),
-                pass = $("#pass-input").val();
+                $("#connect-button").click(function() {
+                    var nt_host = $("#nt-host-input").val(),
+                        user = $("#username-input").val(),
+                        pass = $("#pass-input").val();
 
-            net = new NetrekConnection(location.hostname, location.port||80, function() {
-                console.log("proxy connection formed");
-                net.connectToServer(nt_host,2592,function(){
-                    console.log("NT server connection formed");
-                    net.sendArray(CP_LOGIN.data(0,user,pass,"html5test"));
+                    console.log("proxy connection formed");
+                    net.connectToServer(nt_host,2592,function(){
+                        console.log("NT server connection formed");
+                        net.sendArray(CP_LOGIN.data(0,user,pass,"html5test"));
 
-                    $("#login-box").html("<h2>Connecting...</h2>");
+                        $("#login-box").html("<h2>Connecting...</h2>");
 
-                    $(document).bind("keyup", function (e) {
-                            if(e.keyCode == 9) {
-                                $("#quickstart").hide();
+                        $(document).bind("keyup", function (e) {
+                                if(e.keyCode == 9) {
+                                    $("#quickstart").hide();
+                                }
+                        });
+
+                        $(document).bind("keydown", function (e) {
+                                if(e.keyCode == 9) {
+                                    $("#quickstart").show();
+                                    e.preventDefault();
+                                }
+                        });
+
+                        // send an idempotent CP_UPDATES request every 10 seconds to save us from being ghostbusted when the player idles
+                        // TODO: get ping working instead!
+                        setInterval(function() { net.sendArray(CP_UPDATES.data(UPDATE_RATE)); }, 10000);
+
+                        // if there was a one-time error talking to server, start the protocol over again
+                        // (this sometimes happens if the server/proxy hasn't had traffic for a while and it doesn't seem to "wake up" in time)
+                        setTimeout(function() {
+                            if(!connected_yet) {
+                                net.sendArray(CP_LOGIN.data(0,user,pass,"html5test"));
                             }
+                        }, 5000);
                     });
-
-                    $(document).bind("keydown", function (e) {
-                            if(e.keyCode == 9) {
-                                $("#quickstart").show();
-                                e.preventDefault();
-                            }
-                    });
-
-                    // send an idempotent CP_UPDATES request every 10 seconds to save us from being ghostbusted when the player idles
-                    setInterval(function() { net.sendArray(CP_UPDATES.data(UPDATE_RATE)); }, 10000);
-
-                    // if there was a one-time error talking to server, start the protocol over again
-                    setTimeout(function() {
-                        if(!connected_yet) {
-                            net.sendArray(CP_LOGIN.data(0,user,pass,"html5test"));
-                        }
-                    }, 5000);
-                })
+                });
             });
         });
-
     });
 });
