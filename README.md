@@ -53,9 +53,9 @@ Currently, they include `packets.js` and `constants.js`.
 
 Art assets in `/data` are taken directly from the [COW Client](http://www.netrek.org/downloads/clients/#cow) and are licensed under a permisive MIT-style license. Author information is uncertain, but the artists probably include:
 
-  Brandon Gillespie
-	Mike McGrath
-	Joe Rumsey
-	Ola Andersson
+* Brandon Gillespie
+* Mike McGrath
+* Joe Rumsey
+* Ola Andersson
 
 
