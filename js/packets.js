@@ -90,6 +90,10 @@ CP_SPEED = {
 
     data: function(speed) {
         if(net_logging) console.log("CP_SPEED speed=",speed);
+        if(tutorial.active) {
+            if(speed==2) { tutorial.handleKeyword("speed2"); }
+            if(speed==5) { tutorial.handleKeyword("speed5"); }
+        }
         return packer.pack(this.format, [this.code, speed]);
     }
 }
@@ -99,6 +103,7 @@ CP_DIRECTION = {
 
     data: function(direction) {
         if(net_logging) console.log("CP_DIRECTION direction=",direction);
+        if(tutorial.active) tutorial.handleKeyword("direct");
         return packer.pack(this.format, [this.code, direction & 255]);
     }
 }
@@ -125,6 +130,7 @@ CP_PHASER = {
 
     data: function(direction) {
         if(net_logging) console.log("CP_PHASER direction=",direction);
+        if(tutorial.active) { tutorial.handleKeyword("phaser"); }
         return packer.pack(this.format, [this.code, direction & 255]);
     }
 }
@@ -143,6 +149,7 @@ CP_TORP = {
 
     data: function(direction) {
         if(net_logging) console.log("CP_TORP direction=",direction);
+        if(tutorial.active) { tutorial.handleKeyword("torp"); }
         return packer.pack(this.format, [this.code, direction & 255]);
     }
 }
@@ -161,6 +168,7 @@ CP_DET_MYTORP = {
 
     data: function(tnum) {
         if(net_logging) console.log("CP_DET_MYTORP");
+        if(tutorial.active) { tutorial.handleKeyword("detmytorp"); }
         return packer.pack(this.format, [this.code, tnum])
     }
 }
@@ -174,7 +182,6 @@ CP_TRACTOR = {
     }
 }
 CP_REPRESS = {
-    code: 25,
     format: '!bbbx',
 
     data: function(state, pnum) {
@@ -188,6 +195,10 @@ CP_CLOAK = {
 
     data: function(state) {
         if(net_logging) console.log("CP_CLOAK state=",state);
+        if(tutorial.active) {
+            if(state==1) { tutorial.handleKeyword("cloakon"); }
+            if(state==0) { tutorial.handleKeyword("cloakoff"); }
+        }
         return packer.pack(this.format, [this.code, state]);
     }
 }
@@ -197,6 +208,7 @@ CP_REPAIR = {
 
     data: function(state) {
         if(net_logging) console.log("CP_REPAIR state=",state);
+        if(tutorial.active) { tutorial.handleKeyword("repair"); }
         return packer.pack(this.format, [this.code, state]);
     }
 }
@@ -206,6 +218,7 @@ CP_SHIELD = {
 
     data: function(state) {
         if(net_logging) console.log("CP_SHIELD state=",state);
+        if(tutorial.active) { tutorial.handleKeyword("shields"); }
         return packer.pack(this.format, [this.code, state]);
     }
 }
@@ -274,6 +287,7 @@ serverPackets = [
         else {
             world.ships[world.playerNum].handleFlags(flags);
             hud.showEngineTemp(etemp/10);
+            if(tutorial.active && (flags & PFORBIT)) { tutorial.handleKeyword("orbit"); }
         }
 
         if(world.player != null) {
@@ -389,6 +403,16 @@ serverPackets = [
 
         if(world.player && pnum == world.player.number) {
             hud.showSpeed(speed);
+
+            if(tutorial.active && speed <= 2) {
+                // TODO: if near a planet
+                for(var i=0; i < world.planets.length; ++i) {
+                    var planet = world.planets[i];
+                    if((planet.x - x)*(planet.x - x) + (planet.y - y)*(planet.y - y) <= 1600000) {
+                        tutorial.handleKeyword("approach")
+                    }
+                }
+            }
         }
     }
   },
@@ -469,6 +493,7 @@ serverPackets = [
             outfitting.undraw();
             world.ships[world.playerNum]; 
             world.draw();
+            if(tutorial.active) { tutorial.handleKeyword("join"); }
         }
     }
   },

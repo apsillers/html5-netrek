@@ -37,6 +37,9 @@ window.addEventListener("load", function() {
     outfitting.init(leftCanvas, rightCanvas);
     world.init(leftCanvas, rightCanvas);
     hud.init(leftCanvas, rightCanvas);
+    tutorial.init($("#tutorial-div")[0], $("#tutorial-tab")[0], $("#tutorial-body")[0]);
+
+    $("#tutorial-enable-link").click(function() { tutorial.activateTutorial(); });
 
     $("#loading-box").css("left", ($("html").width() - $("#loading-box").width()) / 2);
     $("#loading-box").html("<h1>Loading...</h1>");
@@ -87,7 +90,22 @@ window.addEventListener("load", function() {
                     $("#inbox").scrollTop($("#inbox")[0].scrollHeight);
                 });
 
+                $("#tutorial-button").click(function() {
+                    tutorial.activateTutorial();
+                    tutorial.showTutorialPanel();
+                    login();
+                });
+
                 $("#connect-button").click(function() {
+                    login();
+                });
+
+                $("#show-login-button").click(function() {
+                    $("#login-choice-div").hide();
+                    $(".login-credentials").show();
+                });
+
+                function login() {
                     var nt_host = $("#nt-host-input").val(),
                         user = $("#username-input").val(),
                         pass = $("#pass-input").val();
@@ -123,7 +141,7 @@ window.addEventListener("load", function() {
                             }
                         }, 5000);
                     });
-                });
+                }
             });
         });
     });

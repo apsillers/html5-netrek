@@ -148,18 +148,18 @@ Ship.prototype = {
 
     setVisible: function(isVis) {
         this.gfx.visible = isVis;
-        this.gfx.changed = true;
+        //this.gfx.changed = true;
 
         this.galGfx.fill = isVis?teamLib.getRaceColor(this.team):"#666";
         this.galGfx.text = isVis?this.number:"?";
-        this.galGfx.changed = true;
+        //this.galGfx.changed = true;
 
         this.cloaked = !isVis;
     },
 
     setShields: function(shieldsUp) {
         this.gfx.stroke = shieldsUp?teamLib.getRaceColor(this.team):"none";
-        this.gfx.changed = true;
+        //this.gfx.changed = true;
 
         this.shields = shieldsUp;
     },
@@ -191,8 +191,8 @@ Ship.prototype = {
             hud.setRepairIndic(this.repairing);
             hud.setOrbitIndic(this.orbitting);
             hud.setBombIndic(this.bombing);
-hud.setTractorIndic(this.tractoring);
-hud.setPressorIndic(this.pressing);
+            hud.setTractorIndic(this.tractoring);
+            hud.setPressorIndic(this.pressing);
         }
     }
 }

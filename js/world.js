@@ -68,7 +68,7 @@ world = {
         this.wCanvas.append(this.wGroup);
         this.gCanvas.append(this.gGroup);
         this.wGroup.append(this.planetGroup);
-        var _self = this;        
+        var _self = this;
         _self.redrawInterval = setInterval(function recenter(){
 
             var debugStr = _self.objects.length+"<br/>";
@@ -90,7 +90,7 @@ world = {
                 obj.gfx.x = coords[0];
                 obj.gfx.y = coords[1];
 
-                if(obj instanceof Phaser) { debugStr+="Phaser</br>"; console.log(obj.gfx); }
+                //if(obj instanceof Phaser) { debugStr+="Phaser</br>"; console.log(obj.gfx); }
 
                 // update display of object in tactical
                 if(obj.galGfx) { 
@@ -155,6 +155,10 @@ world = {
             }
         });
 
+        $("#chatInput").bind("keyup", function handleKeys(e) {
+            e.stopPropagation();
+        });
+
         $(document).bind("keyup", function handleKeys(e) {
             // set speed with number keys
             if(e.which >= 48 && e.which <= 57) {
@@ -178,8 +182,14 @@ world = {
                 } else if(e.keyCode == 66) { // b bomb planet
                     net.sendArray(CP_BOMB.data(_self.player.bombing?0:1));
                     e.preventDefault();
-                } else if(e.keyCode == 68) { // d - det enemy torps
+                } else if(e.keyCode == 68  && !e.shiftKey) { // d - det enemy torps
                     net.sendArray(CP_DET_TORPS.data());
+                    e.preventDefault();
+                } else if(e.keyCode == 68 && e.shiftKey) { // d - det all of the player's torps
+                    var baseTorpIndex = _self.player.number * 8;
+                    for(var i=0; i < 8; ++i) {
+                        net.sendArray(CP_DET_MYTORP.data(baseTorpIndex + i));
+                    }
                     e.preventDefault();
                 } else if(e.keyCode == 88) { // x - beam down
                     net.sendArray(CP_BEAM.data(2));
