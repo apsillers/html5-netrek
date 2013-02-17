@@ -18,11 +18,20 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-        var connected_yet = false;
-        var creds = {};
+var connected_yet = false;
+
+$(function() {
+    $("#loading-box").css("left", ($("html").width() - $("#loading-box").width()) / 2);
+    $("#overlay").width("100%");
+    $("#overlay").css("top",$(window).scrollTop()+"px");
+    $("#overlay").css("left",$(window).scrollLeft()+"px");
+    
+});
 
 // used to start the game
 window.addEventListener("load", function() {
+    $("#loading-box").html("<h1>Loading...</h1>");
+
     var lCanvas = document.getElementById("leftCanvas"),
         rCanvas = document.getElementById("rightCanvas")
 
@@ -38,11 +47,9 @@ window.addEventListener("load", function() {
     world.init(leftCanvas, rightCanvas);
     hud.init(leftCanvas, rightCanvas);
     tutorial.init($("#tutorial-div")[0], $("#tutorial-tab")[0], $("#tutorial-body")[0]);
+    playerList.init($("#playerlist")[0]);
 
     $("#tutorial-enable-link").click(function() { tutorial.activateTutorial(); });
-
-    $("#loading-box").css("left", ($("html").width() - $("#loading-box").width()) / 2);
-    $("#loading-box").html("<h1>Loading...</h1>");
 
     imageLib.loadAll(function() {
         net = new NetrekConnection(location.hostname, location.port||80, function() {
@@ -50,9 +57,6 @@ window.addEventListener("load", function() {
                 $("#loading-box").hide();
                 $("#login-box").show();
 
-                $("#overlay").width("100%");
-                $("#overlay").css("top",$(window).scrollTop()+"px");
-                $("#overlay").css("left",$(window).scrollLeft()+"px");
                 $("#login-box").css("top",$(window).scrollTop()+100+"px");
                 $("#login-box").css("left",($("html").width() - $("#login-box").width()) / 2 + $(window).scrollLeft());
 
@@ -118,13 +122,13 @@ window.addEventListener("load", function() {
 
                         $(document).bind("keyup", function (e) {
                                 if(e.keyCode == 9) {
-                                    $("#quickstart").hide();
+                                    $("#playerlist-div").hide();
                                 }
                         });
 
                         $(document).bind("keydown", function (e) {
                                 if(e.keyCode == 9) {
-                                    $("#quickstart").show();
+                                    $("#playerlist-div").show();
                                     e.preventDefault();
                                 }
                         });

@@ -318,6 +318,7 @@ serverPackets = [
         var ignored = uvars.shift(), pnum = uvars.shift(), rank = uvars.shift(),
             name = uvars.shift(), monitor = uvars.shift(), login  = uvars.shift();
         if(net_logging) console.log("SP_PL_LOGIN pnum=",pnum,"rank=",rank,"name=",name,"monitor=",monitor,"login=",login)
+        playerList.addPlayer(pnum, name, rank);
     }
   },
   { // SP_PING - only received if client sends CP_PING_RESPONSE after SP_LOGIN
@@ -365,6 +366,8 @@ serverPackets = [
         world.ships[pnum].setImage(img);
         world.ships[pnum].setTeam(team[0]);
         world.ships[pnum].shipType = shiptype;
+     
+        playerList.updatePlayer(pnum, team);
     }
   },
   { // SP_KILLS
@@ -375,6 +378,7 @@ serverPackets = [
         var ignored = uvars.shift(), pnum = uvars.shift(), kills = uvars.shift();
         if(net_logging) console.log("SP_KILLS pnum=",pnum,"kills=",kills);
         if(world.ships[pnum]) world.ships[pnum].kills = kills;
+        playerList.updatePlayer(pnum, null, kills);
     }
   },
   { // SP_PSTATUS
@@ -384,10 +388,11 @@ serverPackets = [
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.shift(), pnum = uvars.shift(), status = uvars.shift();
         if(net_logging) console.log("SP_PSTATUS pnum=",pnum,"status=",status);
-        if(connected_yet && world.player && pnum == world.player.number && status == 1) {
+        if(connected_yet && world.player && pnum == world.player.number && status == POUTFIT) {
             world.undraw();
             outfitting.draw(leftCanvas, rightCanvas);
         }
+        if(status == PFREE) { playerList.removePlayer(pnum); }
     }
   },
   { // SP_PLAYER
@@ -597,6 +602,7 @@ serverPackets = [
             m_recpt = uvars.shift(), m_from = uvars.shift(), mesg = uvars.shift();
         if(net_logging) console.log("SP_MESSAGE m_flags=",m_flags.toString(2),"m_recpt=",m_recpt,"m_from=",m_from,"mesg=",mesg);
 
+        // bold the sender/receiver pair of a message
         mesg = mesg.replace(/^(El Nath|Beta Crucis|[^\-]+)->(\S+)/,"<b>$1->$2</b> ")
         $("#inbox").append(mesg + "<br />");
         $("#inbox").scrollTop($("#inbox")[0].scrollHeight);
@@ -624,6 +630,8 @@ serverPackets = [
         if(world.player != null && pnum == world.player.number) {
             hud.showArmies(armies, kills);
         }
+
+        playerList.updatePlayer(pnum, null, kills);
     }
   },
   { // SP_WARNING
