@@ -40,7 +40,7 @@ playerList = {
         this.update();
     },
     updatePlayer: function(pnum, team, kills) {
-        this.list[pnum].team = team||this.list[pnum].team||"--";
+        this.list[pnum].team = team||(this.list[pnum]&&this.list[pnum].team)||"--";
         this.list[pnum].kills = kills||"--";
         this.update();
     }

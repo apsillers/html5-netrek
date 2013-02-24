@@ -61,7 +61,7 @@ world = {
         this.wCanvas = wCanvas;
         this.gCanvas = gCanvas;
         this.galacticFactor = 100000 / gCanvas.height;
-        this.galaticXOffset = gCanvas.width - gCanvas.height;
+        this.galaticXOffset = gCanvas.width - gCanvas.height - 0;
     },
 
     draw: function() {
@@ -155,11 +155,9 @@ world = {
             }
         });
 
-        $("#chatInput").bind("keyup", function handleKeys(e) {
-            e.stopPropagation();
-        });
-
         $(document).bind("keyup", function handleKeys(e) {
+            if(chat.chatting || chat.choosing) { return true; } 
+
             // set speed with number keys
             if(e.which >= 48 && e.which <= 57) {
                 var speed = e.which - 48;

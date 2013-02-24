@@ -20,6 +20,7 @@
 -->
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Netrek Client</title>
 <script src="js/lib/jquip.events.css.min.js"></script>
 <script src="js/main.js"></script>
@@ -27,7 +28,6 @@
 <script src="js/lib/cake2.js"></script>
 <script src="js/lib/base64.js"></script>
 <script src="js/jspack.js"></script>
-<!--<script src="all.js"></script>-->
 <script src="js/constants.js"></script>
 <script src="js/team.js"></script>
 <script src="js/images.js"></script>
@@ -42,6 +42,7 @@
 <script src="js/packets.js"></script>
 <script src="js/net.js"></script>
 <script src="js/playerlist.js"></script>
+<script src="js/chat.js"></script>
 <link href="css/all.css" rel="stylesheet" type="text/css" media="all">
 
 </head>
@@ -54,7 +55,7 @@
   <div style="float:left; position: relative;">
   <div id="chatbox" style="width: 498px; height:198px; position: absolute; top: 0px; left: 0px; background-color: white; border: thin solid black;">
     <div id="inbox" style=" height:170px; overflow-y: scroll; font-family: monospace; font-size: 10px;"></div>
-    <input id="chatInput" type="text" style=" height: 20px; width: 490px; font-size: 10px; font-family: monospace;" />
+    <input id="chatInput" type="text" style="height: 20px; width: 490px; font-size: 10px; font-family: monospace;" />
   </div>
   </div>
 </div>
@@ -78,6 +79,8 @@
 <div id="login-box">
     <div id="login-inner"><div id="login-inner-inner">
         <div id="login-title">Netrek Login</div>
+
+        <div id="login-error" style="color: #800; font-family: monospace; font-weight: bold; padding: 0 4px;"></div>
 
         <div id="login-choice-div">
             <div><input type="button" id="tutorial-button" class="big-button" value="Launch tutorial" /></div>
@@ -103,6 +106,7 @@
         <div id="login-tips">Want to play Netrek on a full desktop client?<br/>Download one now from <a href="http://www.netrek.org/">netrek.org</a>.</div>
     </div></div>
     <div style="clear:left;"></div>
+    <h2 id="login-loading" style="display:none;">Loading...</h2>
 </div>
 
 <div id="loading-box">

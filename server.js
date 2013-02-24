@@ -115,7 +115,7 @@ io.sockets.on('connection', function (socket) {
             });
 
 		    serverConn.on('error', function(e) {
-                console.log("socket error",e);
+                socket.emit("serverError");
             });
 
             // foward all data from the browser client to the server
@@ -139,6 +139,7 @@ io.sockets.on('connection', function (socket) {
             socket.emit('serverConnected');
         }).on('error', function(e) {
            console.log("Connect error: " + e.message);
+           socket.emit("connectError");
         });
     });
 });

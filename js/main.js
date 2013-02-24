@@ -48,6 +48,7 @@ window.addEventListener("load", function() {
     hud.init(leftCanvas, rightCanvas);
     tutorial.init($("#tutorial-div")[0], $("#tutorial-tab")[0], $("#tutorial-body")[0]);
     playerList.init($("#playerlist")[0]);
+    chat.init($("#chatInput")[0]);
 
     $("#tutorial-enable-link").click(function() { tutorial.activateTutorial(); });
 
@@ -114,9 +115,17 @@ window.addEventListener("load", function() {
                         user = $("#username-input").val(),
                         pass = $("#pass-input").val();
 
-                    $("#login-box").html("<h2>Connecting...</h2>");
+                    $("#login-inner").hide();
+                    $("#login-loading").show();
 
-                    net.connectToServer(nt_host,2592,function(){
+                    net.connectToServer(nt_host,2592,function(success){
+                        if(!success) {
+                            $("#login-loading").hide();
+                            $("#login-inner").show();
+                            $("#login-error").html("Could not connect to server.<br />Choose another server from the list.");
+                            return;
+                        }
+
                         console.log("NT server connection formed");
                         net.sendArray(CP_LOGIN.data(0,user,pass,"html5test"));
 

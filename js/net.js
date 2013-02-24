@@ -61,7 +61,8 @@ NetrekConnection = function(webhost, webport, callback) {
         this.serverHost = host;
         this.serverPort = port;
         var _self = this;
-		this.conn.once('serverConnected', function() {
+
+        var onConnect = function() {
             document.title += " - " + _self.serverHost;
 			_self.sendArray(CP_SOCKET.data(10));
             // if the browser has Web Worker support
@@ -71,6 +72,7 @@ NetrekConnection = function(webhost, webport, callback) {
                     if(typeof evt.data == "object" && typeof evt.data.msgCode != "undefined") {
                         serverPackets[evt.data.msgCode].handler(evt.data.data);
                     }
+
                 });
 
                 // base64-decode all packets from the server and send them to the worker
@@ -90,9 +92,19 @@ NetrekConnection = function(webhost, webport, callback) {
                 console.warn('The Netrek server unexpected closed the connection. You probably timed out. Try reloading the page.');
             });
 
+            _self.conn.removeListener(onError);
+
             // once everything is set up, do the specified callback
-		    callback();
-		});
+		    callback(true);
+		}
+
+        var onError = function() {
+            _self.conn.removeListener(onConnect);
+            callback(false);
+        }
+
+		this.conn.once('serverConnected', onConnect);
+        this.conn.once("connectError", onError)
 		this.conn.emit('joinServer', {host:host, port:port});
 	}
 
