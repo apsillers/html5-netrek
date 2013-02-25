@@ -138,7 +138,7 @@ tutorial = {
 
     showTutorialPanel: function() {
         if(this != tutorial.tutorialTab) { return tutorial.showTutorialPanel.call(tutorial.tutorialTab); }
-        tutorial.tutorialDiv.style.right = "0";
+        tutorial.tutorialBody.style.width = "500px";
         this[(this.innerText==undefined)?"textContent":"innerText"] = ">>";
         this.removeEventListener("click",tutorial.showTutorialPanel);
         this.addEventListener("click", tutorial.hideTutorialPanel);
@@ -146,7 +146,7 @@ tutorial = {
 
     hideTutorialPanel: function() {
         if(this != tutorial.tutorialTab) { return tutorial.hideTutorialPanel.call(tutorial.tutorialTab); }
-        tutorial.tutorialDiv.style.right = "-520px";
+        tutorial.tutorialBody.style.width = "0px";
         this[(this.innerText==undefined)?"textContent":"innerText"] = "<< ?";
         this.removeEventListener("click", tutorial.hideTutorialPanel);
         tutorial.tutorialTab.addEventListener("click", tutorial.showTutorialPanel);
