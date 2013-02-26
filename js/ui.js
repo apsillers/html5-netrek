@@ -33,6 +33,7 @@ hud = {
     fuelMeter: null,
     fuelText: null,
     uiGfx: null,
+    targetSpeed: 0,
 
     init: function(canvas, rcanvas) {
         this.hCanvas = canvas;
@@ -322,6 +323,7 @@ hud = {
     },
     showSpeedPointer: function(speed) {
         if(speed > this.maxSpeed) { speed = this.maxSpeed; }
+        this.targetSpeed = speed;
         this.speedPointer.y = -300 * Math.pow(speed/12, 0.75);
         this.speedPointer.changed = true;
     },

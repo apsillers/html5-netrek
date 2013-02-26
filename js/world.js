@@ -113,12 +113,11 @@ world = {
         hud.draw();
 
         // UI: set dest heading via right-click
-        $(this.wCanvas.canvas).bind("contextmenu", function setCourseWithRightClick(e) {
+        $(this.wCanvas.canvas).bind("contextmenu", _self.setCourseWithRightClick = function (e) {
             var offset = $(this).offset();
             var offsetX = e.pageX - offset.left;
             var offsetY = e.pageY - offset.top;
             // get the angle
-            //_self.player.setRotation(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)));
             net.sendArray(CP_DIRECTION.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY))));
             e.preventDefault();
         });
@@ -250,6 +249,8 @@ world = {
             }
         });
 
+        gamepad.startReading();
+
         this.drawn = true;
     },
 
@@ -266,6 +267,8 @@ world = {
         $(this.wCanvas.canvas).unbind("touchstart", this.startDirectingOnTouch);
         $(this.wCanvas.canvas).unbind("touchmove", this.changeDirectingOnMove);
         $(this.wCanvas.canvas).unbind("touchend", this.sendDirectionOnEnd);
+
+        gamepad.stopReading();
 
         this.drawn = false;
     },
@@ -361,6 +364,10 @@ world = {
         }
 
         return angle;
+    },
+
+    getAngleFromJoystick: function(x,y) {
+        return Math.atan2(x,-y);
     },
 
     Planet: function(placeX, placeY, name, features, includingWorld) {

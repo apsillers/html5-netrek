@@ -25,7 +25,7 @@ $(function() {
     $("#overlay").width("100%");
     $("#overlay").css("top",$(window).scrollTop()+"px");
     $("#overlay").css("left",$(window).scrollLeft()+"px");
-    
+
 });
 
 // used to start the game
@@ -49,6 +49,7 @@ window.addEventListener("load", function() {
     tutorial.init($("#tutorial-div")[0], $("#tutorial-tab")[0], $("#tutorial-body")[0]);
     playerList.init($("#playerlist")[0]);
     chat.init($("#chatInput")[0]);
+    gamepad.init();
 
     $("#tutorial-enable-link").click(function() { tutorial.activateTutorial(); });
 

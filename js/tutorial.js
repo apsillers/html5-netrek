@@ -138,7 +138,8 @@ tutorial = {
 
     showTutorialPanel: function() {
         if(this != tutorial.tutorialTab) { return tutorial.showTutorialPanel.call(tutorial.tutorialTab); }
-        tutorial.tutorialBody.style.width = "500px";
+        tutorial.tutorialBody.style.display = "block";
+        tutorial.tutorialBody.style.padding = "10px";
         this[(this.innerText==undefined)?"textContent":"innerText"] = ">>";
         this.removeEventListener("click",tutorial.showTutorialPanel);
         this.addEventListener("click", tutorial.hideTutorialPanel);
@@ -146,7 +147,8 @@ tutorial = {
 
     hideTutorialPanel: function() {
         if(this != tutorial.tutorialTab) { return tutorial.hideTutorialPanel.call(tutorial.tutorialTab); }
-        tutorial.tutorialBody.style.width = "0px";
+        tutorial.tutorialBody.style.display = "none";
+        tutorial.tutorialBody.style.padding = "0";
         this[(this.innerText==undefined)?"textContent":"innerText"] = "<< ?";
         this.removeEventListener("click", tutorial.hideTutorialPanel);
         tutorial.tutorialTab.addEventListener("click", tutorial.showTutorialPanel);
