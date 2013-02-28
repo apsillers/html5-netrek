@@ -73,6 +73,20 @@ window.addEventListener("load", function() {
                     $("#login-box").css("left",($("html").width() - $("#login-box").width()) / 2 + $(window).scrollLeft());
                 });
 
+                /*var resizeGame = function() {
+                    var container = lCanvas.firstElementChild;
+                    var canvas = container.firstElementChild;
+                    container.style.width = $(window).width() - $(rCanvas).data("width") + "px";
+                    container.style.height = $(window).height();
+                    canvas.width = $(window).width() - $(rCanvas).data("width");
+                    canvas.height = $(window).height();
+                }
+                resizeTimeout = null;
+                $(window).resize(function() {
+                    if(resizeTimeout) clearTimeout(resizeTimeout);
+                    setTimeout(resizeGame, 100);
+                });*/
+
                 document.getElementById("connect-button").focus();
 
                 for(var i = 0; i < serverList.length; ++i) {
