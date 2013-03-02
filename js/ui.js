@@ -206,6 +206,25 @@ hud = {
             clearTimeout(world.torpFireTimeout);
         });
         this.uiGfxRight.append(this.pressorButton);
+
+        this.dPadMap = new CanvasNode({x:this.hCanvas.width - 100, y:this.hCanvas.height - 100});
+        this.dPadMap.append(new Polygon([0,0, 20,0, 20,20, 40,20, 40,40, 20,40, 20,60, 0,60, 0,40, -20,40, -20,20, 0,20], {fill:"#444", stroke:"white", zIndex:-50}));
+        this.dPadUp = new TextNode("", {fill:"white", font:"bold 8pt courier", y:-5, x:10, align:"center"});
+        this.dPadMap.append(this.dPadUp);
+        this.dPadDown = new TextNode("", {fill:"white", font:"bold 8pt courier", y:70, x:10, align:"center"});
+        this.dPadMap.append(this.dPadDown);
+        this.dPadLeft = new TextNode("", {fill:"white", font:"bold 8pt courier", y:32, x:-25, align:"right"});
+        this.dPadMap.append(this.dPadLeft);
+        this.dPadRight = new TextNode("", {fill:"white", font:"bold 8pt courier", y:32, x:45, align:"left"});
+        this.dPadMap.append(this.dPadRight);
+        this.uiGfx.append(this.dPadMap);
+
+        this.dPadCommands = [
+            ["Beam up", "Orbit", "Beam down", "Bomb"],
+            ["Report", "Carry", "Chat", "Carry"],
+            ["Repair", "Shields", "", "Cloak"],
+            ["Tractor", "Det torps", "Pressor", "Det mine"],
+        ]
     },
 
     draw: function() {
@@ -216,6 +235,19 @@ hud = {
     undraw: function() {
         this.hCanvas.removeChild(this.uiGfx);
         this.rCanvas.removeChild(this.uiGfxRight);
+    },
+
+    showDPadCommands: function(buttonNum) {
+        var commands = this.dPadCommands[buttonNum];
+        this.dPadUp.text = commands[0];
+        this.dPadRight.text = commands[1];
+        this.dPadDown.text = commands[2];
+        this.dPadLeft.text = commands[3];
+        this.uiGfx.append(this.dPadMap);
+        this.dPadMap.changed = true;
+    },
+    hideDPadCommands: function() {
+        this.uiGfx.remove(this.dPadMap);
     },
 
     showDirectionWheel: function(show) {
