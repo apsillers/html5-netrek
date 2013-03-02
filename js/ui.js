@@ -217,7 +217,6 @@ hud = {
         this.dPadMap.append(this.dPadLeft);
         this.dPadRight = new TextNode("", {fill:"white", font:"bold 8pt courier", y:32, x:45, align:"left"});
         this.dPadMap.append(this.dPadRight);
-        this.uiGfx.append(this.dPadMap);
 
         this.dPadCommands = [
             ["Beam up", "Orbit", "Beam down", "Bomb"],
