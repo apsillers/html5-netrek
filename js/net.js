@@ -83,7 +83,7 @@ NetrekConnection = function(webhost, webport, callback) {
 			    this.on('message', function(e) {
                     // if the browser lacks Web Worker support, just do processing in a blocking way
                     _self.buffer += atob(e);
-                    if(!_self.reading) _self.readMessages();
+                    if(!_self.reading) { _self.readMessages(); }
                 });
             }
 
@@ -143,7 +143,7 @@ NetrekConnection = function(webhost, webport, callback) {
             this.buffer = this.buffer.substr(length);
             // send data to the handler for this message type; this causes the action to occur
             msgClass.handler(packer.stringToBytes(data));
-            setTimeout(this.readMessages(), 0);
+            this.readMessages();
         } else {
             this.reading = false;
             return;
@@ -151,9 +151,3 @@ NetrekConnection = function(webhost, webport, callback) {
     }
 
 }
-
-
-Array.prototype.next = function() {
-    return this.splice(0,1)[0];
-}
-
