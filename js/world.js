@@ -370,6 +370,12 @@ world = {
         return Math.atan2(x,-y);
     },
 
+    shipsByProximityToWorldPoint: function(x,y) {
+        return this.ships.slice().sort(function(a,b) {
+            return Math.pow(a.gfx.x-x,2)+Math.pow(a.gfx.y-y,2) - Math.pow(b.gfx.x-x,2)+Math.pow(b.gfx.y-y,2);
+        });
+    },
+
     Planet: function(placeX, placeY, name, features, includingWorld) {
         var planet_self = this;
         var world_xy = world.netrek2world(placeX, placeY);

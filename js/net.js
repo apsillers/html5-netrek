@@ -22,19 +22,15 @@
 // The WS server is an intermediary between the browser and Netrek (NT) server.
 // Sort of like a proxy, but it does a little more (e.g., metaserver queries).
 // See node/server.node.js for the protocol and code
-NetrekConnection = function(webhost, webport, callback) {
+NetrekConnection = function(callback) {
 
     if(typeof window.Worker == "function") this.worker = new Worker("js/net_worker.js");
-
-    this.host = webhost || "localhost";
-	this.port = webport || 8080;
 	
     this.serverHost = null;
     this.serverPort = null;
 
-	this.conn = io.connect("ws://"+this.host+":"+this.port);
-	this.conn.once("connect",callback);
-	
+    setTimeout(callback, 4);
+
     // the stream of Netrek messages we haven't resolved yet
     this.buffer = "";
 
@@ -48,10 +44,11 @@ NetrekConnection = function(webhost, webport, callback) {
     // (note that the WS should query the meta server for this info, but it is
     //  possible the WS could just lie and/or list only a few favored servers)
     this.getServerList = function(callback) {
-        this.conn.once("serverData", function(serverList) {
+        callback([{host:"netrek.apsillers.com", port:"2592"}]);
+        /*this.conn.once("serverData", function(serverList) {
             if(typeof callback === "function"){ callback(serverList); }
         });
-        this.conn.emit("serverDataReq");
+        this.conn.emit("serverDataReq");*/
     }
 
     // connectToServer: tell the WS server we want to join a server
@@ -61,6 +58,8 @@ NetrekConnection = function(webhost, webport, callback) {
         this.serverHost = host;
         this.serverPort = port;
         var _self = this;
+
+	    this.conn = new WebSocket("ws://"+host+":"+port, ["base64"]);
 
         var onConnect = function() {
             document.title += " - " + _self.serverHost;
@@ -76,36 +75,33 @@ NetrekConnection = function(webhost, webport, callback) {
                 });
 
                 // base64-decode all packets from the server and send them to the worker
-			    this.on('message', function(e) {
-                    _self.worker.postMessage(e);
-                });
+			    this.onmessage = function(e) {
+                    _self.worker.postMessage(e.data);
+                };
             } else {
-			    this.on('message', function(e) {
+			    this.onmessage = function(e) {
                     // if the browser lacks Web Worker support, just do processing in a blocking way
-                    _self.buffer += atob(e);
-                    if(!_self.reading) { _self.readMessages(); }
-                });
+console.log(e);
+                    _self.buffer += atob(e.data);
+                    if(!_self.reading) _self.readMessages();
+                };
             }
 
             // listen for a closure notification from the server
-            this.once('serverClosure', function() {
+            this.onerror = function() {
                 console.warn('The Netrek server unexpected closed the connection. You probably timed out. Try reloading the page.');
-            });
-
-            _self.conn.removeListener(onError);
+            };
 
             // once everything is set up, do the specified callback
 		    callback(true);
 		}
 
         var onError = function() {
-            _self.conn.removeListener(onConnect);
             callback(false);
         }
 
-		this.conn.once('serverConnected', onConnect);
-        this.conn.once("connectError", onError)
-		this.conn.emit('joinServer', {host:host, port:port});
+		this.conn.onopen = onConnect;
+        this.conn.onerror = onError;
 	}
 
     this.sendArray = function(data_array) {
@@ -151,3 +147,9 @@ NetrekConnection = function(webhost, webport, callback) {
     }
 
 }
+
+
+Array.prototype.next = function() {
+    return this.splice(0,1)[0];
+}
+

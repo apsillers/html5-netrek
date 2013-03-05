@@ -54,7 +54,7 @@ window.addEventListener("load", function() {
     $("#tutorial-enable-link").click(function() { tutorial.activateTutorial(); });
 
     imageLib.loadAll(function() {
-        net = new NetrekConnection(location.hostname, location.port||80, function() {
+        net = new NetrekConnection(function() {
             net.getServerList(function(serverList) {
                 $("#loading-box").hide();
                 $("#login-box").show();
@@ -133,7 +133,7 @@ window.addEventListener("load", function() {
                     $("#login-inner").hide();
                     $("#login-loading").show();
 
-                    net.connectToServer(nt_host,2592,function(success){
+                    net.connectToServer(nt_host,16445,function(success){
                         if(!success) {
                             $("#login-loading").hide();
                             $("#login-inner").show();
