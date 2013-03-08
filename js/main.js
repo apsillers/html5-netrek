@@ -20,14 +20,6 @@
 
 var connected_yet = false;
 
-$(function() {
-    $("#loading-box").css("left", ($("html").width() - $("#loading-box").width()) / 2);
-    $("#overlay").width("100%");
-    $("#overlay").css("top",$(window).scrollTop()+"px");
-    $("#overlay").css("left",$(window).scrollLeft()+"px");
-
-});
-
 // used to start the game
 window.addEventListener("load", function() {
     $("#loading-box").html("<h1>Loading...</h1>");
@@ -42,6 +34,11 @@ window.addEventListener("load", function() {
     rightCanvas = new Canvas(rCanvas, $(rCanvas).data("width"), $(rCanvas).data("height"), {
         fill: 'black'
     });
+
+    $("#loading-box").css("left", ($("html").width() - $("#loading-box").width()) / 2);
+    $("#overlay").width("100%");
+    $("#overlay").css("top",$(window).scrollTop()+"px");
+    $("#overlay").css("left",$(window).scrollLeft()+"px");
 
     outfitting.init(leftCanvas, rightCanvas);
     world.init(leftCanvas, rightCanvas);
@@ -87,17 +84,28 @@ window.addEventListener("load", function() {
                     setTimeout(resizeGame, 100);
                 });*/
 
-                document.getElementById("connect-button").focus();
-
-                for(var i = 0; i < serverList.length; ++i) {
-                    $("#nt-host-input").append($("<option></option>").text(serverList[i].host));
-                }
+                $("#join-button").click(function() {
+                    $("#menu-div").hide();
+                    $("#server-choice-div").show();
+                });
 
                 // if this is a dev server, default to localhost
                 if(location.hostname == "localhost" || location.hostname == "127.0.0.1") {
-                    $("#nt-host-input").append("<option>localhost</option>").val("localhost");
+                    serverList.push({"host":location.hostname})
                 }
 
+                for(var i = 0; i < serverList.length; ++i) {
+                    var hostbutton = $("<div class='main-menu-button host-button'></div>").text(serverList[i].host);
+                    $.data(hostbutton[0], "data-host", serverList[i].host);
+                    $("#list-back-button").before(hostbutton);
+                }
+
+                $(".host-button").click(function() {
+                    $("#server-choice-div").hide();
+                    $("#credentials-div").show();
+                    $("#connect-button").focus();
+                    $("#nt-host-input").val($(this).data("host"));
+                });
 
                 $("#chatbox").bind("mouseover", function() {
                     $("#chatbox").css("top","-200px").height(398);
@@ -113,22 +121,37 @@ window.addEventListener("load", function() {
                 $("#tutorial-button").click(function() {
                     tutorial.activateTutorial();
                     tutorial.showTutorialPanel();
-                    login();
+                    login(CONFIG.tutorial_server, "guest", "");
+                });
+
+                $("#credits-button").click(function() {
+                    $("#menu-div").hide();
+                    $("#credits-div").show();
+                });
+
+                $("#credits-back-button").click(function() {
+                    $("#menu-div").show();
+                    $("#credits-div").hide();
+                });
+
+                $("#list-back-button").click(function() {
+                    $("#menu-div").show();
+                    $("#server-choice-div").hide();
                 });
 
                 $("#connect-button").click(function() {
                     login();
                 });
 
-                $("#show-login-button").click(function() {
-                    $("#login-choice-div").hide();
-                    $(".login-credentials").show();
+                $("#login-back-button").click(function() {
+                    $("#credentials-div").hide();
+                    $("#server-choice-div").show();
                 });
 
-                function login() {
-                    var nt_host = $("#nt-host-input").val(),
-                        user = $("#username-input").val(),
-                        pass = $("#pass-input").val();
+                function login(nt_host_var, user_var, pass_var) {
+                    var nt_host = nt_host_var || $("#nt-host-input").val(),
+                        user = user_var || $("#username-input").val(),
+                        pass = pass_var || $("#pass-input").val();
 
                     $("#login-inner").hide();
                     $("#login-loading").show();
@@ -137,7 +160,9 @@ window.addEventListener("load", function() {
                         if(!success) {
                             $("#login-loading").hide();
                             $("#login-inner").show();
-                            $("#login-error").html("Could not connect to server.<br />Choose another server from the list.");
+                            $("#credentials-div").hide();
+                            $("#server-choice-div").show();
+                            $("#login-error").html("Could not connect to server.");
                             return;
                         }
 
