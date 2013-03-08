@@ -28,6 +28,7 @@
 <script src="js/lib/base64.js"></script>
 <script src="js/jspack.js"></script>
 <script src="js/constants.js"></script>
+<script src="config.js"></script>
 <script src="js/team.js"></script>
 <script src="js/images.js"></script>
 <script src="js/world.js"></script>
@@ -60,6 +61,7 @@
   </div>
 </div>
 
+<!-- tutorial sidebar -->
 <div id="tutorial-div" style="position: absolute; right:0px; top:0; z-index: 5; alpha: 0.95; opacity: 0.95;">
     <div id="tutorial-tab" style="background-color: #Fa5; font-weight: bold; cursor:pointer; float: left;">&lt;&lt; ?</div>
     <div id="tutorial-body" style="background-color: #Fa5; width: 500px; height: 500px; padding: 0px; float:left; overflow-y: auto; display:none;">
@@ -67,6 +69,7 @@
     </div>
 </div>
 
+<!-- player list -->
 <div id="playerlist-div" style="position: absolute; z-index:10000; background-color: rgba(50, 50, 50, 0.90); left:50%; width:1000px; top: 20px; margin-left: -500px; height:460px; color: white; display:none; font-size: 10pt;">
     <h1 style="padding-left: 10px;">Player List</h1>
     <div id="playerlist" style="padding: 10px;">
@@ -74,36 +77,58 @@
     </div>
 </div>
 
+<!-- overlay that hides the game during login -->
 <div id="overlay"></div>
 
 <div id="login-box">
     <div id="login-inner"><div id="login-inner-inner">
-        <div id="login-title">Netrek Login</div>
+        <div id="login-title">Netrek</div>
 
-        <div id="login-error" style="color: #800; font-family: monospace; font-weight: bold; padding: 0 4px;"></div>
+    <img src="data/screenshot.png" style="float:left">
 
-        <div id="login-choice-div">
-            <div><input type="button" id="tutorial-button" class="big-button" value="Launch tutorial" /></div>
-
-            <div style="margin:10px 0; font-weight: bold;">OR</div>
-
-            <div><input type="button" style="margin-top:0;" id="show-login-button" class="big-button" value="Log in to a server" /></div>
+    <div id="all-menus" style="float: left;">
+        <div id="menu-div">
+                <div id="tutorial-button" class="main-menu-button">Tutorial</div>
+                <div id="join-button" class="main-menu-button">Join Server</div>
+                <div id="credits-button" class="main-menu-button">Credits</div>
         </div>
 
-        <div style="float:left;" class="login-credentials">
-            <div class="login-row login-label">Host:</div>
-            <div class="login-row login-label">Username:</div>
-            <div class="login-row login-label">Password: </div>
+        <div id="credits-div">
+            <strong>Author:</strong> Andrew Sillers (apsillers)<br/>
+            <strong>License:</strong> GPLv3<br/>
+            <strong>Source:</strong> On <a href="https://github.com/apsillers/html5-netrek" style="color: #ddd">Github</a>
+            <br /><br/>
+            <div id="credits-back-button" class="main-menu-button">&lt; Back</div>
+            <br/>
         </div>
-        <div style="float:left;" class="login-credentials">
-            <!-- nt-host-input will be populated with options by net.getServerList in main.js -->
-            <div class="login-row"><select id="nt-host-input"></select></div>
-            <div class="login-row"><input id="username-input" type="text" value="guest" /></div>
-            <div class="login-row"><input id="pass-input" type="password" /></div>
+
+        <div id="server-choice-div">
+            <div id="login-error" style="color: #B00; font-family: monospace; font-weight: bold; padding: 0 4px;"></div>
+            <div id="list-back-button" class="main-menu-button">&lt; Back</div>
         </div>
-        <div style="clear:left;"></div>
-        <div><input type="button" value="Connect" class="big-button login-credentials" id="connect-button" /></div>
-        <div id="login-tips">Want to play Netrek on a full desktop client?<br/>Download one now from <a href="http://www.netrek.org/">netrek.org</a>.</div>
+
+        <div id="credentials-div">
+            <div style="float:left;" class="login-credentials">
+                <div class="login-row login-label">Username:</div>
+                <div class="login-row login-label">Password: </div>
+            </div>
+
+            <div style="float:left;" class="login-credentials">
+                <!-- nt-host-input will be populated with options by net.getServerList in main.js -->
+                <div class="login-row"><input id="username-input" type="text" value="guest" /></div>
+                <div class="login-row"><input id="pass-input" type="password" /></div>
+                <input id="nt-host-input" type="hidden" />
+            </div>
+            <div style="clear:left;"></div>
+            <div>
+                <input type="button" value="< Back" class="big-button login-credentials" id="login-back-button" style="width:75px;" />
+                <input type="button" value="Connect" class="big-button login-credentials" id="connect-button" />
+            </div>
+        </div>
+
+        <div id="login-tips">Want to play Netrek on a full desktop client? Download one now from <a href="http://www.netrek.org/" style="color:#ddd;">netrek.org</a>.</div>
+    </div>
+
     </div></div>
     <div style="clear:left;"></div>
     <h2 id="login-loading" style="display:none;">Loading...</h2>
