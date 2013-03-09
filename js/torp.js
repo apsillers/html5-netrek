@@ -25,10 +25,9 @@ var Torp = function(placeX, placeY, dir, team, includingWorld) {
     {
         y: world_xy[0],
         x: world_xy[1],
-        fill: team.indexOf(includingWorld.player.team)?"#FFF":"#FF0"//teamLib.getRaceColor(team)
+        fill: team.indexOf(includingWorld.player.team)==-1?"#FFF":"#FF0"//teamLib.getRaceColor(team)
 
     });
-
 
     this.x = placeX;
     this.y = placeY;
@@ -38,9 +37,7 @@ var Torp = function(placeX, placeY, dir, team, includingWorld) {
     this.includingWorld = includingWorld;
     this.gfxRoot = world.wGroup;
     this.isOnCanvas = true;
-    //this.boundRedraw = function() { self.redrawSelf(); };
 
-    //this.redrawInterval = setInterval(this.boundRedraw, 150);
 }
 Torp.prototype = {
     setOnCanvas: function(setOn) {
@@ -57,16 +54,9 @@ Torp.prototype = {
         this.x = placeX;
         this.y = placeY;
         this.dir = dir;
-        this.gfx.fill = "white";
-        //clearInterval(this.redrawInterval);
-        //this.redrawInterval = setInterval(this.boundRedraw, 150);
-    }/*,
+    },
 
-    redrawSelf: function() {
-        var radDir = world.byte2rad(this.dir);
-        var dx = 12 * Math.cos(radDir);
-        var dy = 12 * Math.sin(radDir);
-        this.x -= 10;
-        this.y -= 10;
-    }*/
+    explode: function() {
+        new Explosion({x: this.x, y: this.y, radius: 0, maxRadius: 5, radiusStep: 0.5});
+    }
 }

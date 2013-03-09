@@ -280,6 +280,8 @@ world = {
         this.objects.push(obj);
     },
     remove: function(obj) {
+        if(obj == undefined) return;
+
         var r = this.objects.splice(this.objects.indexOf(obj),1);
         obj.gfx.removeSelf();
         if(obj.galGfx) { obj.galGfx.removeSelf(); }
@@ -294,6 +296,10 @@ world = {
             this.player = shipObj;
         }
         this.add(shipObj);
+    },
+    removeShip: function(num) {
+        this.remove(this.ships[num]);
+        //this.ships[num] = undefined;
     },
     addTorp: function(num, torpObj) {
         this.torps[num] = torpObj;

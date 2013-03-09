@@ -35,11 +35,6 @@ window.addEventListener("load", function() {
         fill: 'black'
     });
 
-    $("#loading-box").css("left", ($("html").width() - $("#loading-box").width()) / 2);
-    $("#overlay").width("100%");
-    $("#overlay").css("top",$(window).scrollTop()+"px");
-    $("#overlay").css("left",$(window).scrollLeft()+"px");
-
     outfitting.init(leftCanvas, rightCanvas);
     world.init(leftCanvas, rightCanvas);
     hud.init(leftCanvas, rightCanvas);
@@ -87,6 +82,7 @@ window.addEventListener("load", function() {
                 $("#join-button").click(function() {
                     $("#menu-div").hide();
                     $("#server-choice-div").show();
+                    $("#login-error").html("");
                 });
 
                 // if this is a dev server, default to localhost
@@ -100,13 +96,6 @@ window.addEventListener("load", function() {
                     $("#list-back-button").before(hostbutton);
                 }
 
-                $(".host-button").click(function() {
-                    $("#server-choice-div").hide();
-                    $("#credentials-div").show();
-                    $("#connect-button").focus();
-                    $("#nt-host-input").val($(this).data("host"));
-                });
-
                 $("#chatbox").bind("mouseover", function() {
                     $("#chatbox").css("top","-200px").height(398);
                     $("#inbox").height(370);
@@ -118,10 +107,18 @@ window.addEventListener("load", function() {
                     $("#inbox").scrollTop($("#inbox")[0].scrollHeight);
                 });
 
+                $(".host-button").click(function() {
+                    $("#server-choice-div").hide();
+                    $("#credentials-div").show();
+                    $("#connect-button").focus();
+                    $("#login-error").html("");
+                    $("#nt-host-input").val($(this).data("host"));
+                });
+
                 $("#tutorial-button").click(function() {
                     tutorial.activateTutorial();
                     tutorial.showTutorialPanel();
-                    login(CONFIG.tutorial_server, "guest", "");
+                    login(CONFIG.tutorial_server, "guest", "", true);
                 });
 
                 $("#credits-button").click(function() {
@@ -148,10 +145,11 @@ window.addEventListener("load", function() {
                     $("#server-choice-div").show();
                 });
 
-                function login(nt_host_var, user_var, pass_var) {
+                function login(nt_host_var, user_var, pass_var, isTutorial_var) {
                     var nt_host = nt_host_var || $("#nt-host-input").val(),
                         user = user_var || $("#username-input").val(),
                         pass = pass_var || $("#pass-input").val();
+                    var isTutorial = isTutorial_var;
 
                     $("#login-inner").hide();
                     $("#login-loading").show();
@@ -161,8 +159,9 @@ window.addEventListener("load", function() {
                             $("#login-loading").hide();
                             $("#login-inner").show();
                             $("#credentials-div").hide();
-                            $("#server-choice-div").show();
-                            $("#login-error").html("Could not connect to server.");
+                            if(isTutorial) { $("#main-menu-div").show(); }
+                            else { $("#server-choice-div").show(); }
+                            $("#login-error").html("Could not connect to server.<br/>Try another server from the list.");
                             return;
                         }
 
@@ -198,4 +197,11 @@ window.addEventListener("load", function() {
             });
         });
     });
+
+    $("#loading-box").css("left", ($("html").width() - $("#loading-box").width()) / 2);
+    $("#overlay").width("100%");
+    $("#overlay").css("top",$(window).scrollTop()+"px");
+    $("#overlay").css("left",$(window).scrollLeft()+"px");
 });
+
+

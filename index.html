@@ -40,6 +40,7 @@
 <script src="js/torp.js"></script>
 <script src="js/phaser.js"></script>
 <script src="js/tractor.js"></script>
+<script src="js/explosion.js"></script>
 <script src="js/packets.js"></script>
 <script src="js/net.js"></script>
 <script src="js/playerlist.js"></script>
@@ -88,6 +89,8 @@
     <img src="data/screenshot.png" style="float:left">
 
     <div id="all-menus" style="float: left;">
+        <div id="login-error" style="color: #B00; font-family: monospace; font-weight: bold; padding: 0 4px;"></div>
+
         <div id="menu-div">
                 <div id="tutorial-button" class="main-menu-button">Tutorial</div>
                 <div id="join-button" class="main-menu-button">Join Server</div>
@@ -104,7 +107,6 @@
         </div>
 
         <div id="server-choice-div">
-            <div id="login-error" style="color: #B00; font-family: monospace; font-weight: bold; padding: 0 4px;"></div>
             <div id="list-back-button" class="main-menu-button">&lt; Back</div>
         </div>
 
