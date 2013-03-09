@@ -6,7 +6,7 @@ This is a HTML5 browser-based client for the game [Netrek](http://www.netrek.org
 
   2. `server.node.js`, a Socket.io-to-TCP proxy which can also serve Web content.  The proxy is necessary for the client to connect, since a browser cannot directly connect to a raw Netrek TCP server/socket.
 
-**To see a live demo, visit http://trekproxy.nodester.com/**
+**To see a live demo, visit http://netrek.nodester.com/**
 
 ##Code Overview##
 
