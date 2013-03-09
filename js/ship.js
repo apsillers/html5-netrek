@@ -194,5 +194,9 @@ Ship.prototype = {
             hud.setTractorIndic(this.tractoring);
             hud.setPressorIndic(this.pressing);
         }
+    },
+
+    explode: function() {
+        new Explosion({x: this.x, y: this.y, radius: 0, maxRadius: 8, radiusStep: 0.7});
     }
 }
