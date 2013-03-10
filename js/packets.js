@@ -317,7 +317,7 @@ serverPackets = [
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.shift(), pnum = uvars.shift(), rank = uvars.shift(),
             name = uvars.shift(), monitor = uvars.shift(), login  = uvars.shift();
-        if(net_logging || true) console.log("SP_PL_LOGIN pnum=",pnum,"rank=",rank,"name=",name,"monitor=",monitor,"login=",login)
+        if(net_logging) console.log("SP_PL_LOGIN pnum=",pnum,"rank=",rank,"name=",name,"monitor=",monitor,"login=",login)
         playerList.addPlayer(pnum, name, rank);
     }
   },
@@ -387,7 +387,7 @@ serverPackets = [
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.shift(), pnum = uvars.shift(), status = uvars.shift();
-        if(net_logging || true) console.log("SP_PSTATUS pnum=",pnum,"status=",status);
+        if(net_logging) console.log("SP_PSTATUS pnum=",pnum,"status=",status);
         if(connected_yet && world.player && pnum == world.player.number && status == POUTFIT) {
             world.undraw();
             outfitting.draw(leftCanvas, rightCanvas);
@@ -528,7 +528,7 @@ serverPackets = [
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.shift(), war = uvars.shift(), status = uvars.shift(), tnum = uvars.shift();
-        if(net_logging || true) console.log("SP_TORP_INFO war=",team_decode(war)," status=",status," tnum=",tnum);
+        if(net_logging) console.log("SP_TORP_INFO war=",team_decode(war)," status=",status," tnum=",tnum);
 
         if(world.torps[tnum] == undefined && status != TFREE) {
             world.addTorp(tnum, new Torp(-10000, -10000, 0, team_decode(war), world));
