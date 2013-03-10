@@ -175,7 +175,7 @@ window.addEventListener("load", function() {
                         });
 
                         $(document).bind("keydown", function (e) {
-                                if(e.keyCode == 9) {
+                                if(e.keyCode == 9 && !e.ctrlKey) {
                                     $("#playerlist-div").show();
                                     e.preventDefault();
                                 }

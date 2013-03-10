@@ -62,6 +62,11 @@ world = {
         this.gCanvas = gCanvas;
         this.galacticFactor = 100000 / gCanvas.height;
         this.galaticXOffset = gCanvas.width - gCanvas.height - 0;
+
+        new Border({x:0, y:0, width: 100000, height: 0})
+        new Border({x:0, y:0, width: 0, height: 100000})
+        new Border({x:100000, y:0, width: 0, height: 100000})
+        new Border({x:0, y:100000, width: 100000, height: 0})
     },
 
     draw: function() {
@@ -281,8 +286,9 @@ world = {
     },
     remove: function(obj) {
         if(obj == undefined) return;
+        var index = this.objects.indexOf(obj);
 
-        var r = this.objects.splice(this.objects.indexOf(obj),1);
+        if(index > -1) { var r = this.objects.splice(index,1); }
         obj.gfx.removeSelf();
         if(obj.galGfx) { obj.galGfx.removeSelf(); }
     },
