@@ -106,7 +106,7 @@ hud = {
         this.armyText = new TextNode("", {fill:"white", x:16, font:"bold 12pt courier" });
         this.armyStatNode.append(this.armyText);
 
-        this.warning = new Rectangle(this.hCanvas.width-50,25, {x: 25, y: 15, stroke:"#F00", fill: "#F44", opacity:0 });
+        this.warning = new Rectangle(this.hCanvas.width-30,25, {x: 15, y: 15, stroke:"#F00", fill: "#F44", opacity:0 });
         this.warningText = new TextNode("", {fill:"white", y:15, x:5, font:"bold 10pt courier"});
         this.warning.append(this.warningText);
         this.uiGfx.append(this.warning);
@@ -174,7 +174,7 @@ hud = {
             ["Beam up", "Orbit", "Beam down", "Bomb"],
             ["Report", "Carry", "Chat", "Carry"],
             ["Repair", "Shields", "", "Cloak"],
-            ["Tractor", "Det torps", "Pressor", "Det mine"],
+            ["Tractor", "Det torps", "Pressor", "Det own"],
         ]
 
         this.reposition();
@@ -192,6 +192,8 @@ hud = {
         this.setXY(this.fuelBox, 4, this.hCanvas.height-5);
         this.setXY(this.directionWheel, this.hCanvas.width / 2, this.hCanvas.height / 2);
         this.setXY(this.dPadMap, this.hCanvas.width - 100, this.hCanvas.height - 100);
+
+        
     },
 
     undraw: function() {
@@ -287,7 +289,7 @@ hud = {
     showWarning: function(msg) {
         if(msg == "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13\x0FB") return;
 
-        msg = msg.replace(/Helmsman:\s+/, "").replace(" captain!", "!");
+        msg = msg.replace(/Helmsman:\s+/, "").replace(/,? captain!/, "!");
 
         var self = this;
         this.warning.opacity = 0.7;
