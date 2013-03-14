@@ -22,7 +22,7 @@ var connected_yet = false;
 
 // used to start the game
 window.addEventListener("load", function() {
-    $("#loading-box").html("<h1>Loading...</h1>");
+    $("#loading-box").html("<h1 style='color: white;'>Loading...</h1>");
 
     var lCanvas = document.getElementById("leftCanvas"),
         rCanvas = document.getElementById("rightCanvas")
@@ -65,7 +65,7 @@ window.addEventListener("load", function() {
                     $("#login-box").css("left",($("html").width() - $("#login-box").width()) / 2 + $(window).scrollLeft());
                 });
 
-                /*var resizeGame = function() {
+                var resizeGame = function() {
                     var container = lCanvas.firstElementChild;
                     var canvas = container.firstElementChild;
                     container.style.width = $(window).width() - $(rCanvas).data("width") + "px";
@@ -77,7 +77,7 @@ window.addEventListener("load", function() {
                 $(window).resize(function() {
                     if(resizeTimeout) clearTimeout(resizeTimeout);
                     setTimeout(resizeGame, 100);
-                });*/
+                });
 
                 $("#join-button").click(function() {
                     $("#menu-div").hide();
