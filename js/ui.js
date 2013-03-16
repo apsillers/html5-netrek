@@ -187,13 +187,15 @@ hud = {
 
     // used to shift elements when the canvas is resized
     reposition: function() {
-        this.setXY(this.healthCircle, 45, this.hCanvas.height-30);
-        this.setXY(this.shieldMeter, 38, this.hCanvas.height-37);
-        this.setXY(this.fuelBox, 4, this.hCanvas.height-5);
-        this.setXY(this.directionWheel, this.hCanvas.width / 2, this.hCanvas.height / 2);
-        this.setXY(this.dPadMap, this.hCanvas.width - 100, this.hCanvas.height - 100);
+        var leftCanvas = this.hCanvas.canvas;
+        this.setXY(this.healthCircle, 45, leftCanvas.height-30);
+        this.setXY(this.shieldMeter, 38, leftCanvas.height-37);
+        this.setXY(this.fuelBox, 4, leftCanvas.height-5);
+        this.setXY(this.directionWheel, leftCanvas.width / 2, leftCanvas.height / 2);
+        this.setXY(this.dPadMap, leftCanvas.width - 100, leftCanvas.height - 100);
 
-        
+        this.warning.width = leftCanvas.width-30;
+        this.warning.changed = true;
     },
 
     undraw: function() {
@@ -204,6 +206,7 @@ hud = {
     setXY: function(gfx, x, y) {
         gfx.x = x;
         gfx.y = y;
+        gfx.changed = true;
     },
 
     createButton: function(x, y, color, key, text, font, onClick) {

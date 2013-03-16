@@ -66,18 +66,37 @@ window.addEventListener("load", function() {
                 });
 
                 var resizeGame = function() {
+                    var minHeight = 440;
+                    var minWidth = 1145;
+
+                    var winHeight = Math.max($(window).height(), minHeight);
+                    var winWidth = Math.max($(window).width(), minWidth);
+
+                    lCanvas.width = winWidth - $(rCanvas).data("width") + "px";
+                    lCanvas.height = winHeight;
                     var container = lCanvas.firstElementChild;
                     var canvas = container.firstElementChild;
-                    container.style.width = $(window).width() - $(rCanvas).data("width") + "px";
-                    container.style.height = $(window).height();
-                    canvas.width = $(window).width() - $(rCanvas).data("width");
-                    canvas.height = $(window).height();
+                    container.style.width = winWidth - $(rCanvas).data("width") + "px";
+                    container.style.height = winHeight + "px";
+                    canvas.width = winWidth - $(rCanvas).data("width");
+                    canvas.height = winHeight;
+                    $("#canvasland").width(winWidth);
+
+                    var chatHeight = winHeight - $(rCanvas).data("height") - 2;
+                    $("#chatbox").css("height", chatHeight + "px");
+                    $("#inbox").css("height", chatHeight - 30 + "px");
+
+                    hud.reposition();
+                    outfitting.reposition();
                 }
                 resizeTimeout = null;
                 $(window).resize(function() {
                     if(resizeTimeout) clearTimeout(resizeTimeout);
-                    setTimeout(resizeGame, 100);
+                    setTimeout(resizeGame, 200);
                 });
+
+                // call it once to get started
+                resizeGame();
 
                 $("#join-button").click(function() {
                     $("#menu-div").hide();
@@ -96,7 +115,7 @@ window.addEventListener("load", function() {
                     $("#list-back-button").before(hostbutton);
                 }
 
-                $("#chatbox").bind("mouseover", function() {
+                /*$("#chatbox").bind("mouseover", function() {
                     $("#chatbox").css("top","-200px").height(398);
                     $("#inbox").height(370);
                 });
@@ -105,7 +124,7 @@ window.addEventListener("load", function() {
                     $("#chatbox").css("top","0px").height(198);
                     $("#inbox").height(170);
                     $("#inbox").scrollTop($("#inbox")[0].scrollHeight);
-                });
+                });*/
 
                 $(".host-button").click(function() {
                     $("#server-choice-div").hide();
