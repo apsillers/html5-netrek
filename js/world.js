@@ -80,8 +80,8 @@ world = {
 
             var centerX = _self.player.x, centerY = _self.player.y,
                 viewBuffer = 150,
-                cnvHalfHgt = _self.wCanvas.height / 2 * _self.subgalacticFactor + viewBuffer,
-                cnvHalfWid = _self.wCanvas.width / 2 * _self.subgalacticFactor + viewBuffer;
+                cnvHalfHgt = _self.wCanvas.canvas.height / 2 * _self.subgalacticFactor + viewBuffer,
+                cnvHalfWid = _self.wCanvas.canvas.width / 2 * _self.subgalacticFactor + viewBuffer;
 
             _self.centerView(_self.player.x, _self.player.y);
 
@@ -341,8 +341,8 @@ world = {
     // the world is measured in pixels; netrek returns values in units
     // the subgalacticFactor sets units per pixel
     netrek2world: function(x,y) {
-        return [((x - this.viewX) / this.subgalacticFactor) + this.wCanvas.width/2,
-                ((y - this.viewY) / this.subgalacticFactor) + this.wCanvas.height/2];
+        return [((x - this.viewX) / this.subgalacticFactor) + this.wCanvas.canvas.width/2,
+                ((y - this.viewY) / this.subgalacticFactor) + this.wCanvas.canvas.height/2];
     },
 
     // the tactical map is measured in pixels; netrek returns values in units
@@ -365,8 +365,8 @@ world = {
 
     getAngleFromCenter: function(offsetX, offsetY) {
         //normalize to canvas cartesian coords
-        var carteX = offsetX - this.wCanvas.width/2;
-        var carteY = this.wCanvas.height/2 - offsetY;
+        var carteX = offsetX - this.wCanvas.canvas.width/2;
+        var carteY = this.wCanvas.canvas.height/2 - offsetY;
         var angle = Math.atan(carteX/carteY);
         // if the click was in a lower quadrent, augment the atan value
         if(carteY<0) {
@@ -441,15 +441,8 @@ world = {
         this.galGfx.append(text);
 
         this.includingWorld = includingWorld;
-        //this.includingWorld.addPlanet(this);
         this.gfxRoot = world.wGroup;
         this.isOnCanvas = true;
-
-        setInterval(function() {
-            //var world_xy = world.netrek2world(placeX, placeY);
-            //planet_self.x = world_xy[0];
-            //planet_self.y = world_xy[0];
-        }, 1000);
     }
 }
 world.Planet.prototype = {
