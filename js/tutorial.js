@@ -52,6 +52,10 @@ tutorial = {
             keyword: "speed2"
         },
         {
+            prompt: "Now cut your engines and coast to a stop by pressing the <b>0 key</b>.",
+            keyword: "speed0"
+        },
+        {
             prompt: "The top right panel (currently obscured by this tutorial panel) is your <b>galactic map</b>, showing the locations of all the planets and ships in the galaxy. Planets are shown as yellow circles, and each ship is represented by its player number and colored by team. The galaxy is divided up into four quadrents, one for each team. Go ahead now and <b>hide this tutorial panel</b> (by clicking the '>>' tab) to see the map, then click it again to bring it back.<br/><br/>Once you've done that,  we'll go over the weapon systems on your ship: <i>torpedoes</i> and <i>phasers</i>. <b>Left click</b> to fire a torpedo.",
             keyword:"torp"
         },
