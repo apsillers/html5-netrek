@@ -43,9 +43,28 @@ gamepad = {
         if(!pad.valid) { return; }
         var lastPad = _self.lastPad;
         
-        if(Math.abs(pad.leftStickX) > 0.5 || Math.abs(pad.leftStickY) > 0.5) {
-            net.sendArray(CP_DIRECTION.data(world.rad2byte(world.getAngleFromJoystick(pad.leftStickX, pad.leftStickY))));
+        var showWheel = false;
+
+        if(Math.abs(pad.leftStickX) > 0.7 || Math.abs(pad.leftStickY) > 0.7) {
+            var showWheel = true;
+            var angle = world.getAngleFromJoystick(pad.leftStickX, pad.leftStickY);
+            net.sendArray(CP_DIRECTION.data(world.rad2byte(angle)));
+            hud.showDirectionNeedle(true);
+            hud.showDirectionAngle(angle);
+        } else {
+            hud.showDirectionNeedle(false);
         }
+
+        if(Math.abs(pad.rightStickX) > 0.7 || Math.abs(pad.rightStickY) > 0.7) {
+            var angle = world.getAngleFromJoystick(pad.rightStickX, pad.rightStickY);
+            showWheel = true;
+            hud.showWeaponNeedle(true);
+            hud.showWeaponAngle(angle);
+        } else {
+            hud.showWeaponNeedle(false);
+        }
+
+        hud.showDirectionWheel(showWheel);
 
         if(pad.l1 < 0.5 && lastPad.l1 >= 0.5) {
             var speed = hud.targetSpeed + 1;

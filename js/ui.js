@@ -113,12 +113,16 @@ hud = {
         this.warningTimeout = null;
 
         /* wheel for steering in touch interfaces */
-        this.directionWheel = new Circle(40, { stroke: "white", fill: "none",
-                                               opacity: 0.5, strokeWidth:20 });
+        this.directionWheel = new Circle(40, { stroke: "#ccc", fill: "none",
+                                               opacity: 0.7, strokeWidth:20 });
         this.directionNeedle = new Line(0, this.directionWheel.radius - this.directionWheel.strokeWidth / 2,
                                         0, this.directionWheel.radius + this.directionWheel.strokeWidth / 2,
-                                        { x:0, y:0, stroke:"red", strokeWidth:2 });
+                                        { x:0, y:0, stroke:"blue", strokeWidth:4 });
         this.directionWheel.append(this.directionNeedle);
+        this.weaponNeedle = new Line(0, this.directionWheel.radius - this.directionWheel.strokeWidth / 2,
+                                        0, this.directionWheel.radius + this.directionWheel.strokeWidth / 2,
+                                        { x:0, y:0, stroke:"red", strokeWidth:4 });
+
 
         /* add right-panel buttons */
         this.shieldButton = this.createButton(0, 0, "blue", "s", "Shield", "bold 14pt courier",
@@ -238,10 +242,23 @@ hud = {
         if(show) { this.uiGfx.append(this.directionWheel); }
         else { this.uiGfx.remove(this.directionWheel); }
     },
+    showWeaponNeedle: function(show) {
+        if(show) { this.directionWheel.append(this.weaponNeedle); }
+        else { this.directionWheel.remove(this.weaponNeedle); }
+    },
+    showDirectionNeedle: function(show) {
+        if(show) { this.directionWheel.append(this.directionNeedle); }
+        else { this.directionWheel.remove(this.directionNeedle); }
+    },
     showDirectionAngle: function(rads) {
         this.directionNeedle.rotation = [rads+Math.PI,0,0];
         this.directionNeedle.changed = true;
     },
+    showWeaponAngle: function(rads) {
+        this.weaponNeedle.rotation = [rads+Math.PI,0,0];
+        this.weaponNeedle.changed = true;
+    },
+
 
     setShieldIndic: function(shieldsUp) {
         this.shieldButton.fill = shieldsUp?"blue":"black";
