@@ -44,12 +44,16 @@ tutorial = {
             keyword: "direct"
         },
         {
-            prompt: "Now let's try moving: <b>press the '5' key</b> on your keyboard. This will set your target speed to warp 5.",
+            prompt: "Now let's try moving: <b>press the 5 key</b> on your keyboard. This will set your target speed to warp 5.",
             keyword: "speed5"
         },
         {
             prompt: "You can see your current speed on the speed meter to the far left. The smaller bar next to it is your <b>engine temperature</b> meter, which rises when you travel at high speeds. Maxing out that bar will cripple your ship temporarily.<br/><br/>Try lowering your speed to warp 2, by pressing the <b>2 key</b> on your keyboard. Note that lower speeds will increase your turn rate, and higher speed decrease it.",
             keyword: "speed2"
+        },
+        {
+            prompt: "Now cut your engines and coast to a stop by pressing the <b>0 key</b>.",
+            keyword: "speed0"
         },
         {
             prompt: "The top right panel (currently obscured by this tutorial panel) is your <b>galactic map</b>, showing the locations of all the planets and ships in the galaxy. Planets are shown as yellow circles, and each ship is represented by its player number and colored by team. The galaxy is divided up into four quadrents, one for each team. Go ahead now and <b>hide this tutorial panel</b> (by clicking the '>>' tab) to see the map, then click it again to bring it back.<br/><br/>Once you've done that,  we'll go over the weapon systems on your ship: <i>torpedoes</i> and <i>phasers</i>. <b>Left click</b> to fire a torpedo.",
