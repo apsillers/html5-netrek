@@ -91,8 +91,7 @@ CP_SPEED = {
     data: function(speed) {
         if(net_logging) console.log("CP_SPEED speed=",speed);
         if(tutorial.active) {
-            if(speed==2) { tutorial.handleKeyword("speed2"); }
-            if(speed==5) { tutorial.handleKeyword("speed5"); }
+            tutorial.handleKeyword("speed" + speed);
         }
         return packer.pack(this.format, [this.code, speed]);
     }
@@ -420,7 +419,6 @@ serverPackets = [
             hud.showSpeed(speed);
 
             if(tutorial.active && speed <= 2) {
-                // TODO: if near a planet
                 for(var i=0; i < world.planets.length; ++i) {
                     var planet = world.planets[i];
                     if((planet.x - x)*(planet.x - x) + (planet.y - y)*(planet.y - y) <= 1600000) {
