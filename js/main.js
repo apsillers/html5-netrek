@@ -85,6 +85,7 @@ window.addEventListener("load", function() {
                     var chatHeight = winHeight - $(rCanvas).data("height") - 2;
                     $("#chatbox").css("height", chatHeight + "px");
                     $("#inbox").css("height", chatHeight - 30 + "px");
+                    $("#inbox").scrollTop($("#inbox")[0].scrollHeight);
 
                     hud.reposition();
                     outfitting.reposition();
