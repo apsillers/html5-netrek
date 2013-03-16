@@ -5,6 +5,17 @@ chat = {
     indiv: 0,
     init: function(input) {
         var self = this;
+
+        
+
+        $(input).bind("click", function() {
+            self.choosing = false;
+            self.chatting = true;
+            self.group = MALL;
+            self.indiv = 0;
+            $(input).focus();
+        });
+
         $(document).bind("keyup", function(e) {
             if(!self.chatting && !self.choosing && world.drawn) {
                 if(e.which == 77) {
