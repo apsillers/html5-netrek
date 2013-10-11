@@ -32,7 +32,9 @@ NetrekConnection = function(secure, webhost, webport, callback) {
     this.serverHost = null;
     this.serverPort = null;
 
-	this.conn = io.connect("ws"+(secure?"s":"")+"://"+this.host+":"+this.port);
+    console.log("conntecting to " + "http"+(secure?"s":"")+"://"+this.host+":"+this.port)
+
+	this.conn = io.connect("http"+(secure?"s":"")+"://"+this.host+":"+this.port);
 	this.conn.once("connect",callback);
 	
     // the stream of Netrek messages we haven't resolved yet
