@@ -22,7 +22,7 @@
 // The WS server is an intermediary between the browser and Netrek (NT) server.
 // Sort of like a proxy, but it does a little more (e.g., metaserver queries).
 // See node/server.node.js for the protocol and code
-NetrekConnection = function(webhost, webport, callback) {
+NetrekConnection = function(secure, webhost, webport, callback) {
 
     if(typeof window.Worker == "function") this.worker = new Worker("js/net_worker.js");
 
@@ -32,7 +32,7 @@ NetrekConnection = function(webhost, webport, callback) {
     this.serverHost = null;
     this.serverPort = null;
 
-	this.conn = io.connect("ws://"+this.host+":"+this.port);
+	this.conn = io.connect("ws"+(secure?"s":"")+"://"+this.host+":"+this.port);
 	this.conn.once("connect",callback);
 	
     // the stream of Netrek messages we haven't resolved yet
@@ -148,6 +148,12 @@ NetrekConnection = function(webhost, webport, callback) {
             this.reading = false;
             return;
         }
+    }
+
+    // injectData: inject fake server packets
+    // used by the tutorial
+    this.injectData = function() {
+        
     }
 
 }

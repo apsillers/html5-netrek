@@ -592,7 +592,7 @@ serverPackets = [
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.shift(), pnum = uvars.shift(), status = uvars.shift(), dir = uvars.shift(), x = uvars.shift(), y = uvars.shift(), target = uvars.shift();
-        if(net_logging || true) console.log("SP_PHASER pnum=",pnum,"status=",status,"dir=",dir,"x=",x,"y=",y,"target=",target);
+        if(net_logging) console.log("SP_PHASER pnum=",pnum,"status=",status,"dir=",dir,"x=",x,"y=",y,"target=",target);
 
         if(status != PHFREE) { world.addPhaser(pnum, new Phaser(world.ships[pnum].x, world.ships[pnum].y, dir, status, target, world)); }
         else { if(world.phasers[pnum] != undefined) world.removePhaser(pnum); }
