@@ -65,9 +65,10 @@ var express = require("express"),
 app.use(express.static(__dirname));
 
 // get the port from either: heroku port var, nodester port var, command-line arg, or use 16446
-var port = process.env.app_port || process.env.PORT || process.argv[2] || 16446;
+var address = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
+var port = process.env.app_port || process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || process.argv[2] || 16446;
 console.log("listening on port " + port)
-server.listen(port);
+server.listen(port, address);
 
 var io = require('socket.io').listen(server);
 io.set('log level', 1);
