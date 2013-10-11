@@ -103,7 +103,7 @@ tutorial = {
 
     showStep: function(num) {
         if(num==1) {
-            net.sendArray(CP_MESSAGE.data(MALL, 0, "!! This player is using the tutorial from http://netrek.nodester.com"));
+            net.sendArray(CP_MESSAGE.data(MALL, 0, "!! This player is using the tutorial from https://netrek-apsillers.rhcloud.com"));
             net.sendArray(CP_MESSAGE.data(MALL, 0, "!! Please be patient as this player learns to play Netrek"));
         }
 
