@@ -17,11 +17,15 @@ The code is mainly in /js at the moment:
 * **outfitting.js** - draws the outfitting screen and sends/receives relevant net info
 * **ui.js** - draws and updates the UI meters for the player (shields, fuel, etc)
 * **ship.js** - represents a ship; information sent to a ship object is used to update its local and tactical graphics
-* **phaser.js**, **torp.js** - representations of phasers and torpedoes
+* **phaser.js**, **torp.js**, **explosion.js** - representations of phasers, torpedoes, and explosions
 * **net.js** - makes connections (through the proxy), reads the data stream, and delegates work to message objects, which performs virtually all server-driven action; e.g., when a `SP_YOU` message comes in, the net object should read it and send the data to the `SP_YOU` handler, which should update the UI with info about the player
 * **packets.js** - contains a class for each message type, which includes the message's ID code, data fields, and function to run when the packet is recieved
 * **images.js** - simple image preloader and image array
 * **constants.js** - global constants used in Netrek protocol and ship max stats (max fuel, max hull, etc.)
+* **tutorial.js** - tutorial text and logic
+* **gamepad.js** - gamepad API listeners that link gamepad events to in-game actions
+* **playerlist.js** - handles the list of players in the game (visible by pressing Tab)
+* **chat.js** - chat input; maps key commands to chat groups (team, all, specific player)
 
 Each file (except for a few, like `ship.js`) includes a singleton.  The code is built around a few powerful singletons that each handle a single aspect of the program (world, net, outfitting...).  These are namespaces that allow the code to be read/used in a sane way that doesn't polute the global namespace.
 
