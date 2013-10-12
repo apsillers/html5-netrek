@@ -40,11 +40,11 @@ Required node.js libraries to run sever.js:
 
 ##Deployment Notes##
 
-The code can be pushed to Nodester as-is in order to run an public instance. Once such instance is http://trekproxy.nodester.com/.
+There is an instance at https://netrek-apsillers.rhcloud.com running on the OpenShift PaaS.
 
 The code could be ported to run as a browser extension, where it might be able to take advantage of native TCP/UDP support. To build such a port, the `/js/net.js` file would need to be rewritten slightly to use native networking capabilities instead of socket.io. All other code can remain the same; `net.js` is the heart of the application, since it is responsible for processing all information from the server and sending tasks to `packets.js`, which is connection-agnostic.
 
-I have created experimental ports that are not yet ready for testing. These include a Chrome extension (using the new `chome.socket` API) and a PhoneGap Android application (using a custom-made plugin for TCP communication). These ports will be posted as branches when they reach an basic level of usability.
+There is an PhoneGap Android application (using a custom-made plugin for TCP communication) as a branch on this repository. It has not been updated in some time, and is missing many of the features of the master branch.
 
 ##Copyright and License##
 
