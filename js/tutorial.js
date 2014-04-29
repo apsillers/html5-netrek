@@ -92,7 +92,7 @@ tutorial = {
             keyword: "orbit"
         },
         {
-            prompt: "Once you orbitting a planet, you have a lot of options:<ul><li>When orbiting a planet with a wrench, repair mode will be much more effective.</li><li>Orbiting a planet with an orange fuel can will refil your fuel very quickly.</li></ul>[This tutorial is a work in progress. <b>This is currently the last entry.</b> Please see the <a href='http://www.netrek.org/beginner/newbie.php'>newbie guide</a> to learn much more about how to download and play Netrek.]",
+            prompt: "Once you are orbitting a planet, you have a lot of options:<ul><li>When orbiting a planet with a wrench, repair mode will be much more effective.</li><li>Orbiting a planet with an orange fuel can will refil your fuel very quickly.</li></ul>[This tutorial is a work in progress. <b>This is currently the last entry.</b> Please see the <a href='http://www.netrek.org/beginner/newbie.php'>newbie guide</a> to learn much more about how to download and play Netrek.]",
             keyword: ""
         },
         {
@@ -103,7 +103,9 @@ tutorial = {
 
     showStep: function(num) {
         if(num==1) {
-            net.sendArray(CP_MESSAGE.data(MALL, 0, "!! This player is using the tutorial from http://netrek.nodester.com"));
+            net.sendArray(CP_MESSAGE.data(MALL, 0, "!! This player is using the tutorial from"));
+            net.sendArray(CP_MESSAGE.data(MALL, 0, "!! " + document.location.protocol + "//" +
+					                   document.location.hostname));
             net.sendArray(CP_MESSAGE.data(MALL, 0, "!! Please be patient as this player learns to play Netrek"));
         }
 
