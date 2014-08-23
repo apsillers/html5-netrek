@@ -50,7 +50,7 @@ window.addEventListener("load", function() {
 	if(location.host.indexOf(".rhcloud.com") == location.host.length - 12) {
 	    port = location.protocol=="https:"?8443:8080;
 	} else {
-	    port = location.port || location.protocol=="https:"?443:80;
+	    port = location.port || (location.protocol=="https:"?443:80);
 	}
 
         net = new NetrekConnection(location.protocol!="http:", location.hostname, port, function() {
