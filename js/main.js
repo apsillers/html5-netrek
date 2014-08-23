@@ -46,7 +46,7 @@ window.addEventListener("load", function() {
     $("#tutorial-enable-link").click(function() { tutorial.activateTutorial(); });
 
     imageLib.loadAll(function() {
-        net = new NetrekConnection(true, location.hostname, 8443, function() {
+        net = new NetrekConnection(location.scheme=="http:", location.hostname, location.port, function() {
             net.getServerList(function(serverList) {
                 $("#loading-box").hide();
                 $("#login-box").show();

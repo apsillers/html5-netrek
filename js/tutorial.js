@@ -92,11 +92,11 @@ tutorial = {
             keyword: "orbit"
         },
         {
-            prompt: "Once you are orbitting a planet, you have a lot of options:<ul><li>When orbiting a planet with a wrench, repair mode will be much more effective.</li><li>Orbiting a planet with an orange fuel can will refil your fuel very quickly.</li></ul>[This tutorial is a work in progress. <b>This is currently the last entry.</b> Please see the <a href='http://www.netrek.org/beginner/newbie.php'>newbie guide</a> to learn much more about how to download and play Netrek.]",
-            keyword: ""
+            prompt: "Once you are orbitting a planet, you have a lot of options:<ul><li>When orbiting a planet with a wrench, repair mode will be much more effective.</li><li>Orbiting a planet with an orange fuel can will refil your fuel very quickly.</li><li>After you have made at least one kill, you can <b>pick up armies</b> on friendly planets until you die. (Carrying armies to enemy planets is how you conquer planets and win the game.)</li><ul><li>You can carry <b>2 armies per kill</b> since your last death.</li><li>Even you have made a kill, only planets that have <b>more than 4 armies</b> are available for pickup. These planets will appear filled in with blue on the galactic map. Each planet reserves 4 defensive \"sentinel\" armies that can not be picked up.</li></ul></ul>To pick up armies, press the <b>z</b> key</li>. Press the <b>z</b> key now.",
+            keyword: "pickup"
         },
         {
-            prompt: "",
+            prompt: "You may have just gotten an error message from your ship. That's either because you haven't made any kills yet or because the planet has 4 or fewer armies.<br/><br/>Let's talk briefly about dropping armies on enemy planets.<ul><li>When orbiting an enemy planet, press the <b>x</b> key to drop any armies you are carrying to destroy opposing armies. Each dropped army destroys one enemy army.</li><li>By pressing <b>b</b>, though, you can bomb an enemy planet down to 4 armies without using up any armies. Always bomb an enemy planet down to 4 armies first, so your dropped armies can attack the remaining 4 (who are immune to bombing).</li><li>Once you bring a planet down to 0, it stops producing new armies. If you drop a friendly army on a planet with 0 armies, your team gains control of the planet.</li></ul>[This tutorial is a work in progress. <b>This is currently the last entry.</b> Please see the <a href='http://www.netrek.org/beginner/newbie.php'>newbie guide</a> to learn much more about how to download and play Netrek.]",
             keyword: ""
         }
     ],

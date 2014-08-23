@@ -247,7 +247,8 @@ CP_BEAM = {
 
     data: function(state) {
         if(net_logging) console.log("CP_BEAM state=",state);
-        return packer.pack(this.format, [this.code, state]);
+        if(tutorial.active && state == 1) { tutorial.handleKeyword("pickup"); }
+	return packer.pack(this.format, [this.code, state]);
     }
 }
 /*************************************************************************
