@@ -91,7 +91,8 @@ CP_SPEED = {
     data: function(speed) {
         if(net_logging) console.log("CP_SPEED speed=",speed);
         if(tutorial.active) {
-            if(speed==2) { tutorial.handleKeyword("speed2"); }
+            if(speed==0) { tutorial.handleKeyword("speed0"); }
+	    if(speed==2) { tutorial.handleKeyword("speed2"); }
             if(speed==5) { tutorial.handleKeyword("speed5"); }
         }
         return packer.pack(this.format, [this.code, speed]);
