@@ -1,5 +1,7 @@
 #HTML5 Netrek Client#
 
+![HTML5 Netrek screenshot](https://apsillers.github.io/images/projects/netrek.png)
+
 This is a HTML5 browser-based client for the game [Netrek](http://www.netrek.org/).  The project includes:
 
   1. client-side files, including JavaScript code that uses socket.io
