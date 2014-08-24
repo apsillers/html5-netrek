@@ -48,7 +48,7 @@ window.addEventListener("load", function() {
     imageLib.loadAll(function() {
 	var port;
 	if(location.host.indexOf(".rhcloud.com") == location.host.length - 12) {
-	    port = location.protocol=="https:"?8443:8080;
+	    port = location.protocol=="https:"?8443:8000;
 	} else {
 	    port = location.port || (location.protocol=="https:"?443:80);
 	}
