@@ -143,7 +143,7 @@ outfitting = {
                                 "destroyed only by a coordinated effort",
                                 "(called 'ogging')."]);
         this.shipButtons[SB].opacity = 0.3;
-        this.otherElems.push(new Line(justRightPx-5,topRowPx+10,justRightPx-5,
+        this.otherElems.push(this.separator = new Line(justRightPx-5,topRowPx+10,justRightPx-5,
                                       bottomRowPx+this.shipButtonDim-10,
                                       {stroke:"#0CC", strokeWidth:2}));
        
@@ -153,7 +153,7 @@ outfitting = {
                                                 stroke: "#5FF", fill:"#033"});
         
         //this.otherElems.push(new TextNode("http://www.netrek.org", {textAlign:"center", x:this.canvasWidth/2, y:this.canvasHeight-8, fill:"#FFF", font:"16px Courier"}));
-        this.otherElems.push(new TextNode("Press Tab for a Quick Start guide", {textAlign:"center", x:this.canvasWidth/2, y:18, fill:"#FFF", font:"16px Courier"}));
+        //this.otherElems.push(new TextNode("Press Tab for a Quick Start guide", {textAlign:"center", x:this.canvasWidth/2, y:18, fill:"#FFF", font:"16px Courier"}));
 
 
         this.selectShip(CA);
@@ -179,6 +179,47 @@ outfitting = {
         this.writeMotd();
 
         this.drawn = true;
+    },
+
+    // used to shift elements when the canvas is resized
+    reposition: function() {
+        this.canvasWidth = this.oCanvas.canvas.width;
+        this.canvasHeight = this.oCanvas.canvas.height;
+
+        var bufferPx = 10;
+        var rightAlignPx = this.canvasWidth - this.raceButtonDim - bufferPx;
+        var bottomAlignPx = this.canvasHeight - this.raceButtonDim - bufferPx;
+        var centerPx = (this.canvasWidth - this.shipButtonDim) / 2 - 5;
+        var topRowPx = 60;
+        var bottomRowPx = this.shipButtonDim + topRowPx + 5;
+        var justLeftPx = centerPx - this.shipButtonDim - 5;
+        var justRightPx = centerPx + this.shipButtonDim + 10;
+
+        this.setXY(this.raceButtons[0], bufferPx, bottomAlignPx);
+        this.setXY(this.raceButtons[1], bufferPx, bufferPx);
+        this.setXY(this.raceButtons[2], rightAlignPx, bufferPx);
+        this.setXY(this.raceButtons[3], rightAlignPx, bottomAlignPx);
+
+        this.setXY(this.shipButtons[SC], justLeftPx, topRowPx);
+        this.setXY(this.shipButtons[DD], centerPx, topRowPx);
+        this.setXY(this.shipButtons[CA], justLeftPx, bottomRowPx);
+        this.setXY(this.shipButtons[BB], centerPx, bottomRowPx);
+        this.setXY(this.shipButtons[AS], justRightPx, topRowPx);
+        this.setXY(this.shipButtons[SB], justRightPx, bottomRowPx);
+
+        this.setXY(this.infoBox, centerPx-205+this.shipButtonDim/2, bottomRowPx+this.shipButtonDim+20)
+
+        this.separator.x1 = justRightPx-5;
+        this.separator.y1 = topRowPx+10;
+        this.separator.x2 = justRightPx-5;
+        this.separator.y2 = bottomRowPx+this.shipButtonDim-10;
+        this.separator.changed = true;
+    },
+
+    setXY: function(gfx, x, y) {
+        gfx.x = x;
+        gfx.y = y;
+        gfx.changed = true;
     },
 
     undraw: function() {
@@ -251,4 +292,5 @@ outfitting = {
         }
     }
 }
+
 

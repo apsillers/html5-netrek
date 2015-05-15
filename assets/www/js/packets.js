@@ -90,6 +90,11 @@ CP_SPEED = {
 
     data: function(speed) {
         if(net_logging) console.log("CP_SPEED speed=",speed);
+        if(tutorial.active) {
+            if(speed==0) { tutorial.handleKeyword("speed0"); }
+	    if(speed==2) { tutorial.handleKeyword("speed2"); }
+            if(speed==5) { tutorial.handleKeyword("speed5"); }
+        }
         return packer.pack(this.format, [this.code, speed]);
     }
 }
@@ -99,6 +104,7 @@ CP_DIRECTION = {
 
     data: function(direction) {
         if(net_logging) console.log("CP_DIRECTION direction=",direction);
+        if(tutorial.active) tutorial.handleKeyword("direct");
         return packer.pack(this.format, [this.code, direction & 255]);
     }
 }
@@ -125,6 +131,7 @@ CP_PHASER = {
 
     data: function(direction) {
         if(net_logging) console.log("CP_PHASER direction=",direction);
+        if(tutorial.active) { tutorial.handleKeyword("phaser"); }
         return packer.pack(this.format, [this.code, direction & 255]);
     }
 }
@@ -143,6 +150,7 @@ CP_TORP = {
 
     data: function(direction) {
         if(net_logging) console.log("CP_TORP direction=",direction);
+        if(tutorial.active) { tutorial.handleKeyword("torp"); }
         return packer.pack(this.format, [this.code, direction & 255]);
     }
 }
@@ -161,6 +169,7 @@ CP_DET_MYTORP = {
 
     data: function(tnum) {
         if(net_logging) console.log("CP_DET_MYTORP");
+        if(tutorial.active) { tutorial.handleKeyword("detmytorp"); }
         return packer.pack(this.format, [this.code, tnum])
     }
 }
@@ -174,7 +183,6 @@ CP_TRACTOR = {
     }
 }
 CP_REPRESS = {
-    code: 25,
     format: '!bbbx',
 
     data: function(state, pnum) {
@@ -188,6 +196,10 @@ CP_CLOAK = {
 
     data: function(state) {
         if(net_logging) console.log("CP_CLOAK state=",state);
+        if(tutorial.active) {
+            if(state==1) { tutorial.handleKeyword("cloakon"); }
+            if(state==0) { tutorial.handleKeyword("cloakoff"); }
+        }
         return packer.pack(this.format, [this.code, state]);
     }
 }
@@ -197,6 +209,7 @@ CP_REPAIR = {
 
     data: function(state) {
         if(net_logging) console.log("CP_REPAIR state=",state);
+        if(tutorial.active) { tutorial.handleKeyword("repair"); }
         return packer.pack(this.format, [this.code, state]);
     }
 }
@@ -206,6 +219,7 @@ CP_SHIELD = {
 
     data: function(state) {
         if(net_logging) console.log("CP_SHIELD state=",state);
+        if(tutorial.active) { tutorial.handleKeyword("shields"); }
         return packer.pack(this.format, [this.code, state]);
     }
 }
@@ -233,7 +247,8 @@ CP_BEAM = {
 
     data: function(state) {
         if(net_logging) console.log("CP_BEAM state=",state);
-        return packer.pack(this.format, [this.code, state]);
+        if(tutorial.active && state == 1) { tutorial.handleKeyword("pickup"); }
+	return packer.pack(this.format, [this.code, state]);
     }
 }
 /*************************************************************************
@@ -274,6 +289,7 @@ serverPackets = [
         else {
             world.ships[world.playerNum].handleFlags(flags);
             hud.showEngineTemp(etemp/10);
+            if(tutorial.active && (flags & PFORBIT)) { tutorial.handleKeyword("orbit"); }
         }
 
         if(world.player != null) {
@@ -304,6 +320,7 @@ serverPackets = [
         var ignored = uvars.shift(), pnum = uvars.shift(), rank = uvars.shift(),
             name = uvars.shift(), monitor = uvars.shift(), login  = uvars.shift();
         if(net_logging) console.log("SP_PL_LOGIN pnum=",pnum,"rank=",rank,"name=",name,"monitor=",monitor,"login=",login)
+        playerList.addPlayer(pnum, name, rank);
     }
   },
   { // SP_PING - only received if client sends CP_PING_RESPONSE after SP_LOGIN
@@ -351,6 +368,8 @@ serverPackets = [
         world.ships[pnum].setImage(img);
         world.ships[pnum].setTeam(team[0]);
         world.ships[pnum].shipType = shiptype;
+     
+        playerList.updatePlayer(pnum, team);
     }
   },
   { // SP_KILLS
@@ -361,6 +380,7 @@ serverPackets = [
         var ignored = uvars.shift(), pnum = uvars.shift(), kills = uvars.shift();
         if(net_logging) console.log("SP_KILLS pnum=",pnum,"kills=",kills);
         if(world.ships[pnum]) world.ships[pnum].kills = kills;
+        playerList.updatePlayer(pnum, null, kills);
     }
   },
   { // SP_PSTATUS
@@ -370,9 +390,20 @@ serverPackets = [
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.shift(), pnum = uvars.shift(), status = uvars.shift();
         if(net_logging) console.log("SP_PSTATUS pnum=",pnum,"status=",status);
-        if(connected_yet && world.player && pnum == world.player.number && status == 1) {
+        if(connected_yet && world.player && pnum == world.player.number && status == POUTFIT) {
             world.undraw();
             outfitting.draw(leftCanvas, rightCanvas);
+        }
+        if(status == PFREE && world.ships[pnum] != undefined) {
+            playerList.removePlayer(pnum);
+            world.removeShip(pnum);
+        }
+        else if(status == PALIVE) {
+            world.addShip(pnum, world.ships[pnum]);
+        }
+        else if(status == PEXPLODE) {
+            world.ships[pnum].explode();
+            world.removeShip(pnum);
         }
     }
   },
@@ -389,6 +420,16 @@ serverPackets = [
 
         if(world.player && pnum == world.player.number) {
             hud.showSpeed(speed);
+
+            if(tutorial.active && speed <= 2) {
+                // TODO: if near a planet
+                for(var i=0; i < world.planets.length; ++i) {
+                    var planet = world.planets[i];
+                    if((planet.x - x)*(planet.x - x) + (planet.y - y)*(planet.y - y) <= 1600000) {
+                        tutorial.handleKeyword("approach")
+                    }
+                }
+            }
         }
     }
   },
@@ -469,6 +510,7 @@ serverPackets = [
             outfitting.undraw();
             world.ships[world.playerNum]; 
             world.draw();
+            if(tutorial.active) { tutorial.handleKeyword("join"); }
         }
     }
   },
@@ -490,10 +532,16 @@ serverPackets = [
         var ignored = uvars.shift(), war = uvars.shift(), status = uvars.shift(), tnum = uvars.shift();
         if(net_logging) console.log("SP_TORP_INFO war=",team_decode(war)," status=",status," tnum=",tnum);
 
-        if(world.torps[tnum] == undefined && status == 1) {
+        if(world.torps[tnum] == undefined && status != TFREE) {
             world.addTorp(tnum, new Torp(-10000, -10000, 0, team_decode(war), world));
         }
-        else if(world.torps[tnum] != undefined && (status == PTFREE || status == PTEXPLODE || status == PTDET)) {
+        else if(world.torps[tnum] != undefined && status == PTFREE || status == PTEXPLODE || status == PTDET) {
+
+            if(status == PTEXPLODE || status == PTDET) {
+                world.torps[tnum].explode();
+                world.removeTorp(tnum);
+            }
+
             world.removeTorp(tnum);
         }
     }
@@ -548,7 +596,7 @@ serverPackets = [
         var ignored = uvars.shift(), pnum = uvars.shift(), status = uvars.shift(), dir = uvars.shift(), x = uvars.shift(), y = uvars.shift(), target = uvars.shift();
         if(net_logging) console.log("SP_PHASER pnum=",pnum,"status=",status,"dir=",dir,"x=",x,"y=",y,"target=",target);
 
-        if(status != PHFREE) { world.addPhaser(pnum, new Phaser(x+world.player.x, y+world.player.y, dir, status, target, world)); }
+        if(status != PHFREE) { world.addPhaser(pnum, new Phaser(world.ships[pnum].x, world.ships[pnum].y, dir, status, target, world)); }
         else { if(world.phasers[pnum] != undefined) world.removePhaser(pnum); }
     }
   },
@@ -572,6 +620,7 @@ serverPackets = [
             m_recpt = uvars.shift(), m_from = uvars.shift(), mesg = uvars.shift();
         if(net_logging) console.log("SP_MESSAGE m_flags=",m_flags.toString(2),"m_recpt=",m_recpt,"m_from=",m_from,"mesg=",mesg);
 
+        // bold the sender/receiver pair of a message
         mesg = mesg.replace(/^(El Nath|Beta Crucis|[^\-]+)->(\S+)/,"<b>$1->$2</b> ")
         $("#inbox").append(mesg + "<br />");
         $("#inbox").scrollTop($("#inbox")[0].scrollHeight);
@@ -599,6 +648,8 @@ serverPackets = [
         if(world.player != null && pnum == world.player.number) {
             hud.showArmies(armies, kills);
         }
+
+        playerList.updatePlayer(pnum, null, kills);
     }
   },
   { // SP_WARNING

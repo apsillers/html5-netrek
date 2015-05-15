@@ -61,22 +61,27 @@ world = {
         this.wCanvas = wCanvas;
         this.gCanvas = gCanvas;
         this.galacticFactor = 100000 / gCanvas.height;
-        this.galaticXOffset = gCanvas.width - gCanvas.height;
+        this.galaticXOffset = gCanvas.width - gCanvas.height - 0;
+
+        new Border({x:0, y:0, width: 100000, height: 0})
+        new Border({x:0, y:0, width: 0, height: 100000})
+        new Border({x:100000, y:0, width: 0, height: 100000})
+        new Border({x:0, y:100000, width: 100000, height: 0})
     },
 
     draw: function() {
         this.wCanvas.append(this.wGroup);
         this.gCanvas.append(this.gGroup);
         this.wGroup.append(this.planetGroup);
-        var _self = this;        
+        var _self = this;
         _self.redrawInterval = setInterval(function recenter(){
 
             var debugStr = _self.objects.length+"<br/>";
 
             var centerX = _self.player.x, centerY = _self.player.y,
                 viewBuffer = 150,
-                cnvHalfHgt = _self.wCanvas.height / 2 * _self.subgalacticFactor + viewBuffer,
-                cnvHalfWid = _self.wCanvas.width / 2 * _self.subgalacticFactor + viewBuffer;
+                cnvHalfHgt = _self.wCanvas.canvas.height / 2 * _self.subgalacticFactor + viewBuffer,
+                cnvHalfWid = _self.wCanvas.canvas.width / 2 * _self.subgalacticFactor + viewBuffer;
 
             _self.centerView(_self.player.x, _self.player.y);
 
@@ -90,7 +95,7 @@ world = {
                 obj.gfx.x = coords[0];
                 obj.gfx.y = coords[1];
 
-                if(obj instanceof Phaser) { debugStr+="Phaser</br>"; console.log(obj.gfx); }
+                //if(obj instanceof Phaser) { debugStr+="Phaser</br>"; console.log(obj.gfx); }
 
                 // update display of object in tactical
                 if(obj.galGfx) { 
@@ -113,12 +118,11 @@ world = {
         hud.draw();
 
         // UI: set dest heading via right-click
-        $(this.wCanvas.canvas).bind("contextmenu", function setCourseWithRightClick(e) {
+        $(this.wCanvas.canvas).bind("contextmenu", _self.setCourseWithRightClick = function (e) {
             var offset = $(this).offset();
             var offsetX = e.pageX - offset.left;
             var offsetY = e.pageY - offset.top;
             // get the angle
-            //_self.player.setRotation(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)));
             net.sendArray(CP_DIRECTION.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY))));
             e.preventDefault();
         });
@@ -156,6 +160,8 @@ world = {
         });
 
         $(document).bind("keyup", function handleKeys(e) {
+            if(chat.chatting || chat.choosing) { return true; } 
+
             // set speed with number keys
             if(e.which >= 48 && e.which <= 57) {
                 var speed = e.which - 48;
@@ -178,8 +184,14 @@ world = {
                 } else if(e.keyCode == 66) { // b bomb planet
                     net.sendArray(CP_BOMB.data(_self.player.bombing?0:1));
                     e.preventDefault();
-                } else if(e.keyCode == 68) { // d - det enemy torps
+                } else if(e.keyCode == 68  && !e.shiftKey) { // d - det enemy torps
                     net.sendArray(CP_DET_TORPS.data());
+                    e.preventDefault();
+                } else if(e.keyCode == 68 && e.shiftKey) { // d - det all of the player's torps
+                    var baseTorpIndex = _self.player.number * 8;
+                    for(var i=0; i < 8; ++i) {
+                        net.sendArray(CP_DET_MYTORP.data(baseTorpIndex + i));
+                    }
                     e.preventDefault();
                 } else if(e.keyCode == 88) { // x - beam down
                     net.sendArray(CP_BEAM.data(2));
@@ -242,6 +254,8 @@ world = {
             }
         });
 
+        gamepad.startReading();
+
         this.drawn = true;
     },
 
@@ -259,6 +273,8 @@ world = {
         $(this.wCanvas.canvas).unbind("touchmove", this.changeDirectingOnMove);
         $(this.wCanvas.canvas).unbind("touchend", this.sendDirectionOnEnd);
 
+        gamepad.stopReading();
+
         this.drawn = false;
     },
 
@@ -269,7 +285,10 @@ world = {
         this.objects.push(obj);
     },
     remove: function(obj) {
-        var r = this.objects.splice(this.objects.indexOf(obj),1);
+        if(obj == undefined) return;
+        var index = this.objects.indexOf(obj);
+
+        if(index > -1) { var r = this.objects.splice(index,1); }
         obj.gfx.removeSelf();
         if(obj.galGfx) { obj.galGfx.removeSelf(); }
     },
@@ -283,6 +302,10 @@ world = {
             this.player = shipObj;
         }
         this.add(shipObj);
+    },
+    removeShip: function(num) {
+        this.remove(this.ships[num]);
+        //this.ships[num] = undefined;
     },
     addTorp: function(num, torpObj) {
         this.torps[num] = torpObj;
@@ -318,8 +341,8 @@ world = {
     // the world is measured in pixels; netrek returns values in units
     // the subgalacticFactor sets units per pixel
     netrek2world: function(x,y) {
-        return [((x - this.viewX) / this.subgalacticFactor) + this.wCanvas.width/2,
-                ((y - this.viewY) / this.subgalacticFactor) + this.wCanvas.height/2];
+        return [((x - this.viewX) / this.subgalacticFactor) + this.wCanvas.canvas.width/2,
+                ((y - this.viewY) / this.subgalacticFactor) + this.wCanvas.canvas.height/2];
     },
 
     // the tactical map is measured in pixels; netrek returns values in units
@@ -342,8 +365,8 @@ world = {
 
     getAngleFromCenter: function(offsetX, offsetY) {
         //normalize to canvas cartesian coords
-        var carteX = offsetX - this.wCanvas.width/2;
-        var carteY = this.wCanvas.height/2 - offsetY;
+        var carteX = offsetX - this.wCanvas.canvas.width/2;
+        var carteY = this.wCanvas.canvas.height/2 - offsetY;
         var angle = Math.atan(carteX/carteY);
         // if the click was in a lower quadrent, augment the atan value
         if(carteY<0) {
@@ -353,6 +376,10 @@ world = {
         }
 
         return angle;
+    },
+
+    getAngleFromJoystick: function(x,y) {
+        return Math.atan2(x,-y);
     },
 
     Planet: function(placeX, placeY, name, features, includingWorld) {
@@ -408,15 +435,8 @@ world = {
         this.galGfx.append(text);
 
         this.includingWorld = includingWorld;
-        //this.includingWorld.addPlanet(this);
         this.gfxRoot = world.wGroup;
         this.isOnCanvas = true;
-
-        setInterval(function() {
-            //var world_xy = world.netrek2world(placeX, placeY);
-            //planet_self.x = world_xy[0];
-            //planet_self.y = world_xy[0];
-        }, 1000);
     }
 }
 world.Planet.prototype = {

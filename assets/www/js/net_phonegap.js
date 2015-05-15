@@ -17,7 +17,7 @@ NetrekConnection = function(callback) {
 			self.sendArray(CP_SOCKET.data(10));
 
             self.readMessages();
-            callback();
+            callback(true);
         }, errorFunc);
         
     }
@@ -58,6 +58,15 @@ NetrekConnection = function(callback) {
     
     this.sendArray = function(data_array) {
         TCPSockets.send(this.socketId, data_array, (function() {}), errorFunc);
+    }
+
+    this.getServerList = function(callback) {
+        setTimeout(function() {
+            callback([
+                {host:"continuum.us.netrek.org",port:2592},
+                {host:"pickled.netrek.org",port:2592}
+            ]);
+        }, 4);
     }
 
     setTimeout(callback, 4);

@@ -33,6 +33,7 @@ hud = {
     fuelMeter: null,
     fuelText: null,
     uiGfx: null,
+    targetSpeed: 0,
 
     init: function(canvas, rcanvas) {
         this.hCanvas = canvas;
@@ -41,10 +42,10 @@ hud = {
         this.uiGfxRight = new CanvasNode({x:1, y:4});
  
         this.healthMeter = new CanvasNode();
-        this.healthCircle = new Circle(29, {x:45, y:this.hCanvas.height-30, fill:"#0A0", stroke:"none", rotation:-3*Math.PI/4, startAngle:0, endAngle:Math.PI});
+        this.healthCircle = new Circle(29, {fill:"#0A0", stroke:"none", rotation:-3*Math.PI/4, startAngle:0, endAngle:Math.PI});
         this.damageMeter = new Circle(15, {stroke:"#A00", fill:"none", strokeWidth:30, startAngle:0, endAngle:Math.PI});
         this.damageText = new TextNode("100",{fill:"white", rotation:-this.healthCircle.rotation, textAlign:"center", font:"bold 9pt courier", x:0, y:12});
-        this.shieldMeter =  new Circle(28, {x:38, y:this.hCanvas.height-37, strokeWidth:30, fill:"none", stroke:"#3AF", rotation:-3*Math.PI/4, startAngle:0, endAngle:Math.PI});
+        this.shieldMeter =  new Circle(28, {strokeWidth:30, fill:"none", stroke:"#3AF", rotation:-3*Math.PI/4, startAngle:0, endAngle:Math.PI});
         this.shieldText = new TextNode("100",{fill:"white", rotation:-this.shieldMeter.rotation, textAlign:"center", font:"bold 9pt courier", x:20, y:20});
         this.healthMeter.append(this.shieldMeter);
         this.healthMeter.append(this.healthCircle);
@@ -53,7 +54,7 @@ hud = {
         this.shieldMeter.append(this.shieldText);
         this.uiGfx.append(this.healthMeter);
 
-        this.fuelBox = new Polygon([0,0,0,-60,60,0],{x:4,y:this.hCanvas.height-5,stroke:"#FFF",strokeWidth:0, fill:"none", borderRadius:5});
+        this.fuelBox = new Polygon([0,0,0,-60,60,0],{stroke:"#FFF",strokeWidth:0, fill:"none", borderRadius:5});
         this.fuelMeter = new Polygon([0,0,0,-60,60,0], {fill:"#F70", stroke:"none"});
         this.fuelText = new TextNode("100",{y:-10,x:15,textAlign:"center",fill:"white",font:"bold 9pt courier"});
         this.fuelBox.append(this.fuelMeter);
@@ -78,15 +79,16 @@ hud = {
             this.speedMeter.append(this.speedNotches[i]);
         }
 
-        this.speedMeter.addEventListener("click", function(e) {
+        this.setSpeedOnClick = function(e) {
             var y = -e.clientY + $(e.target).offset().top + hud.speedMeter.y;
             var speed = Math.ceil(12 * Math.pow(y/300,1/0.75));
             net.sendArray(CP_SPEED.data(speed));
             hud.showSpeedPointer(speed);
             e.stopPropagation();
             clearTimeout(world.torpFireTimeout);
-        });
-
+        }
+        this.speedMeter.addEventListener("click", this.setSpeedOnClick);
+        
         this.etempMeter = new Polygon([0,0, 20,0, 20,-100], {x:30, y:350, fill:"none", stroke: "#AAA", strokeWidth:2});
         this.etempBar = new Rectangle(0,0);
         this.etempMeter.append(this.etempBar);
@@ -103,106 +105,82 @@ hud = {
         this.armyText = new TextNode("", {fill:"white", x:16, font:"bold 12pt courier" });
         this.armyStatNode.append(this.armyText);
 
-        this.warning = new Rectangle(this.hCanvas.width-50,25, {x: 25, y: 15, stroke:"#F00", fill: "#F44", opacity:0 });
+        this.warning = new Rectangle(this.hCanvas.width-30,25, {x: 15, y: 15, stroke:"#F00", fill: "#F44", opacity:0 });
         this.warningText = new TextNode("", {fill:"white", y:15, x:5, font:"bold 10pt courier"});
         this.warning.append(this.warningText);
         this.uiGfx.append(this.warning);
         this.warningTimeout = null;
 
-        this.directionWheel = new Circle(40, { x: this.hCanvas.width / 2,
-                                               y: this.hCanvas.height / 2,
-                                               stroke: "white", fill: "none",
-                                               opacity: 0.5, strokeWidth:20 });
+        /* wheel for steering in touch interfaces */
+        this.directionWheel = new Circle(40, { stroke: "#ccc", fill: "none",
+                                               opacity: 0.7, strokeWidth:20 });
         this.directionNeedle = new Line(0, this.directionWheel.radius - this.directionWheel.strokeWidth / 2,
                                         0, this.directionWheel.radius + this.directionWheel.strokeWidth / 2,
-                                        { x:0, y:0, stroke:"red", strokeWidth:2 });
+                                        { x:0, y:0, stroke:"blue", strokeWidth:4 });
         this.directionWheel.append(this.directionNeedle);
+        this.weaponNeedle = new Line(0, this.directionWheel.radius - this.directionWheel.strokeWidth / 2,
+                                        0, this.directionWheel.radius + this.directionWheel.strokeWidth / 2,
+                                        { x:0, y:0, stroke:"red", strokeWidth:4 });
 
-        this.shieldButton = new Rectangle(45,45, { stroke:"blue", cursor: "pointer", fill:"black", x:0, y: 0 });
-        this.shieldButton.append(new TextNode("s", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
-        this.shieldButton.append(new TextNode("Shield", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
-        this.shieldButton.addEventListener("click",function(){
-            net.sendArray(CP_SHIELD.data(world.player.shields?0:1));
-            clearTimeout(world.torpFireTimeout);
-        });
+
+        /* add right-panel buttons */
+        this.shieldButton = this.createButton(0, 0, "blue", "s", "Shield", "bold 14pt courier",
+                             function(){ net.sendArray(CP_SHIELD.data(world.player.shields?0:1)); });
         this.uiGfxRight.append(this.shieldButton);
 
-        this.cloakButton = new Rectangle(45,45, { stroke:"#797", cursor: "pointer", fill:"black", x:0, y: 50 });
-        this.cloakButton.append(new TextNode("c", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
-        this.cloakButton.append(new TextNode("Cloak", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
-        this.cloakButton.addEventListener("click",function(){
-            net.sendArray(CP_CLOAK.data(world.player.cloaked?0:1));
-            clearTimeout(world.torpFireTimeout);
-        });
+        this.cloakButton = this.createButton(0, 50, "#797", "c", "Cloak", "bold 14pt courier",
+                            function(){ net.sendArray(CP_CLOAK.data(world.player.cloaked?0:1)); });
         this.uiGfxRight.append(this.cloakButton);
 
-        this.repairButton = new Rectangle(45,45, { stroke:"orange", cursor: "pointer", fill:"black", x:0, y: 100 });
-        this.repairButton.append(new TextNode("Sft+R", {fill:"white", font:"bold 10pt courier", y:17, x:22, align:"center"}));
-        this.repairButton.append(new TextNode("Repair", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
-        this.repairButton.addEventListener("click",function(){
-            net.sendArray(CP_REPAIR.data(world.player.repairing?0:1));
-            clearTimeout(world.torpFireTimeout);
-        });
+        this.repairButton = this.createButton(0, 100, "orange", "Sft+R", "Repair", "bold 10pt courier",
+                             function(){ net.sendArray(CP_REPAIR.data(world.player.repairing?0:1)); });
         this.uiGfxRight.append(this.repairButton);
 
-        this.orbitButton = new Rectangle(45,45, { stroke:"#ffd700", cursor: "pointer", fill:"black", x:50, y: 0 });
-        this.orbitButton.append(new TextNode("o", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
-        this.orbitButton.append(new TextNode("Orbit", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
-        this.orbitButton.addEventListener("click",function(){
-            net.sendArray(CP_ORBIT.data(world.player.orbitting?0:1));
-            clearTimeout(world.torpFireTimeout);
-        });
-        this.uiGfxRight.append(this.orbitButton);
-
-        this.dropButton = new Rectangle(45,45, { stroke:"#ffd700", cursor: "pointer", fill:"black", x:50, y: 150 });
-        this.dropButton.append(new TextNode("x", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
-        this.dropButton.append(new TextNode("Drop", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
-        this.dropButton.addEventListener("click",function(){
-            net.sendArray(CP_BEAM.data(2));
-            clearTimeout(world.torpFireTimeout);
-        });
-
-        this.pickupButton = new Rectangle(45,45, { stroke:"#ffd700", cursor: "pointer", fill:"black", x:50, y: 100 });
-        this.pickupButton.append(new TextNode("z", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
-        this.pickupButton.append(new TextNode("Pickup", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
-        this.pickupButton.addEventListener("click",function(){
-            net.sendArray(CP_BEAM.data(1));
-            clearTimeout(world.torpFireTimeout);
-        });
-
-        this.bombButton = new Rectangle(45,45, { stroke:"red", cursor: "pointer", fill:"black", x:50, y: 50 });
-        this.bombButton.append(new TextNode("b", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
-        this.bombButton.append(new TextNode("Bomb", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
-        this.bombButton.addEventListener("click",function(){
-            net.sendArray(CP_BOMB.data(world.player.bombing?0:1));
-            clearTimeout(world.torpFireTimeout);
-        });
-
-        this.tractorButton = new Rectangle(45,45, { stroke:"green", cursor: "pointer", fill:"black", x:0, y: 150 });
-        this.tractorButton.append(new TextNode("Sft+T", {fill:"white", font:"bold 10pt courier", y:17, x:22, align:"center"}));
-        this.tractorButton.append(new TextNode("Tractor", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
-        this.tractorButton.addEventListener("click",function(){
-            if(world.player.tractoring) {
-                net.sendArray(CP_TRACTOR.data(0,0));
-            } else {
-                world.setTractorCursor(true, false);
-            }
-            clearTimeout(world.torpFireTimeout);
+        this.tractorButton = this.createButton(0, 150, "green", "Sft+R", "Tractor", "bold 10pt courier", function(){
+            if(world.player.tractoring) { net.sendArray(CP_TRACTOR.data(0,0)); }
+            else { world.setTractorCursor(true, false); }
         });
         this.uiGfxRight.append(this.tractorButton);
 
-        this.pressorButton = new Rectangle(45,45, { stroke:"purple", cursor: "pointer", fill:"black", x:0, y: 200 });
-        this.pressorButton.append(new TextNode("y", {fill:"white", font:"bold 14pt courier", y:17, x:22, align:"center"}));
-        this.pressorButton.append(new TextNode("Pressor", {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
-        this.pressorButton.addEventListener("click",function(){
-            if(world.player.pressing) {
-                net.sendArray(CP_REPRESS.data(0,0));
-            } else {
-                world.setTractorCursor(true, true);
-            }
-            clearTimeout(world.torpFireTimeout);
+        this.pressorButton = this.createButton(0, 200, "purple", "y", "Pressor", "bold 14pt courier", function(){
+            if(world.player.pressing) { net.sendArray(CP_REPRESS.data(0,0)); }
+            else { world.setTractorCursor(true, true); }
         });
         this.uiGfxRight.append(this.pressorButton);
+
+        this.orbitButton = this.createButton(50, 0, "yellow", "o", "Orbit", "bold 14pt courier",
+                            function(){ net.sendArray(CP_ORBIT.data(world.player.orbitting?0:1)); });
+        this.uiGfxRight.append(this.orbitButton);
+
+        this.bombButton = this.createButton(50, 50, "red", "b", "Bomb", "bold 14pt courier", function(){
+            net.sendArray(CP_BOMB.data(world.player.bombing?0:1));
+        });
+        this.pickupButton = this.createButton(50, 100, "#ffd700", "z", "Pickup", "bold 14pt courier", function(){
+            net.sendArray(CP_BEAM.data(1));
+        });
+        this.dropButton = this.createButton(50, 150, "#ffd700", "x", "Drop", "bold 14pt courier", function(){
+            net.sendArray(CP_BEAM.data(2));
+        });
+
+        this.dPadMap = new CanvasNode({});
+        this.dPadMap.append(new Polygon([0,0, 20,0, 20,20, 40,20, 40,40, 20,40, 20,60, 0,60, 0,40, -20,40, -20,20, 0,20], {fill:"#444", stroke:"white", zIndex:-50}));
+        this.dPadUp = new TextNode("", {fill:"white", font:"bold 8pt courier", y:-5, x:10, align:"center"});
+        this.dPadMap.append(this.dPadUp);
+        this.dPadDown = new TextNode("", {fill:"white", font:"bold 8pt courier", y:70, x:10, align:"center"});
+        this.dPadMap.append(this.dPadDown);
+        this.dPadLeft = new TextNode("", {fill:"white", font:"bold 8pt courier", y:32, x:-25, align:"right"});
+        this.dPadMap.append(this.dPadLeft);
+        this.dPadRight = new TextNode("", {fill:"white", font:"bold 8pt courier", y:32, x:45, align:"left"});
+        this.dPadMap.append(this.dPadRight);
+
+        this.dPadCommands = [
+            ["Beam up", "Orbit", "Beam down", "Bomb"],
+            ["Report", "Carry", "Chat", "Carry"],
+            ["Repair", "Shields", "", "Cloak"],
+            ["Tractor", "Det torps", "Pressor", "Det own"],
+        ]
+
+        this.reposition();
     },
 
     draw: function() {
@@ -210,18 +188,76 @@ hud = {
         this.rCanvas.append(this.uiGfxRight);
     },
 
+    // used to shift elements when the canvas is resized
+    reposition: function() {
+        var leftCanvas = this.hCanvas.canvas;
+        this.setXY(this.healthCircle, 45, leftCanvas.height-30);
+        this.setXY(this.shieldMeter, 38, leftCanvas.height-37);
+        this.setXY(this.fuelBox, 4, leftCanvas.height-5);
+        this.setXY(this.directionWheel, leftCanvas.width / 2, leftCanvas.height / 2);
+        this.setXY(this.dPadMap, leftCanvas.width - 100, leftCanvas.height - 100);
+
+        this.warning.width = leftCanvas.width-30;
+        this.warning.changed = true;
+    },
+
     undraw: function() {
         this.hCanvas.removeChild(this.uiGfx);
+        this.rCanvas.removeChild(this.uiGfxRight);
+    },
+
+    setXY: function(gfx, x, y) {
+        gfx.x = x;
+        gfx.y = y;
+        gfx.changed = true;
+    },
+
+    createButton: function(x, y, color, key, text, font, onClick) {
+        var width = 45, height = 45;
+        var button = new Rectangle(width,height, { stroke:color, cursor: "pointer", fill:"black", x:x, y:y });
+        button.append(new TextNode(key, {fill:"white", font:font, y:17, x:22, align:"center"}));
+        button.append(new TextNode(text, {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
+        button.addEventListener("click",function() {
+            onClick.call(this);
+            clearTimeout(world.torpFireTimeout);
+        });
+        return button;
+    },
+
+    showDPadCommands: function(buttonNum) {
+        var commands = this.dPadCommands[buttonNum];
+        this.dPadUp.text = commands[0];
+        this.dPadRight.text = commands[1];
+        this.dPadDown.text = commands[2];
+        this.dPadLeft.text = commands[3];
+        this.uiGfx.append(this.dPadMap);
+        this.dPadMap.changed = true;
+    },
+    hideDPadCommands: function() {
+        this.uiGfx.remove(this.dPadMap);
     },
 
     showDirectionWheel: function(show) {
         if(show) { this.uiGfx.append(this.directionWheel); }
         else { this.uiGfx.remove(this.directionWheel); }
     },
+    showWeaponNeedle: function(show) {
+        if(show) { this.directionWheel.append(this.weaponNeedle); }
+        else { this.directionWheel.remove(this.weaponNeedle); }
+    },
+    showDirectionNeedle: function(show) {
+        if(show) { this.directionWheel.append(this.directionNeedle); }
+        else { this.directionWheel.remove(this.directionNeedle); }
+    },
     showDirectionAngle: function(rads) {
         this.directionNeedle.rotation = [rads+Math.PI,0,0];
         this.directionNeedle.changed = true;
     },
+    showWeaponAngle: function(rads) {
+        this.weaponNeedle.rotation = [rads+Math.PI,0,0];
+        this.weaponNeedle.changed = true;
+    },
+
 
     setShieldIndic: function(shieldsUp) {
         this.shieldButton.fill = shieldsUp?"blue":"black";
@@ -272,7 +308,7 @@ hud = {
     showWarning: function(msg) {
         if(msg == "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13\x0FB") return;
 
-        msg = msg.replace(/Helmsman:\s+/, "");
+        msg = msg.replace(/Helmsman:\s+/, "").replace(/,? captain!/, "!");
 
         var self = this;
         this.warning.opacity = 0.7;
@@ -319,6 +355,7 @@ hud = {
     },
     showSpeedPointer: function(speed) {
         if(speed > this.maxSpeed) { speed = this.maxSpeed; }
+        this.targetSpeed = speed;
         this.speedPointer.y = -300 * Math.pow(speed/12, 0.75);
         this.speedPointer.changed = true;
     },

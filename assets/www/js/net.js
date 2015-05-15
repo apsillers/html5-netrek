@@ -1,8 +1,28 @@
+/*
+    Copyright (C) 2012 Andrew P. Sillers (apsillers@gmail.com)
+
+    This file is part of the HTML5 Netrek Client.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
 // This class handles all communication with the WebSocket (WS) server.
 // The WS server is an intermediary between the browser and Netrek (NT) server.
 // Sort of like a proxy, but it does a little more (e.g., metaserver queries).
 // See node/server.node.js for the protocol and code
-NetrekConnection = function(webhost, webport, callback) {
+NetrekConnection = function(secure, webhost, webport, callback) {
 
     if(typeof window.Worker == "function") this.worker = new Worker("js/net_worker.js");
 
@@ -12,7 +32,9 @@ NetrekConnection = function(webhost, webport, callback) {
     this.serverHost = null;
     this.serverPort = null;
 
-	this.conn = io.connect("ws://"+this.host+":"+this.port);
+    console.log("conntecting to " + "http"+(secure?"s":"")+"://"+this.host+":"+this.port);
+
+	this.conn = io.connect("http"+(secure?"s":"")+"://"+this.host+":"+this.port);
 	this.conn.once("connect",callback);
 	
     // the stream of Netrek messages we haven't resolved yet
@@ -41,7 +63,8 @@ NetrekConnection = function(webhost, webport, callback) {
         this.serverHost = host;
         this.serverPort = port;
         var _self = this;
-		this.conn.once('serverConnected', function() {
+
+        var onConnect = function() {
             document.title += " - " + _self.serverHost;
 			_self.sendArray(CP_SOCKET.data(10));
             // if the browser has Web Worker support
@@ -51,6 +74,7 @@ NetrekConnection = function(webhost, webport, callback) {
                     if(typeof evt.data == "object" && typeof evt.data.msgCode != "undefined") {
                         serverPackets[evt.data.msgCode].handler(evt.data.data);
                     }
+
                 });
 
                 // base64-decode all packets from the server and send them to the worker
@@ -61,7 +85,7 @@ NetrekConnection = function(webhost, webport, callback) {
 			    this.on('message', function(e) {
                     // if the browser lacks Web Worker support, just do processing in a blocking way
                     _self.buffer += atob(e);
-                    if(!_self.reading) _self.readMessages();
+                    if(!_self.reading) { _self.readMessages(); }
                 });
             }
 
@@ -70,9 +94,19 @@ NetrekConnection = function(webhost, webport, callback) {
                 console.warn('The Netrek server unexpected closed the connection. You probably timed out. Try reloading the page.');
             });
 
+            _self.conn.removeListener(onError);
+
             // once everything is set up, do the specified callback
-		    callback();
-		});
+		    callback(true);
+		}
+
+        var onError = function() {
+            _self.conn.removeListener(onConnect);
+            callback(false);
+        }
+
+		this.conn.once('serverConnected', onConnect);
+        this.conn.once("connectError", onError)
 		this.conn.emit('joinServer', {host:host, port:port});
 	}
 
@@ -111,17 +145,17 @@ NetrekConnection = function(webhost, webport, callback) {
             this.buffer = this.buffer.substr(length);
             // send data to the handler for this message type; this causes the action to occur
             msgClass.handler(packer.stringToBytes(data));
-            setTimeout(this.readMessages(), 0);
+            this.readMessages();
         } else {
             this.reading = false;
             return;
         }
     }
 
+    // injectData: inject fake server packets
+    // used by the tutorial
+    this.injectData = function() {
+        
+    }
+
 }
-
-
-Array.prototype.next = function() {
-    return this.splice(0,1)[0];
-}
-

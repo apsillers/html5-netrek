@@ -20,122 +20,124 @@
 -->
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Netrek Client</title>
 <script src="cordova-2.2.0.js"></script>
 <script src="TCPSockets.js"></script>
-<script src="js/lib/cake2.js"></script>
 <script src="js/lib/jquip.events.css.min.js"></script>
+<script src="js/lib/cake2.js"></script>
 <script src="js/lib/base64.js"></script>
 <script src="js/jspack.js"></script>
 <script src="js/constants.js"></script>
+<script src="config.js"></script>
 <script src="js/team.js"></script>
 <script src="js/images.js"></script>
 <script src="js/world.js"></script>
+<script src="js/border.js"></script>
+<script src="js/tutorial.js"></script>
 <script src="js/outfitting.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/ship.js"></script>
 <script src="js/torp.js"></script>
 <script src="js/phaser.js"></script>
 <script src="js/tractor.js"></script>
+<script src="js/explosion.js"></script>
 <script src="js/packets.js"></script>
 <script src="js/net_phonegap.js"></script>
 <script src="js/main.js"></script>
+<script src="js/playerlist.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/gamepad.js"></script>
+
 <link href="css/all.css" rel="stylesheet" type="text/css" media="all">
 
 </head>
 <body style="margin:0;">
 <div style="float: left" id="debug"></div>
-<div id="canvasland" style="margin-left:auto; margin-right:auto; width: 951px; margin-top:0;">
+<div id="canvasland" style="margin-left:auto; margin-right:auto; width: 1051px; margin-top:0;">
   <div id="leftCanvas" style="float:left;" data-width="550" data-height="500"></div>
-  <div id="rightCanvas" style="margin-left:1px;" data-width="400" data-height="300"></div>
+  <div id="rightCanvas" style="margin-left:1px;" data-width="500" data-height="300"></div>
 
   <div style="float:left; position: relative;">
-  <div id="chatbox" style="width: 398px; height:198px; position: absolute; top: 0px; left: 0px; background-color: white; border: thin solid black;">
-    <div id="inbox" style=" height:170px; overflow-y: scroll; font-family: monospace;"></div>
-    <input id="chatInput" type="text" style=" height: 20px; width: 390px; font-size: 12px; font-family: monospace;" />
+  <div id="chatbox" style="width: 498px; height:198px; position: absolute; top: 0px; left: 0px; background-color: white; border: thin solid black;">
+    <div id="inbox" style=" height:170px; overflow-y: scroll; font-family: monospace; font-size: 10px;"></div>
+    <input id="chatInput" type="text" style="height: 20px; width: 490px; font-size: 10px; font-family: monospace;" />
   </div>
   </div>
 </div>
 
-<div id="quickstart" style="position:fixed; z-index:10000; background-color: rgba(50, 50, 255, 0.95); margin:0; top:3%; left:3%; width:90%; height:86%; padding:2% 2%; color: white; display:none; font-size: 10pt;">
-  <div style="float:left; width:49%; border: thin dashed white; height:100%; overflow-y: auto;">
-    <h1 style="padding:0 10px; font-size: 15pt;">Quick Controls Guide</h1>
-    <div style="padding:0 10px;">
-        <ul>
-          <li><b>Left click:</b> Fire torpedo</li>
-          <li><b>Shift+click</b> or <b>Middle click:</b> Fire phaser</li>
-          <li><b>Right click:</b> Set ship heading</li>
-          <br />
-          <li><b>0-9:</b> Set warp speed (also set by clicking speed meter)</li>
-          <li><b>c:</b> Toggle cloaking</li>
-          <li><b>s:</b> Toggle shields</li>
-          <li><b>R:</b> Repair mode (note this is <b>Shift+R</b>)</li>
-          <li><b>d:</b> Pre-detonate nearby torpedos</li>
-          <br />
-          <li><b>o:</b> Orbit planet</li>
-          <li><b>b:</b> Bomb enemy planet</li>
-          <li><b>z:</b> Beam up friendly armies</li>
-          <li><b>x:</b> Beam down armies onto planet</li>
-          <br/>
-          <li>For more information, see the <a style="color:white;" href="http://netrek.org/beginner/newbie.php#Commands">Netrek Manual</a>.</li>
-        </ul>
+<!-- tutorial sidebar -->
+<div id="tutorial-div" style="position: absolute; right:0px; top:0; z-index: 5; alpha: 0.95; opacity: 0.95;">
+    <div id="tutorial-tab" style="background-color: #Fa5; font-weight: bold; cursor:pointer; float: left;">&lt;&lt; ?</div>
+    <div id="tutorial-body" style="background-color: #Fa5; width: 500px; height: 500px; padding: 0px; float:left; overflow-y: auto; display:none;">
+        <div>Tutorial mode off.</div><br/><div><a href="#" id="tutorial-enable-link">Click to enable tutorial mode.</a></div>
     </div>
-  </div>
-  <div style="float:right; width:49%; border: thin dashed white; height:100%; overflow-y: auto;">
-    <h1 style="padding:0 10px; font-size: 15pt;">Game Overview</h1>
-    <div style="padding:0 10px;">
-
-      <b>Dogfighting</b>
-      <ul style="margin-top:2px;">
-          <li>Torpedoes and phasers use up fuel.</li>
-          <li>Torps do a fixed amount of damage. Phasers do more damage at close range.</li>
-          <li>Press <b>d</b> to destroy nearby torpedoes. You will take some damage, but less than a direct hit.</li>
-      </ul>
-
-      <b>Planets</b>
-      <ul style="margin-top:2px;">
-          <li>You can orbit a nearby planet by pressing <b>o</b>.</li>
-          <li>Orbiting repair planets (wrench) enhances Repair Mode.</li
-          <li>Orbiting fuel planets (orange fuel can) quickly refills fuel.</li>
-          <li>Agri planets (blue rim) produce armies faster.</li>
-      </ul>
-
-      <b>Armies</b>
-      <ul style="margin-top:2px;">
-          <li>The goal of Netrek is to conquer planets, by moving armies from your planets onto enemy planets.</li>
-          <li>Orbit a firendly planet and pick up armies with <b>z</b>. Then, orbit an enemy planet and drop them with <b>x</b>. Each army you drop destroys an enemy army. When the enemy planet has no armies left, dropping another army conquers the planet for your team.</li>
-          <li>You can carry armies after you have made a kill.</li>
-          <li>Bomb an enemy planet with <b>b</b> to destroy armies, but bombing cannot reduce it below 4 armies.</li>
-      </ul>
-
-    </div>
-  </div>
-  <div style="clear:both;"></div>
 </div>
 
+<!-- player list -->
+<div id="playerlist-div" style="position: absolute; z-index:10000; background-color: rgba(50, 50, 50, 0.90); left:50%; width:1000px; top: 20px; margin-left: -500px; height:460px; color: white; display:none; font-size: 10pt;">
+    <h1 style="padding-left: 10px;">Player List</h1>
+    <div id="playerlist" style="padding: 10px;">
+        <div></div>
+    </div>
+</div>
+
+<!-- overlay that hides the game during login -->
 <div id="overlay"></div>
 
 <div id="login-box">
     <div id="login-inner"><div id="login-inner-inner">
-<div id="login-title">Netrek Login</div>
-        <div style="float:left;">
-            <div class="login-row login-label">Host:</div>
-            <div class="login-row login-label">Username:</div>
-            <div class="login-row login-label">Password: </div>
+        <div id="login-title">Netrek</div>
+
+    <img src="data/screenshot.png" style="float:left">
+
+    <div id="all-menus" style="float: left;">
+        <div id="login-error" style="color: #B00; font-family: monospace; font-weight: bold; padding: 0 4px;"></div>
+
+        <div id="menu-div">
+                <div id="tutorial-button" class="main-menu-button">Tutorial</div>
+                <div id="join-button" class="main-menu-button">Join Server</div>
+                <div id="credits-button" class="main-menu-button">Credits</div>
         </div>
-        <div style="float:left;">
-            <div class="login-row"><select id="nt-host-input">
-              <option>continuum.us.netrek.org</option>
-              <option>pickled.netrek.org</option>
-            </select></div>
-            <div class="login-row"><input id="username-input" type="text" value="guest" /></div>
-            <div class="login-row"><input id="pass-input" type="password" /></div>
+
+        <div id="credits-div">
+            <strong>Author:</strong> Andrew Sillers (apsillers)<br/>
+            <strong>License:</strong> GPLv3<br/>
+            <strong>Source:</strong> On <a href="https://github.com/apsillers/html5-netrek" style="color: #ddd">Github</a>
+            <br /><br/>
+            <div id="credits-back-button" class="main-menu-button">&lt; Back</div>
+            <br/>
         </div>
-        <div style="clear:left;"></div>
-        <div><input type="button" value="Connect" id="connect-button" /></div>
-        <div id="login-tips"><em>Not sure what to do?</em> Just make sure the username says "guest" and the password field is empty. Press "Connect" and the game will start.</div>
+
+        <div id="server-choice-div">
+            <div id="list-back-button" class="main-menu-button">&lt; Back</div>
+        </div>
+
+        <div id="credentials-div">
+            <div style="float:left;" class="login-credentials">
+                <div class="login-row login-label">Username:</div>
+                <div class="login-row login-label">Password: </div>
+            </div>
+
+            <div style="float:left;" class="login-credentials">
+                <!-- nt-host-input will be populated with options by net.getServerList in main.js -->
+                <div class="login-row"><input id="username-input" type="text" value="guest" /></div>
+                <div class="login-row"><input id="pass-input" type="password" /></div>
+                <input id="nt-host-input" type="hidden" />
+            </div>
+            <div style="clear:left;"></div>
+            <div>
+                <input type="button" value="< Back" class="big-button login-credentials" id="login-back-button" style="width:75px;" />
+                <input type="button" value="Connect" class="big-button login-credentials" id="connect-button" />
+            </div>
+        </div>
+
+        <div id="login-tips">Want to play Netrek on a full desktop client? Download one now from <a href="http://www.netrek.org/" style="color:#ddd;">netrek.org</a>.</div>
+    </div>
+
     </div></div>
     <div style="clear:left;"></div>
+    <h2 id="login-loading" style="display:none; color: white;">Loading...</h2>
 </div>
 
 <div id="loading-box">
