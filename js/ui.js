@@ -62,7 +62,8 @@ hud = {
         this.uiGfx.append(this.fuelBox);
 
         this.maxSpeed = 12;
-        this.speedMeter = new Polygon([0,0, 0,-300, 50,-300], {x:20, y:350, fill:"none", stroke: "white", strokeWidth:2});
+        this.targetSpeed = 0;
+        this.speedMeter = new Polygon([0,0, 0,-300, 50,-300, 20,0], {x:20, y:310, fill:"none", stroke: "white", strokeWidth:2});
         this.meter = new Rectangle(0,0);
         this.speedPointer = new Polygon([-2,0, -9,-3, -9,3], {fill:"none", stroke: "white", strokeWidth:1});
         this.speedNumber = new TextNode("0", { fill: "white", font:"bold 12pt courier", y:25 });
@@ -70,12 +71,22 @@ hud = {
         this.speedMeter.append(this.speedPointer);
         this.speedMeter.append(this.speedNumber);
         
-        this.uiGfx.append(this.speedMeter);
+        this.smallModeSpeedMeter = new CanvasNode({x:10, y:25});
+        this.smallModeCurrentSpeed = new TextNode("0", { fill: "white", font:"bold 16pt courier", x:0, y:25 });
+        this.smallModeTargetSpeed = new TextNode("0", { fill: "green", font:"bold 16pt courier", x:25, y:25 });
+        this.smallModeSpeedPlus = new Circle(10, {fill:"#0A0", stroke:"#0F0", x:32, y:-3 });
+        this.smallModeSpeedPlus.append(new TextNode("+", { fill: "#0F0", font:"bold 16pt courier", align:"center", y:5 }));
+        this.smallModeSpeedMinus =new Circle(10, {fill:"#700", stroke:"#F00", x:32, y:40 });
+        this.smallModeSpeedMinus.append(new TextNode("-", { fill: "#F00", font:"bold 16pt courier", align:"center", y:5 }));
+        this.smallModeSpeedMeter.append(this.smallModeCurrentSpeed);
+        this.smallModeSpeedMeter.append(this.smallModeTargetSpeed);
+        this.smallModeSpeedMeter.append(this.smallModeSpeedPlus);
+        this.smallModeSpeedMeter.append(this.smallModeSpeedMinus);
 
         this.speedNotches = [];
         for(var i=0; i<12; ++i) {
             var frac = Math.pow(i/12, 0.75);
-            this.speedNotches[i] = new Line(0,-frac*300, frac*50,-frac*300, { opacity:0.4 });
+            this.speedNotches[i] = new Line(0,-frac*300, 20 + frac*30,-frac*300, { opacity:0.4 });
             this.speedMeter.append(this.speedNotches[i]);
         }
 
@@ -88,9 +99,20 @@ hud = {
             clearTimeout(world.torpFireTimeout);
         }
         this.speedMeter.addEventListener("click", this.setSpeedOnClick);
-        
 
-        this.etempMeter = new Polygon([0,0, 20,0, 20,-100], {x:30, y:350, fill:"none", stroke: "#AAA", strokeWidth:2});
+        function speedChanger(diff) {
+            return function(e) {
+                this.targetSpeed = Math.min(this.targetSpeed+diff, this.maxSpeed);
+                this.smallModeTargetSpeed.text = this.targetSpeed;
+                net.sendArray(CP_SPEED.data(this.targetSpeed));
+                e.stopPropagation();
+                clearTimeout(world.torpFireTimeout);
+            }.bind(hud);
+        }
+        this.smallModeSpeedPlus.addEventListener("click", speedChanger(1));  
+        this.smallModeSpeedMinus.addEventListener("click", speedChanger(-1));        
+
+        this.etempMeter = new Polygon([0,0, 20,0, 20,-100], {x:50, y:310, fill:"none", stroke: "#AAA", strokeWidth:2});
         this.etempBar = new Rectangle(0,0);
         this.etempMeter.append(this.etempBar);
         this.uiGfx.append(this.etempMeter);
@@ -186,7 +208,16 @@ hud = {
 
     draw: function() {
         this.hCanvas.append(this.uiGfx);
-        this.rCanvas.append(this.uiGfxRight);
+
+        if(!smallMode) {
+            this.uiGfxRight.x = 0;
+            this.rCanvas.append(this.uiGfxRight);
+        } else {
+            this.uiGfxRight.x = leftCanvas.width - 120;
+            this.uiGfx.append(this.uiGfxRight);
+            this.etempMeter.x = 70;
+            this.etempMeter.y = 110;
+        }
     },
 
     // used to shift elements when the canvas is resized
@@ -198,6 +229,20 @@ hud = {
         this.setXY(this.directionWheel, leftCanvas.width / 2, leftCanvas.height / 2);
         this.setXY(this.dPadMap, leftCanvas.width - 100, leftCanvas.height - 100);
 
+        if(!smallMode) {
+            this.uiGfx.append(this.speedMeter);
+            this.uiGfx.removeChild(this.smallModeSpeedMeter);
+            this.uiGfxRight.x = 0;
+            this.rCanvas.append(this.uiGfxRight);
+        } else {
+            this.uiGfx.append(this.smallModeSpeedMeter);
+            this.uiGfx.removeChild(this.speedMeter);
+            this.uiGfxRight.x = leftCanvas.width - 120;
+            this.uiGfx.append(this.uiGfxRight);
+        }
+
+	this.uiGfx.changed = true;
+
         this.warning.width = leftCanvas.width-30;
         this.warning.changed = true;
     },
@@ -205,6 +250,7 @@ hud = {
     undraw: function() {
         this.hCanvas.removeChild(this.uiGfx);
         this.rCanvas.removeChild(this.uiGfxRight);
+        this.uiGfx.removeChild(this.uiGfxRight);
     },
 
     setXY: function(gfx, x, y) {
@@ -351,6 +397,8 @@ hud = {
         this.speedMeter.appendChild(this.meter);
         this.speedMeter.changed = true;
 
+        this.smallModeCurrentSpeed.text = speed;
+
         if(speed) this.speedNumber.text = "Warp " + speed;
         else this.speedNumber.text = "";
     },
@@ -359,6 +407,7 @@ hud = {
         this.targetSpeed = speed;
         this.speedPointer.y = -300 * Math.pow(speed/12, 0.75);
         this.speedPointer.changed = true;
+        this.smallModeTargetSpeed.text = speed;
     },
     showEngineTemp: function(percent) {
         percent = Math.max(0,Math.min(100,percent));

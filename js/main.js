@@ -19,6 +19,7 @@
 */
 
 var connected_yet = false;
+var smallMode = false;
 
 // used to start the game
 window.addEventListener("load", function() {
@@ -76,16 +77,28 @@ window.addEventListener("load", function() {
                     var minHeight = 440;
                     var minWidth = 1145;
 
-                    var winHeight = Math.max($(window).height(), minHeight);
-                    var winWidth = Math.max($(window).width(), minWidth);
+                    var winHeight = $(window).height();
+                    var winWidth = $(window).width();
 
-                    lCanvas.width = winWidth - $(rCanvas).data("width") + "px";
-                    lCanvas.height = winHeight;
+                    var leftWidth = winWidth - $(rCanvas).data("width");
+                    if(leftWidth < 550) {
+                        smallMode = true;
+                        $(rCanvas).hide();
+                        $("#chatbox").hide();
+                        leftWidth = winWidth;
+                    } else {
+                        smallMode = false;
+                        $(rCanvas).show();
+                        $("#chatbox").show();
+                    }
+
+                    leftCanvas.width = leftWidth;
+                    leftCanvas.height = winHeight;
                     var container = lCanvas.firstElementChild;
                     var canvas = container.firstElementChild;
-                    container.style.width = winWidth - $(rCanvas).data("width") + "px";
+                    container.style.width = leftWidth + "px";
                     container.style.height = winHeight + "px";
-                    canvas.width = winWidth - $(rCanvas).data("width");
+                    canvas.width = leftWidth;
                     canvas.height = winHeight;
                     $("#canvasland").width(winWidth);
 
