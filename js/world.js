@@ -143,14 +143,15 @@ world = {
                 var offsetX = e.pageX - offset.left;
                 var offsetY = e.pageY - offset.top;
 
-                if(!("ontouchstart" in document)) {
                     if(!e.shiftKey) {
+console.log("click clearing timeout", world.torpFireTimeout);
+                        clearTimeout(_self.torpFireTimeout);
                         // maybe this click was intended for a UI element, which may cancel the torp fire
-                        _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 500);
+                        _self.torpFireTimeout = setTimeout(function() { console.log("running the timeout"); net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 10);
+console.log("click setting timeout", world.torpFireTimeout);
                     } else {
                         net.sendArray(CP_PHASER.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY))));
                     }
-                }
             } else {
                 setTimeout(function(){ _self.setTractorCursor(false) }, 100);
             }
@@ -256,10 +257,13 @@ world = {
                 net.sendArray(CP_DIRECTION.data(_self.rad2byte(_self.directingAngle)));
                 _self.showDirecting(false);
             } else {
+console.log("touchend clearing timeout", world.torpFireTimeout);
+                clearTimeout(_self.torpFireTimeout);
                 var offset = $(this).offset();
                 var offsetX = e.changedTouches[0].pageX - offset.left;
                 var offsetY = e.changedTouches[0].pageY - offset.top;
-                _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 4);
+                _self.torpFireTimeout = setTimeout(function() { console.log("touchend torp"); net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 10);
+console.log("touchend setting timeout", _self.torpFireTimeout);
             }
         });
 
