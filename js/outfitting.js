@@ -180,6 +180,8 @@ outfitting = {
         // draw message of the day
         this.writeMotd();
 
+        this.mCanvas.removeChild(hud.uiGfxRight);
+
         this.drawn = true;
     },
 

@@ -59,7 +59,7 @@ window.addEventListener("load", function() {
                 $("#loading-box").hide();
                 $("#login-box").show();
 
-                $("#login-box").css("top",$(window).scrollTop()+100+"px");
+                $("#login-box").css("top",25);
                 $("#login-box").css("left",($("html").width() - $("#login-box").width()) / 2 + $(window).scrollLeft());
 
                 $(window).resize(function() {
@@ -69,11 +69,12 @@ window.addEventListener("load", function() {
                 $(window).scroll(function() {
                     $("#overlay").css("top",$(window).scrollTop()+"px");
                     $("#overlay").css("left",$(window).scrollLeft()+"px");
-                    $("#login-box").css("top",$(window).scrollTop()+100+"px");
+                    $("#login-box").css("top",25);
                     $("#login-box").css("left",($("html").width() - $("#login-box").width()) / 2 + $(window).scrollLeft());
                 });
 
                 var resizeGame = function() {
+                    resizeTimeout = null;
                     var minHeight = 440;
                     var minWidth = 1145;
 
@@ -113,7 +114,7 @@ window.addEventListener("load", function() {
                 resizeTimeout = null;
                 $(window).resize(function() {
                     if(resizeTimeout) clearTimeout(resizeTimeout);
-                    setTimeout(resizeGame, 200);
+                    resizeTimeout = setTimeout(resizeGame, 100);
                 });
 
                 // call it once to get started
