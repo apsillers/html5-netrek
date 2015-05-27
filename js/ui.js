@@ -108,7 +108,6 @@ hud = {
                 net.sendArray(CP_SPEED.data(this.targetSpeed));
                 e.stopPropagation();
                 clearTimeout(world.torpFireTimeout);
-console.log("button press: clearing timeout", world.torpFireTimeout);
             }.bind(hud);
         }
         this.smallModeSpeedPlus.addEventListener("click", speedChanger(1));  
