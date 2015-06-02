@@ -25,8 +25,10 @@ var SC=0, DD=1, CA=2, BB=3, AS=4, SB=5;
 outfitting = {
     canvasWidth: 0,
     canvasHeight: 0,
+    smallRaceButtonDim: 70,
     raceButtonDim: 96,
     shipButtonDim: 70,
+    shipButtonDimY: 40,
     oCanvas: null,
     infoBox: null,
     raceButtons: [],
@@ -63,7 +65,7 @@ outfitting = {
     /* Add a ship button to the canvas and return its cake.js object. */
     makeShipButton: function(txt, shipId, x, y, fg, bg, desc) {
         var _self = this;
-        var button = new Rectangle(this.shipButtonDim, this.shipButtonDim, {x:x, y:y, rx:10, ry:10, strokeWidth:2, stroke: fg, fill:bg});
+        var button = new Rectangle(this.shipButtonDim, this.shipButtonDimY, {x:x, y:y, rx:10, ry:10, strokeWidth:2, stroke: fg, fill:bg});
         button.append(new TextNode(txt, {y:15, x:this.shipButtonDim/2, fill: fg, font: "bold 8pt Courier", textAlign:"center"}));
         button.addEventListener("mouseover",function(){ _self.showInfoText(desc); });
         button.addEventListener("mouseout",function() { _self.showInfoText(_self.defaultInfoText); });
@@ -101,8 +103,8 @@ outfitting = {
  
         // add ship buttons
         var centerPx = (this.canvasWidth - this.shipButtonDim) / 2 - 5;
-        var topRowPx = 60;
-        var bottomRowPx = this.shipButtonDim + topRowPx + 5;
+        var topRowPx = 10;
+        var bottomRowPx = this.shipButtonDimY + topRowPx + 5;
         var justLeftPx = centerPx - this.shipButtonDim - 5;
         var justRightPx = centerPx + this.shipButtonDim + 10;
         this.shipButtons[SC] = this.makeShipButton("Scout", SC, justLeftPx,
@@ -144,11 +146,11 @@ outfitting = {
                                 "(called 'ogging')."]);
         this.shipButtons[SB].opacity = 0.3;
         this.otherElems.push(this.separator = new Line(justRightPx-5,topRowPx+10,justRightPx-5,
-                                      bottomRowPx+this.shipButtonDim-10,
+                                      bottomRowPx+this.shipButtonDimY-10,
                                       {stroke:"#0CC", strokeWidth:2}));
        
         this.infoBox = new Rectangle(420, 120, {x:centerPx-210+this.shipButtonDim/2,
-                                                y:bottomRowPx+this.shipButtonDim+20,
+                                                y:bottomRowPx+this.shipButtonDimY+20,
                                                 rx:10, ry:10, strokeWidth:2,
                                                 stroke: "#5FF", fill:"#033"});
         
@@ -178,6 +180,8 @@ outfitting = {
         // draw message of the day
         this.writeMotd();
 
+        this.mCanvas.removeChild(hud.uiGfxRight);
+
         this.drawn = true;
     },
 
@@ -190,10 +194,27 @@ outfitting = {
         var rightAlignPx = this.canvasWidth - this.raceButtonDim - bufferPx;
         var bottomAlignPx = this.canvasHeight - this.raceButtonDim - bufferPx;
         var centerPx = (this.canvasWidth - this.shipButtonDim) / 2 - 5;
-        var topRowPx = 60;
-        var bottomRowPx = this.shipButtonDim + topRowPx + 5;
+        var topRowPx = 20;
+        var bottomRowPx = this.shipButtonDimY + topRowPx + 5;
         var justLeftPx = centerPx - this.shipButtonDim - 5;
         var justRightPx = centerPx + this.shipButtonDim + 10;
+
+        var buttonDim = smallMode?this.smallRaceButtonDim:this.raceButtonDim;
+        var bufferPx = 10;
+        var rightAlignPx = this.canvasWidth - buttonDim - bufferPx;
+        var font = "bold " + (smallMode?8:11) + "pt Courier";
+        for(var i=0; i<4; ++i) {
+            if(i > 1 && smallMode) { this.raceButtons.x = rightAlignPx; }
+            this.raceButtons[i].width = buttonDim;
+            this.raceButtons[i].height = buttonDim;
+            this.raceButtons[i].childNodes[0].x = buttonDim/2;
+            this.raceButtons[i].childNodes[1].x = buttonDim/2;
+            this.raceButtons[i].childNodes[1].y = buttonDim - 15;
+            this.raceButtons[i].childNodes[1].font = font;
+            this.raceButtons[i].changed = true;
+            this.raceButtons[i].childNodes[0].changed = true;
+        }
+
 
         this.setXY(this.raceButtons[0], bufferPx, bottomAlignPx);
         this.setXY(this.raceButtons[1], bufferPx, bufferPx);
@@ -207,12 +228,14 @@ outfitting = {
         this.setXY(this.shipButtons[AS], justRightPx, topRowPx);
         this.setXY(this.shipButtons[SB], justRightPx, bottomRowPx);
 
-        this.setXY(this.infoBox, centerPx-205+this.shipButtonDim/2, bottomRowPx+this.shipButtonDim+20)
+        this.infoBox.width = smallMode?270:420;
+        this.setXY(this.infoBox, centerPx-this.infoBox.width/2+this.shipButtonDim/2+bufferPx/2, bottomRowPx+this.shipButtonDim+20)
+        this.showInfoText(this.defaultInfoText);
 
         this.separator.x1 = justRightPx-5;
         this.separator.y1 = topRowPx+10;
         this.separator.x2 = justRightPx-5;
-        this.separator.y2 = bottomRowPx+this.shipButtonDim-10;
+        this.separator.y2 = bottomRowPx+this.shipButtonDimY-10;
         this.separator.changed = true;
     },
 
@@ -244,7 +267,7 @@ outfitting = {
     showInfoText: function(strArray) {
         this.infoBox.removeAllChildren();
         for(var i=0; i<strArray.length; ++i) {
-            this.infoBox.append(new TextNode(strArray[i], {y:17*(i+1)+5, x:10, font:"12pt Courier", fill: this.infoBox.stroke}));
+            this.infoBox.append(new TextNode(strArray[i], {y:(smallMode?13:17)*(i+1)+5, x:10, font:(smallMode?8:12)+"pt Courier", fill: this.infoBox.stroke}));
         }
     },
    
