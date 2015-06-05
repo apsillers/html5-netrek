@@ -143,14 +143,13 @@ world = {
                 var offsetX = e.pageX - offset.left;
                 var offsetY = e.pageY - offset.top;
 
-                if(!("ontouchstart" in document)) {
                     if(!e.shiftKey) {
+                        clearTimeout(_self.torpFireTimeout);
                         // maybe this click was intended for a UI element, which may cancel the torp fire
-                        _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 500);
+                        _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 10);
                     } else {
                         net.sendArray(CP_PHASER.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY))));
                     }
-                }
             } else {
                 setTimeout(function(){ _self.setTractorCursor(false) }, 100);
             }
@@ -256,6 +255,7 @@ world = {
                 net.sendArray(CP_DIRECTION.data(_self.rad2byte(_self.directingAngle)));
                 _self.showDirecting(false);
             } else {
+                clearTimeout(_self.torpFireTimeout);
                 var offset = $(this).offset();
                 var offsetX = e.changedTouches[0].pageX - offset.left;
                 var offsetY = e.changedTouches[0].pageY - offset.top;

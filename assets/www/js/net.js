@@ -78,11 +78,11 @@ NetrekConnection = function(secure, webhost, webport, callback) {
                 });
 
                 // base64-decode all packets from the server and send them to the worker
-			    this.on('message', function(e) {
+                this.on('message', function(e) {
                     _self.worker.postMessage(e);
                 });
             } else {
-			    this.on('message', function(e) {
+                this.on('message', function(e) {
                     // if the browser lacks Web Worker support, just do processing in a blocking way
                     _self.buffer += atob(e);
                     if(!_self.reading) { _self.readMessages(); }
@@ -97,17 +97,17 @@ NetrekConnection = function(secure, webhost, webport, callback) {
             _self.conn.removeListener(onError);
 
             // once everything is set up, do the specified callback
-		    callback(true);
-		}
+            callback(true);
+        }
 
         var onError = function() {
             _self.conn.removeListener(onConnect);
             callback(false);
         }
 
-		this.conn.once('serverConnected', onConnect);
+        this.conn.once('serverConnected', onConnect);
         this.conn.once("connectError", onError)
-		this.conn.emit('joinServer', {host:host, port:port});
+        this.conn.emit('joinServer', {host:host, port:port});
 	}
 
     this.sendArray = function(data_array) {

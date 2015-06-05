@@ -426,7 +426,7 @@ hud = {
     showSpeed: function(speed) {
         var frac = Math.pow(speed/12, 0.75);
         this.speedMeter.remove(this.meter);
-        this.meter = new Polygon([0,0, 0,-frac*300,frac*50, -frac*300], {fill:"green", strokeWidth:0, zIndex:-5});
+        this.meter = new Polygon([20,0, 0,0, 0,-frac*300, 20 + frac*30, -frac*300], {fill:"green", strokeWidth:0, zIndex:-5});
         this.speedMeter.appendChild(this.meter);
         this.speedMeter.changed = true;
 
