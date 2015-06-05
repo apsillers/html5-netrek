@@ -61,7 +61,8 @@
   <div style="float:left; position: relative;">
   <div id="chatbox" style="width: 498px; height:198px; position: absolute; top: 0px; left: 0px; background-color: white; border: thin solid black;">
     <div id="inbox" style=" height:170px; overflow-y: scroll; font-family: monospace; font-size: 10px;"></div>
-    <input id="chatInput" type="text" style="height: 20px; width: 490px; font-size: 10px; font-family: monospace;" />
+    <input id="chatTargetButton" value="All:" type="button" style="width: 60px; margin-left: 3px;" />
+    <input id="chatInput" type="text" style="height: 20px; width: 410px; font-size: 10px; font-family: monospace;" />
   </div>
   </div>
 </div>
@@ -110,7 +111,14 @@
         </div>
 
         <div id="server-choice-div">
+            <div id="list-custom-button" class="main-menu-button">Custom &gt;&gt;</div>
             <div id="list-back-button" class="main-menu-button">&lt; Back</div>
+        </div>
+
+        <div id="server-custom-div">
+            <input id="custom-host-input" />
+            <div id="custom-connect-button" class="main-menu-button">Connect &gt;&gt;</div>
+            <div id="custom-back-button" class="main-menu-button">&lt; Back</div>
         </div>
 
         <div id="credentials-div">

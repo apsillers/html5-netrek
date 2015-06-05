@@ -139,6 +139,7 @@ window.addEventListener("load", function() {
                     var hostbutton = $("<div class='main-menu-button host-button'></div>").text(serverList[i].host);
                     $.data(hostbutton[0], "data-host", serverList[i].host);
                     $("#list-back-button").before(hostbutton);
+                    $("#list-custom-button").before(hostbutton);
                 }
 
                 /*$("#chatbox").bind("mouseover", function() {
@@ -160,6 +161,14 @@ window.addEventListener("load", function() {
                     $("#nt-host-input").val($(this).data("host"));
                 });
 
+                $("#custom-connect-button").click(function() {
+                    $("#server-custom-div").hide();
+                    $("#credentials-div").show();
+                    $("#connect-button").focus();
+                    $("#login-error").html("");
+                    $("#nt-host-input").val($("#custom-host-input").val());
+                });
+
                 $("#tutorial-button").click(function() {
                     tutorial.activateTutorial();
                     tutorial.showTutorialPanel();
@@ -178,6 +187,16 @@ window.addEventListener("load", function() {
 
                 $("#list-back-button").click(function() {
                     $("#menu-div").show();
+                    $("#server-choice-div").hide();
+                });
+
+                $("#custom-back-button").click(function() {
+                    $("#server-choice-div").show();
+                    $("#server-custom-div").hide();
+                });
+
+                $("#list-custom-button").click(function() {
+                    $("#server-custom-div").show();
                     $("#server-choice-div").hide();
                 });
 

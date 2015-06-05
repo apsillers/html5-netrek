@@ -73,11 +73,11 @@ hud = {
         this.speedMeter.append(this.speedNumber);
         
         this.smallModeSpeedMeter = new CanvasNode({x:10, y:65});
-        this.smallModeCurrentSpeed = new TextNode("0", { fill: "white", font:"bold 16pt courier", x:0, y:25 });
-        this.smallModeTargetSpeed = new TextNode("0", { fill: "green", font:"bold 16pt courier", x:25, y:25 });
-        this.smallModeSpeedPlus = new Circle(10, {fill:"#0A0", stroke:"#0F0", x:32, y:-3 });
+        this.smallModeCurrentSpeed = new TextNode("0", { fill: "white", font:"bold 16pt courier", x:0, y:30 });
+        this.smallModeTargetSpeed = new TextNode("0", { fill: "green", font:"bold 16pt courier", x:25, y:30 });
+        this.smallModeSpeedPlus = new Circle(15, {fill:"#0A0", stroke:"#0F0", x:32, y:-3 });
         this.smallModeSpeedPlus.append(new TextNode("+", { fill: "#0F0", font:"bold 16pt courier", align:"center", y:5 }));
-        this.smallModeSpeedMinus = new Circle(10, {fill:"#700", stroke:"#F00", x:32, y:40 });
+        this.smallModeSpeedMinus = new Circle(15, {fill:"#700", stroke:"#F00", x:32, y:50 });
         this.smallModeSpeedMinus.append(new TextNode("-", { fill: "#F00", font:"bold 16pt courier", align:"center", y:5 }));
         this.smallModeSpeedMeter.append(this.smallModeCurrentSpeed);
         this.smallModeSpeedMeter.append(this.smallModeTargetSpeed);
