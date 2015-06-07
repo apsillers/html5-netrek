@@ -19,6 +19,7 @@
 */
 
 var connected_yet = false;
+var smallMode = false;
 
 // used to start the game
 window.addEventListener("load", function() {
@@ -62,7 +63,7 @@ window.addEventListener("load", function() {
                 $("#loading-box").hide();
                 $("#login-box").show();
 
-                $("#login-box").css("top",$(window).scrollTop()+100+"px");
+                $("#login-box").css("top",25);
                 $("#login-box").css("left",($("html").width() - $("#login-box").width()) / 2 + $(window).scrollLeft());
 
                 $(window).resize(function() {
@@ -72,24 +73,37 @@ window.addEventListener("load", function() {
                 $(window).scroll(function() {
                     $("#overlay").css("top",$(window).scrollTop()+"px");
                     $("#overlay").css("left",$(window).scrollLeft()+"px");
-                    $("#login-box").css("top",$(window).scrollTop()+100+"px");
+                    $("#login-box").css("top",25);
                     $("#login-box").css("left",($("html").width() - $("#login-box").width()) / 2 + $(window).scrollLeft());
                 });
 
                 var resizeGame = function() {
+                    resizeTimeout = null;
                     var minHeight = 440;
                     var minWidth = 1145;
 
-                    var winHeight = Math.max($(window).height(), minHeight);
-                    var winWidth = Math.max($(window).width(), minWidth);
+                    var winHeight = $(window).height();
+                    var winWidth = $(window).width();
 
-                    lCanvas.width = winWidth - $(rCanvas).data("width") + "px";
-                    lCanvas.height = winHeight;
+                    var leftWidth = winWidth - $(rCanvas).data("width");
+                    if(leftWidth < 550) {
+                        smallMode = true;
+                        $(rCanvas).hide();
+                        $("#chatbox").hide();
+                        leftWidth = winWidth;
+                    } else {
+                        smallMode = false;
+                        $(rCanvas).show();
+                        $("#chatbox").show();
+                    }
+
+                    leftCanvas.width = leftWidth;
+                    leftCanvas.height = winHeight;
                     var container = lCanvas.firstElementChild;
                     var canvas = container.firstElementChild;
-                    container.style.width = winWidth - $(rCanvas).data("width") + "px";
+                    container.style.width = leftWidth + "px";
                     container.style.height = winHeight + "px";
-                    canvas.width = winWidth - $(rCanvas).data("width");
+                    canvas.width = leftWidth;
                     canvas.height = winHeight;
                     $("#canvasland").width(winWidth);
 
@@ -104,7 +118,7 @@ window.addEventListener("load", function() {
                 resizeTimeout = null;
                 $(window).resize(function() {
                     if(resizeTimeout) clearTimeout(resizeTimeout);
-                    setTimeout(resizeGame, 200);
+                    resizeTimeout = setTimeout(resizeGame, 100);
                 });
 
                 // call it once to get started
@@ -125,6 +139,7 @@ window.addEventListener("load", function() {
                     var hostbutton = $("<div class='main-menu-button host-button'></div>").text(serverList[i].host);
                     $.data(hostbutton[0], "data-host", serverList[i].host);
                     $("#list-back-button").before(hostbutton);
+                    $("#list-custom-button").before(hostbutton);
                 }
 
                 /*$("#chatbox").bind("mouseover", function() {
@@ -146,6 +161,14 @@ window.addEventListener("load", function() {
                     $("#nt-host-input").val($(this).data("host"));
                 });
 
+                $("#custom-connect-button").click(function() {
+                    $("#server-custom-div").hide();
+                    $("#credentials-div").show();
+                    $("#connect-button").focus();
+                    $("#login-error").html("");
+                    $("#nt-host-input").val($("#custom-host-input").val());
+                });
+
                 $("#tutorial-button").click(function() {
                     tutorial.activateTutorial();
                     tutorial.showTutorialPanel();
@@ -164,6 +187,16 @@ window.addEventListener("load", function() {
 
                 $("#list-back-button").click(function() {
                     $("#menu-div").show();
+                    $("#server-choice-div").hide();
+                });
+
+                $("#custom-back-button").click(function() {
+                    $("#server-choice-div").show();
+                    $("#server-custom-div").hide();
+                });
+
+                $("#list-custom-button").click(function() {
+                    $("#server-custom-div").show();
                     $("#server-choice-div").hide();
                 });
 

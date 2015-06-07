@@ -37,7 +37,7 @@ world = {
     viewY: 0,
     galacticFactor: 200,
     subgalacticFactor: 40,
-    galaticXOffset: 0,
+    galacticXOffset: 0,
     playerNum: null,
     player: null,
     drawn: false,
@@ -61,18 +61,27 @@ world = {
         this.wCanvas = wCanvas;
         this.gCanvas = gCanvas;
         this.galacticFactor = 100000 / gCanvas.height;
-        this.galaticXOffset = gCanvas.width - gCanvas.height - 0;
+        this.galacticXOffset = gCanvas.width - gCanvas.height - 0;
 
         new Border({x:0, y:0, width: 100000, height: 0})
         new Border({x:0, y:0, width: 0, height: 100000})
         new Border({x:100000, y:0, width: 0, height: 100000})
         new Border({x:0, y:100000, width: 100000, height: 0})
+
+        var dims = this.netrek2tac(100000, 100000);
+        this.gGroup.appendChild(new Rectangle(dims[0] - this.galacticXOffset, dims[1], { fill: "#444", stroke: "#FFF", strokeWidth: 2, x: this.galacticXOffset, opacity: 0.7 }));
     },
 
     draw: function() {
         this.wCanvas.append(this.wGroup);
-        this.gCanvas.append(this.gGroup);
         this.wGroup.append(this.planetGroup);
+
+        if(smallMode) {
+            this.wCanvas.append(this.gGroup);
+        } else {
+            this.gCanvas.append(this.gGroup);
+        }
+
         var _self = this;
         _self.redrawInterval = setInterval(function recenter(){
 
@@ -134,14 +143,13 @@ world = {
                 var offsetX = e.pageX - offset.left;
                 var offsetY = e.pageY - offset.top;
 
-                if(!("ontouchstart" in document)) {
                     if(!e.shiftKey) {
+                        clearTimeout(_self.torpFireTimeout);
                         // maybe this click was intended for a UI element, which may cancel the torp fire
-                        _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 4);
+                        _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 10);
                     } else {
                         net.sendArray(CP_PHASER.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY))));
                     }
-                }
             } else {
                 setTimeout(function(){ _self.setTractorCursor(false) }, 100);
             }
@@ -247,6 +255,7 @@ world = {
                 net.sendArray(CP_DIRECTION.data(_self.rad2byte(_self.directingAngle)));
                 _self.showDirecting(false);
             } else {
+                clearTimeout(_self.torpFireTimeout);
                 var offset = $(this).offset();
                 var offsetX = e.changedTouches[0].pageX - offset.left;
                 var offsetY = e.changedTouches[0].pageY - offset.top;
@@ -261,7 +270,11 @@ world = {
 
     undraw: function() {
         this.wCanvas.removeChild(this.wGroup);
-        this.gCanvas.removeChild(this.gGroup);
+        if(smallMode) {
+            this.wCanvas.removeChild(this.gGroup);
+        } else {
+            this.gCanvas.removeChild(this.gGroup);
+        }
         hud.undraw();
         clearInterval(this.redrawInterval);
         $(this.wCanvas.canvas).unbind("click", this.fireTorpWithLeftClick);
@@ -348,7 +361,7 @@ world = {
     // the tactical map is measured in pixels; netrek returns values in units
     // the galacticFactor sets units per pixel
     netrek2tac: function(x,y) {
-        return [x / this.galacticFactor + this.galaticXOffset,
+        return [x / this.galacticFactor + this.galacticXOffset,
                 y / this.galacticFactor];
     },
     

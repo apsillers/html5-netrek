@@ -119,6 +119,10 @@ body {
     display: none;
 }
 
+#server-custom-div {
+    display: none;
+}
+
 
 #credits-div {
     display: none;
