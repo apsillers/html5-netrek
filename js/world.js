@@ -236,6 +236,11 @@ world = {
                    Math.abs(offsetY - parseInt(this.height) / 2) < 20) {
                     _self.showDirecting(true);
                 }
+            } else if(_self.directing) {
+                var offset = $(this).offset();
+                var offsetX = e.changedTouches[0].pageX - offset.left;
+                var offsetY = e.changedTouches[0].pageY - offset.top;
+                net.sendArray(CP_PHASER.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY))));
             }
         });
 
@@ -380,13 +385,13 @@ world = {
         //normalize to canvas cartesian coords
         var carteX = offsetX - this.wCanvas.canvas.width/2;
         var carteY = this.wCanvas.canvas.height/2 - offsetY;
-        var angle = Math.atan(carteX/carteY);
+        var angle = Math.atan2(carteX, carteY);
         // if the click was in a lower quadrent, augment the atan value
-        if(carteY<0) {
-            angle *= -1;
-            if(carteX>0) angle = Math.PI - angle;
-            else         angle = -Math.PI - angle;
-        }
+        //if(carteY<0) {
+        //    angle *= -1;
+        //    if(carteX>0) angle = Math.PI - angle;
+        //    else         angle = -Math.PI - angle;
+        //}
 
         return angle;
     },
