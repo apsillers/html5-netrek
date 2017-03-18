@@ -22,23 +22,22 @@ var imageLib = {
     ships: ["SC","DD","CA","BB","AS","SB"],
     races: ["Rom", "Kli", "Ori", "Fed"],
     raceIds: [ROM, KLI, ORI, FED],
+	shipIds: [SC,DD,CA,BB,AS,SB],
 
     images:[],
 
     // load all images and fire callback
     loadAll: function(callback) {
-        var total = this.races.length * this.ships.length;
-
         for(var i = 0; i < this.races.length; ++i) {
-            this.images[this.raceIds[i]] = [];
             for(var j = 0; j < this.ships.length; ++j) {
-                var img = new Image();
-                this.images[this.raceIds[i]][j] = img;
-                img.onload = function() {
-                    if(--total == 0) { callback(); }
-                }
-                img.src = "data/img/"+this.races[i]+"/"+this.ships[j]+"0.png";
+                PIXI.loader.add(this.raceIds[i]+":"+this.shipIds[j], "data/img/"+this.races[i]+"/"+this.ships[j]+"0.png");
+				//console.log(this.raceIds[i]+":"+this.shipIds[j], "data/img/"+this.races[i]+"/"+this.ships[j]+"0.png");
             }
         }
-    }
+		PIXI.loader.load(callback);
+    },
+	
+	getTexture: function(raceNum, shipNum) {
+		return PIXI.loader.resources[raceNum+":"+shipNum].texture;
+	}
 }

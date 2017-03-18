@@ -50,46 +50,25 @@ var Ship = function(options) {
 
     if(typeof options.gfx != "object") {
         var world_xy = world.netrek2world(options.x, options.y);
-        this.gfx = new Circle(this.radius,
-        {
-            y: world_xy[0] + options.img.height/2,
-            x: world_xy[1] + options.img.width/2,
-            stroke: teamLib.getRaceColor(options.team),
-            strokeWidth: 1,
-            fill: 'none',
-            radius: 12,
-            zIndex:10000000
-        });
-        this.hullGfx = new ImageNode(options.img,
-        {
-          x: 0,
-          y: 0,
-          centered: true,
-          stroke: 'none',
-          zIndex: -1
-        });
-        this.gfx.append(this.hullGfx);
-        //this.setImage(options.img);
+		this.gfx = new PIXI.Container();
+		this.shieldsGfx = new PIXI.Graphics().lineStyle(1,teamLib.getRaceColor(options.team),1).drawCircle(0, 0, 12);
+		this.gfx.addChild(this.shieldsGfx);
+		this.gfx.position.set(world_xy[1], world_xy[0]);
+		
+        this.setImage(options.img);
+        this.gfx.addChild(this.hullGfx);
     } else {
         this.gfx = options.gfx;
     }
-    this.numberGfx = new TextNode(this.number, {
-        x: 15,
-        y: -3,
-        fill: teamLib.getRaceColor(options.team)
-    });
-    this.gfx.append(this.numberGfx);
+    this.numberGfx = new PIXI.Text(this.number, { fill: teamLib.getRaceColor(options.team) });
+	this.numberGfx.position.set(15, -3);
+    this.gfx.addChild(this.numberGfx);
 
     if(typeof options.galGfx != "object") {
         var tac_xy = world.netrek2tac(options.x, options.y);
-        this.galGfx = new TextNode(this.number,
-        {
-            y: tac_xy[0],
-            x: tac_xy[1],
-            fill: teamLib.getRaceColor(options.team),
-            font:"bold 13px courier",
-            zIndex:10000000
-        })
+		this.galGfx = new PIXI.Text(this.number, { fill: teamLib.getRaceColor(options.team), fontWeight:"bold", fontSize:"13px", fontFamily:"courier" });
+        this.galGfx.position.set(tac_xy[0], tac_xy[1]);
+        
     } else {
         this.gfx = options.gfx;
     }
@@ -97,7 +76,7 @@ var Ship = function(options) {
     this.includingWorld = options.world;
     this.gfxRoot = world.wGroup;
 
-    this.gfx.addEventListener("click", function() {
+    this.hullGfx.on("click", function() {
         if(world.tractorCursor) {
             if(world.isPressor) {
                 net.sendArray(CP_REPRESS.data(1, parseInt(_self.number)));
@@ -117,23 +96,15 @@ Ship.prototype = {
     // convert 0-255 rotation to radians and set
     setRotation: function(byteRot) {
         var rads = Math.PI*2 * byteRot/255;
-        this.hullGfx.rotation = [rads,0,0];
-        this.hullGfx.changed = true;
-        this.gfx.changed = true;
+        this.hullGfx.rotation = rads;
     },
 
     setImage: function(img) {
-        if(this.hullGfx) { this.gfx.remove(this.hullGfx); }
-        this.hullGfx = new ImageNode(img,
-        {
-          x: 0,
-          y: 0,
-          centered: true,
-          stroke: 'none',
-          zIndex: -1
-        });
-        this.gfx.append(this.hullGfx);
-        this.gfx.changed = true;
+		if(this == world.ships[7]) { console.log(img); }
+        if(this.hullGfx) { this.gfx.removeChild(this.hullGfx); }
+        this.hullGfx = new PIXI.Sprite(img);
+		this.hullGfx.pivot.set(this.hullGfx.width/2, this.hullGfx.height/2);
+        this.gfx.addChild(this.hullGfx);
     },
 
     setTeam: function(team) {
@@ -158,15 +129,14 @@ Ship.prototype = {
     },
 
     setShields: function(shieldsUp) {
-        this.gfx.stroke = shieldsUp?teamLib.getRaceColor(this.team):"none";
-        //this.gfx.changed = true;
+        this.shieldsGfx.alpha = shieldsUp?1:0;
 
         this.shields = shieldsUp;
     },
 
     setOnCanvas: function(setOn) {
         if(setOn && !this.isOnCanvas) {
-            this.gfxRoot.append(this.gfx);
+            this.gfxRoot.addChild(this.gfx);
             this.isOnCanvas = true;
         } else if(!setOn && this.isOnCanvas) {
             this.gfx.removeSelf();

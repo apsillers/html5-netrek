@@ -25,18 +25,15 @@ var Explosion = function(options) {
 
     this.x = options.x || 0;
     this.y = options.y || 0;
-
-    this.gfx = new Circle();
-    this.gfx.radius = options.radius || 0;
-    this.gfx.stroke = "red";
-    this.gfx.fill = "orange";
-    this.gfx.strokeWidth = 2;
+    this.radius = options.radius || 0;
+    this.gfx = new PIXI.Graphics().lineStyle(2,0xFF0000,1).beginFill(0xffa500).drawCircle(0, 0, this.radius);
 
     world.add(this);
 
     this.growInterval = setInterval(function () {
-        self.gfx.radius += (options.radiusStep || 0.5);
-        if(self.gfx.radius > (options.maxRadius || 8)) {
+        self.radius += (options.radiusStep || 0.5);
+		this.gfx = new PIXI.Graphics().lineStyle(2,0xFF0000,1).beginFill(0xffa500).drawCircle(0, 0, this.radius);
+        if(self.radius > (options.maxRadius || 8)) {
             world.remove(self);
             clearInterval(self.growInterval);
         }

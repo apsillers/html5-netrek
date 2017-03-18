@@ -354,11 +354,11 @@ serverPackets = [
         var uvars = packer.unpack(this.format, data);
         var ignored = uvars.shift(), pnum = uvars.shift(), shiptype = uvars.shift(), team = team_decode(uvars.shift());
         if(net_logging) console.log("SP_PLAYER_INFO pnum=",pnum,"shiptype=",shiptype,"team=",team);
-        var img = imageLib.images[team.length?team[0]:FED][shiptype];
+        var img = imageLib.getTexture(team.length?team[0]:FED, shiptype);
+		
         if(world.ships[pnum] == undefined) {
             world.addShip(pnum, new Ship({
                 img: img,
-                galImg: imageLib.images[1][shiptype], 
                 team:team[0],
                 number:pnum.toString(),
                 shipType: shiptype

@@ -20,9 +20,9 @@
 world = {
     wCanvas: null,       // world canvas
     gCanvas: null,       // galactic canvas
-    wGroup: new CanvasNode(),        // world group
-    gGroup: new CanvasNode(),        // galactic group
-    planetGroup: new CanvasNode(),
+    wGroup: new PIXI.Container(),        // world group
+    gGroup: new PIXI.Container(),        // galactic group
+    planetGroup: new PIXI.Container(),
     redrawInterval: null,
     objects: [],         // all objects in the world (which are doubly recorded in the arrays below)
     ships: [],           // array of ships, indexed by ship id
@@ -49,7 +49,7 @@ world = {
     setTractorCursor: function(cursor, pressor) {
         this.tractorCursor = cursor;
         this.isPressor = pressor;
-        this.wCanvas.cursor = cursor?"crosshair":"default";
+        this.wCanvas.style.cursor = cursor?"crosshair":"default";
     },
 
     showDirecting: function(directing) {
@@ -57,11 +57,13 @@ world = {
         hud.showDirectionWheel(directing);
     },
 
-    init: function(wCanvas, gCanvas) {
-        this.wCanvas = wCanvas;
-        this.gCanvas = gCanvas;
-        this.galacticFactor = 100000 / gCanvas.height;
-        this.galacticXOffset = gCanvas.width - gCanvas.height - 0;
+    init: function(lApp, rApp) {
+        this.wCanvas = lApp.view;
+        this.gCanvas = rApp.view;
+		this.lGroup = lApp.stage;
+		this.rGroup = rApp.stage;
+        this.galacticFactor = 100000 / this.gCanvas.height;
+        this.galacticXOffset = this.gCanvas.width - this.gCanvas.height - 0;
 
         new Border({x:0, y:0, width: 100000, height: 0})
         new Border({x:0, y:0, width: 0, height: 100000})
@@ -69,17 +71,20 @@ world = {
         new Border({x:0, y:100000, width: 100000, height: 0})
 
         var dims = this.netrek2tac(100000, 100000);
-        this.gGroup.appendChild(new Rectangle(dims[0] - this.galacticXOffset, dims[1], { fill: "#444", stroke: "#FFF", strokeWidth: 2, x: this.galacticXOffset, opacity: 0.7 }));
+        var rect = new PIXI.Graphics().lineStyle(2,0xFFFFFF,0.7).beginFill(0x444444).drawRect(0,0,dims[0] - this.galacticXOffset, dims[1]);
+        rect.position.x = this.galacticXOffset;
+        this.gGroup.addChild(rect);
+		this.wGroup.addChild(this.planetGroup);
     },
 
     draw: function() {
-        this.wCanvas.append(this.wGroup);
-        this.wGroup.append(this.planetGroup);
+        
+		this.lGroup.addChild(this.wGroup);
 
         if(smallMode) {
-            this.wCanvas.append(this.gGroup);
+            this.wCanvas.addChild(this.gGroup);
         } else {
-            this.gCanvas.append(this.gGroup);
+            this.rGroup.addChild(this.gGroup);
         }
 
         var _self = this;
@@ -89,8 +94,8 @@ world = {
 
             var centerX = _self.player.x, centerY = _self.player.y,
                 viewBuffer = 150,
-                cnvHalfHgt = _self.wCanvas.canvas.height / 2 * _self.subgalacticFactor + viewBuffer,
-                cnvHalfWid = _self.wCanvas.canvas.width / 2 * _self.subgalacticFactor + viewBuffer;
+                cnvHalfHgt = _self.wCanvas.height / 2 * _self.subgalacticFactor + viewBuffer,
+                cnvHalfWid = _self.wCanvas.width / 2 * _self.subgalacticFactor + viewBuffer;
 
             _self.centerView(_self.player.x, _self.player.y);
 
@@ -115,10 +120,7 @@ world = {
                 }
 
                 // objects not on canvas shouldn't get drawn
-                obj.setOnCanvas(Math.abs(centerX - obj.x) < cnvHalfWid && Math.abs(centerY - obj.y) < cnvHalfHgt);
-
-                // let Cake know this should get redrawn
-                obj.gfx.changed = true;
+                //obj.setOnCanvas(Math.abs(centerX - obj.x) < cnvHalfWid && Math.abs(centerY - obj.y) < cnvHalfHgt);
             }
 
             //$("#debug").html(debugStr);
@@ -127,7 +129,7 @@ world = {
         hud.draw();
 
         // UI: set dest heading via right-click
-        $(this.wCanvas.canvas).bind("contextmenu", _self.setCourseWithRightClick = function (e) {
+        $(this.wCanvas).bind("contextmenu", _self.setCourseWithRightClick = function (e) {
             var offset = $(this).offset();
             var offsetX = e.pageX - offset.left;
             var offsetY = e.pageY - offset.top;
@@ -137,7 +139,7 @@ world = {
         });
         
         // UI: fire torps via left-click
-        $(this.wCanvas.canvas).click(function fireTorpWithLeftClick(e) {
+        $(this.wCanvas).click(function fireTorpWithLeftClick(e) {
             if(!_self.tractorCursor) {
                 var offset = $(this).offset();
                 var offsetX = e.pageX - offset.left;
@@ -157,7 +159,7 @@ world = {
         });
 
         // UI: fire phasers via middle-click
-        $(this.wCanvas.canvas).mousedown(function firePhasersWithMiddleClick(e) {
+        $(this.wCanvas).mousedown(function firePhasersWithMiddleClick(e) {
             if(e.which==2) {
                 var offset = $(this).offset();
                 var offsetX = e.pageX - offset.left;
@@ -227,7 +229,7 @@ world = {
             }
         });
 
-        $(this.wCanvas.canvas).bind("touchstart", function(e) {
+        $(this.wCanvas).bind("touchstart", function(e) {
             if(!_self.tractorCursor && !_self.directing) {
                 var offset = $(this).offset();
                 var offsetX = e.targetTouches[0].pageX - offset.left;
@@ -244,7 +246,7 @@ world = {
             }
         });
 
-        $(this.wCanvas.canvas).bind("touchmove", function(e) {
+        $(this.wCanvas).bind("touchmove", function(e) {
             if(_self.directing) {
                 var offset = $(this).offset();
                 var offsetX = e.targetTouches[0].pageX - offset.left;
@@ -255,7 +257,7 @@ world = {
             }
         });
 
-        $(this.wCanvas.canvas).bind("touchend", function(e) {
+        $(this.wCanvas).bind("touchend", function(e) {
             if(_self.directing) {
                 net.sendArray(CP_DIRECTION.data(_self.rad2byte(_self.directingAngle)));
                 _self.showDirecting(false);
@@ -269,27 +271,25 @@ world = {
         });
 
         gamepad.startReading();
-
-        this.drawn = true;
     },
 
     undraw: function() {
-        this.wCanvas.removeChild(this.wGroup);
+        this.lGroup.removeChild(this.wGroup);
         if(smallMode) {
-            this.wCanvas.removeChild(this.gGroup);
+            this.lGroup.removeChild(this.gGroup);
         } else {
-            this.gCanvas.removeChild(this.gGroup);
+            this.rGroup.removeChild(this.gGroup);
         }
         hud.undraw();
         clearInterval(this.redrawInterval);
-        $(this.wCanvas.canvas).unbind("click", this.fireTorpWithLeftClick);
-        $(this.wCanvas.canvas).unbind("contextmenu", this.setCourseWithRightClick);
-        $(this.wCanvas.canvas).unbind("mousedown", this.firePhasersWithMIddleClick);
-        $(this.wCanvas.canvas).unbind("keyup", this.handleKeys);
+        $(this.wCanvas).unbind("click", this.fireTorpWithLeftClick);
+        $(this.wCanvas).unbind("contextmenu", this.setCourseWithRightClick);
+        $(this.wCanvas).unbind("mousedown", this.firePhasersWithMIddleClick);
+        $(this.wCanvas).unbind("keyup", this.handleKeys);
 
-        $(this.wCanvas.canvas).unbind("touchstart", this.startDirectingOnTouch);
-        $(this.wCanvas.canvas).unbind("touchmove", this.changeDirectingOnMove);
-        $(this.wCanvas.canvas).unbind("touchend", this.sendDirectionOnEnd);
+        $(this.wCanvas).unbind("touchstart", this.startDirectingOnTouch);
+        $(this.wCanvas).unbind("touchmove", this.changeDirectingOnMove);
+        $(this.wCanvas).unbind("touchend", this.sendDirectionOnEnd);
 
         gamepad.stopReading();
 
@@ -297,9 +297,9 @@ world = {
     },
 
     add: function(obj) {
-        this.wGroup.append(obj.gfx);
+        this.wGroup.addChild(obj.gfx);
 
-        if(obj.galGfx) this.gGroup.append(obj.galGfx);
+        if(obj.galGfx) this.gGroup.addChild(obj.galGfx);
         this.objects.push(obj);
     },
     remove: function(obj) {
@@ -307,8 +307,8 @@ world = {
         var index = this.objects.indexOf(obj);
 
         if(index > -1) { var r = this.objects.splice(index,1); }
-        obj.gfx.removeSelf();
-        if(obj.galGfx) { obj.galGfx.removeSelf(); }
+        obj.gfx.parent.removeChild(obj.gfx);
+        if(obj.galGfx) { obj.galGfx.parent.removeChild(obj.galGfx); }
     },
     addPlanet: function(num, planetObj) {
         this.planets[num] = planetObj;
@@ -359,8 +359,8 @@ world = {
     // the world is measured in pixels; netrek returns values in units
     // the subgalacticFactor sets units per pixel
     netrek2world: function(x,y) {
-        return [((x - this.viewX) / this.subgalacticFactor) + this.wCanvas.canvas.width/2,
-                ((y - this.viewY) / this.subgalacticFactor) + this.wCanvas.canvas.height/2];
+        return [((x - this.viewX) / this.subgalacticFactor) + this.wCanvas.width/2,
+                ((y - this.viewY) / this.subgalacticFactor) + this.wCanvas.height/2];
     },
 
     // the tactical map is measured in pixels; netrek returns values in units
@@ -383,8 +383,8 @@ world = {
 
     getAngleFromCenter: function(offsetX, offsetY) {
         //normalize to canvas cartesian coords
-        var carteX = offsetX - this.wCanvas.canvas.width/2;
-        var carteY = this.wCanvas.canvas.height/2 - offsetY;
+        var carteX = offsetX - this.wCanvas.width/2;
+        var carteY = this.wCanvas.height/2 - offsetY;
         var angle = Math.atan2(carteX, carteY);
         // if the click was in a lower quadrent, augment the atan value
         //if(carteY<0) {
@@ -403,19 +403,13 @@ world = {
     Planet: function(placeX, placeY, name, features, includingWorld) {
         var planet_self = this;
         var world_xy = world.netrek2world(placeX, placeY);
-        var cir = new Circle(18,
-        {
-            y: world_xy[0],
-            x: world_xy[1],
-            fill: 'none',
-            stroke: '#FF0',
-            align: "center"
-        });
-        var text = new TextNode(name.replace(/\x00/g,""),
-                                {y:cir.radius+15, textAlign:"center",
-                                 fill:'yellow', scale:1.2,
-                                 font:"bold 9px courier"});
-        cir.append(text);
+        var cir = new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawCircle(0,0,18);
+        cir.position.set(world_xy[0], world_xy[1]);
+
+        var text = new PIXI.Text(name.replace(/\x00/g,""), { fill:0xFFFF00, fontWeight:"bold", fontSize:"9px", fontFamily:"courier" });
+        text.position.y = cir.radius+15;
+		text.position.x = 0;
+        cir.addChild(text);
         
         this.x = placeX;
         this.y = placeY;
@@ -425,36 +419,32 @@ world = {
         this.repair = false;
         this.agri = false;
 
-        this.armyGfx = new Polygon([0,0, 0,6, 6,6, 6,0],{stroke:"none", fill:"#00F", x:-14, y:2, opacity:0.4});
-        this.armyGfx.append(new Circle(3,{stroke:"none", fill:"#00F", x:3, y:0, startAngle: Math.PI}));
-        this.armyGfx.append(new Circle(3,{stroke:"none", fill:"#00F", x:3, y:-6}));
-        this.gfx.append(this.armyGfx);
+        this.armyGfx = new PIXI.Graphics().beginFill(0x0000FF,0.4).drawPolygon([0,0, 0,6, 6,6, 6,0],{stroke:"none", opacity:0.4});
+        this.armyGfx.position.set(-14, 2);
+        var part1 = new PIXI.Graphics().beginFill(0x0000FF).arc(0, 0, 3, Math.PI, Math.PI * 2);
+        part1.position.set(3,0);
+        this.armyGfx.addChild(part1);
+        var part2 = new PIXI.Graphics().beginFill(0x0000FF).arc(0, 0, 3, Math.PI, Math.PI * 2);
+        part1.position.set(3,-6);
+        this.armyGfx.addChild(part2);
+        this.gfx.addChild(this.armyGfx);
 
-        this.armyCountGfx = new TextNode("0", {fill:"white", font:"bold 8px courier", y:2});
-        this.armyGfx.append(this.armyCountGfx);
+        this.armyCountGfx = new PIXI.Text("0", {fill:0xFFFFFF, fontWeight:"bold", fontSize:"8px", fontFamily:"courier"});
+		this.armyCountGfx.position.y = 2;
+        this.armyGfx.addChild(this.armyCountGfx);
 
         var tac_xy = world.netrek2tac(placeX, placeY);
-        this.galGfx = new Circle(this.radius,
-        {
-            y: tac_xy[0],
-            x: tac_xy[1],
-            stroke: "#FF0",
-            radius: 7,
-            zIndex:1,
-            align: "center"
-        });
-        this.galGfx.x -= this.galGfx.radius;
-        this.galGfx.y += this.galGfx.radius;
+		this.galGfx = new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawCircle(-3.5,-3.5,7);
+		this.galGfx.position.set(tac_xy[0], tac_xy[1]);
+        this.galGfx.x -= this.galGfx.width/2;
+        this.galGfx.y += this.galGfx.width/2;
 
-        var text = new TextNode(name.replace(/\x00/g,"").substring(0,3),
-                                {y:this.galGfx.radius+7, textAlign:"center",
-                                 fill:'yellow', scale:1.2,
-                                 font:"bold 9px courier"});
-        this.galGfx.append(text);
+        var text = new PIXI.Text(name.replace(/\x00/g,"").substring(0,3), { fill:0xFFFF00, fontWeight:"bold", fontSize:"9px", fontFamily:"courier"});
+        text.position.y = this.galGfx.radius+7;
+        this.galGfx.addChild(text);
 
         this.includingWorld = includingWorld;
         this.gfxRoot = world.wGroup;
-        this.isOnCanvas = true;
     }
 }
 world.Planet.prototype = {
@@ -466,19 +456,24 @@ world.Planet.prototype = {
 
     showRepair: function(doShow) {
         if(!this.repair && doShow) {
-            this.gfx.append(new Polygon([0,0, -3,3, -3,8, 0,11, 0,19, -3,22, -3,26, 0,29, 0,23, 4,23, 4,29, 7,26, 7,22, 4,19, 4,11, 7,8, 7,3, 4,0, 4,6, 0,6],{stroke:"#4F0", fill:"#0F0", x:0, y:-this.gfx.radius+3, x:-3}));
-            this.galGfx.append(new Circle(2, {x:-3, fill:"#0F0", stroke:"none"}));
+            var wrench = new PIXI.Graphics().lineStyle(1,0x44FF00,1).beginFill(0x00FF00).drawPolygon([0,0, -3,3, -3,8, 0,11, 0,19, -3,22, -3,26, 0,29, 0,23, 4,23, 4,29, 7,26, 7,22, 4,19, 4,11, 7,8, 7,3, 4,0, 4,6, 0,6]);
+			wrench.position.set(-3, -this.gfx.radius+3);
+            this.gfx.addChild(wrench);
+			var dot = new PIXI.Graphics().beginFill(0x00FF00).drawCircle(2);
+			dot.position.x = -3;
+			this.galGfx.addChild(dot);
         }
         this.repair = doShow;
     },
 
     showFuel: function(doShow) {
         if(!this.fuel && doShow) {
-            var tank = new Polygon([0,0,5,0,8,2,8,13,0,13], {x:this.gfx.radius-12,y:-7, stroke:"#FF0", fill:"#F70"});
-            tank.append(new Polygon([2,3,5,6], {stroke:"#FF0"}));
-            tank.append(new Polygon([2,6,5,3], {stroke:"#FF0"}));
-            this.gfx.append(tank);
-            this.galGfx.append(new Circle(2, {x:3, fill:"#F70", stroke:"none"}));
+            var tank = new PIXI.Graphics().lineStyle(1,0xFFFF00,1).beginFill(0xFF7700).drawPolygon([0,0,5,0,8,2,8,13,0,13]);
+			tank.position.set(this.gfx.radius-12,-7);
+            tank.addChild(new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawPolygon([2,3,5,6]));
+            tank.addChild(new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawPolygon([2,6,5,3]));
+            this.gfx.addChild(tank);
+            this.galGfx.addChild(new PIXI.Graphics().beginFill(0xFF7700).drawCircle(3,0,2));
         }
         this.fuel = doShow;
     },
@@ -511,10 +506,10 @@ world.Planet.prototype = {
 
     setOnCanvas: function(setOn) {
         if(setOn && !this.isOnCanvas) {
-            this.gfxRoot.append(this.gfx);
+            this.gfxRoot.addChild(this.gfx);
             this.isOnCanvas = true;
         } else if(!setOn && this.isOnCanvas) {
-            this.gfx.removeSelf();
+            obj.gfx.parent.removeChild(obj.gfx);
             this.isOnCanvas = false;
         }
     },

@@ -27,11 +27,11 @@ var teamLib = {
     FED:0x1,
 
     getRaceColor: function(race, isLight) {
-        if(race == FED) return isLight?"#330":"#FF0";
-        if(race == KLI) return isLight?"#030":"#0F0";
-        if(race == ROM) return isLight?"#300":"#F00";
-        if(race == ORI) return isLight?"#003":"#00F";
-        return isLight?"#FFF":"#FFF";
+        if(race == FED) return isLight?0x333300:0xFFFF00;
+        if(race == KLI) return isLight?0x003300:0x00FF00;
+        if(race == ROM) return isLight?0x330000:0xFF0000;
+        if(race == ORI) return isLight?0x000033:0x0000FF;
+        return isLight?0xFFFFFF:0xFFFFFF;
     },
 
     raceDecode: function(n) {

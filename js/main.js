@@ -26,16 +26,14 @@ window.addEventListener("load", function() {
     $("#loading-box").html("<h1 style='color: white;'>Loading...</h1>");
 
     var lCanvas = document.getElementById("leftCanvas"),
-        rCanvas = document.getElementById("rightCanvas")
+        rCanvas = document.getElementById("rightCanvas");
 
     // make canvas and world
-    leftCanvas = new Canvas(lCanvas, $(lCanvas).data("width"), $(lCanvas).data("height"), {
-        fill: 'black'
-    });
-    rightCanvas = new Canvas(rCanvas, $(rCanvas).data("width"), $(rCanvas).data("height"), {
-        fill: 'black'
-    });
-
+    leftCanvas = new PIXI.Application($(lCanvas).data("width"), $(lCanvas).data("height"));
+	lCanvas.appendChild(leftCanvas.view);
+    rightCanvas = new PIXI.Application($(rCanvas).data("width"), $(rCanvas).data("height"));
+    rCanvas.appendChild(rightCanvas.view);
+	
     outfitting.init(leftCanvas, rightCanvas);
     world.init(leftCanvas, rightCanvas);
     hud.init(leftCanvas, rightCanvas);
@@ -93,14 +91,7 @@ window.addEventListener("load", function() {
                         $("#chatbox").show();
                     }
 
-                    leftCanvas.width = leftWidth;
-                    leftCanvas.height = winHeight;
-                    var container = lCanvas.firstElementChild;
-                    var canvas = container.firstElementChild;
-                    container.style.width = leftWidth + "px";
-                    container.style.height = winHeight + "px";
-                    canvas.width = leftWidth;
-                    canvas.height = winHeight;
+                    leftCanvas.renderer.resize(leftWidth, winHeight);
                     $("#canvasland").width(winWidth);
 
                     var chatHeight = winHeight - $(rCanvas).data("height") - 2;

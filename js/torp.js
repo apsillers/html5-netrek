@@ -21,13 +21,8 @@
 var Torp = function(placeX, placeY, dir, team, includingWorld) {
     var self = this;
     var world_xy = world.netrek2world(placeX, placeY);
-    var cir = new Circle(2,
-    {
-        y: world_xy[0],
-        x: world_xy[1],
-        fill: team.indexOf(includingWorld.player.team)==-1?"#FFF":"#FF0"//teamLib.getRaceColor(team)
-
-    });
+	var cir = new PIXI.Graphics().beginFill(team.indexOf(includingWorld.player.team)==-1?0xFFFFFF:0xFFFF00).drawCircle(0,0,2);
+	cir.position.set(world_xy[1], world_xy[0]);
 
     this.x = placeX;
     this.y = placeY;

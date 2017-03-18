@@ -26,7 +26,7 @@ playerList = {
         this.listDiv.replaceChild(table, this.listDiv.firstElementChild);
     },
     addPlayer: function(pnum, name, rank) {
-        console.log("add player", pnum, name, rank)
+        //console.log("add player", pnum, name, rank)
         this.list[pnum] = {
             pnum: pnum,
             name: name,
@@ -37,7 +37,7 @@ playerList = {
         this.update();
     },
     removePlayer: function(pnum) {
-        console.log("remove player", pnum);
+        //console.log("remove player", pnum);
         delete this.list[pnum];
         this.update();
     },

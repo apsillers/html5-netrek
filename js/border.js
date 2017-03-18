@@ -20,11 +20,9 @@
 var Border = function(options) {
     this.x = options.x;
     this.y = options.y;
-
-    this.gfx = new Line(0,0,
-                        options.width / world.subgalacticFactor,
-                        options.height / world.subgalacticFactor,
-                        { stroke: "white", strokeWidth: 2 });
+	this.gfx = new PIXI.Graphics();
+    this.gfx.lineStyle(2, 0xFFFFFF, 1).moveTo(0, 0);
+	this.gfx.lineTo(options.width / world.subgalacticFactor, options.height / world.subgalacticFactor);
     world.add(this);
 }
 Border.prototype = {
