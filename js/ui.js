@@ -326,8 +326,8 @@ hud = {
     },
 
     undraw: function() {
-        this.hCanvas.removeChild(this.uiGfx);
-        this.rCanvas.removeChild(this.uiGfxRight);
+        this.hGroup.removeChild(this.uiGfx);
+        this.rGroup.removeChild(this.uiGfxRight);
         this.uiGfx.removeChild(this.uiGfxRight);
         this.drawn = false;
     },

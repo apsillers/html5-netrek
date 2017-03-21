@@ -406,9 +406,9 @@ world = {
         var cir = new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawCircle(0,0,18);
         cir.position.set(world_xy[0], world_xy[1]);
 
-        var text = new PIXI.Text(name.replace(/\x00/g,""), { fill:0xFFFF00, fontWeight:"bold", fontSize:"9px", fontFamily:"courier" });
-        text.position.y = cir.radius+15;
-		text.position.x = 0;
+        var text = new PIXI.Text(name.replace(/\x00/g,""), { fill:0xFFFF00, fontWeight:"bold", fontSize:"11px", fontFamily:"arial" });
+        text.position.y = cir.height/2+15;
+		text.position.x = -text.width/2;
         cir.addChild(text);
         
         this.x = placeX;
@@ -419,14 +419,14 @@ world = {
         this.repair = false;
         this.agri = false;
 
-        this.armyGfx = new PIXI.Graphics().beginFill(0x0000FF,0.4).drawPolygon([0,0, 0,6, 6,6, 6,0],{stroke:"none", opacity:0.4});
-        this.armyGfx.position.set(-14, 2);
+        this.armyGfx = new PIXI.Graphics().beginFill(0x0000FF,0.4).drawPolygon([0,0, 0,6, 6,6, 6,0]);
+        this.armyGfx.position.set(-14, -2);
         var part1 = new PIXI.Graphics().beginFill(0x0000FF).arc(0, 0, 3, Math.PI, Math.PI * 2);
         part1.position.set(3,0);
         this.armyGfx.addChild(part1);
-        var part2 = new PIXI.Graphics().beginFill(0x0000FF).arc(0, 0, 3, Math.PI, Math.PI * 2);
-        part1.position.set(3,-6);
-        this.armyGfx.addChild(part2);
+        //var part2 = new PIXI.Graphics().beginFill(0x0000FF).arc(0, 0, 3, Math.PI, Math.PI * 2);
+        //part1.position.set(3,-6);
+        //this.armyGfx.addChild(part2);
         this.gfx.addChild(this.armyGfx);
 
         this.armyCountGfx = new PIXI.Text("0", {fill:0xFFFFFF, fontWeight:"bold", fontSize:"8px", fontFamily:"courier"});
@@ -439,8 +439,9 @@ world = {
         this.galGfx.x -= this.galGfx.width/2;
         this.galGfx.y += this.galGfx.width/2;
 
-        var text = new PIXI.Text(name.replace(/\x00/g,"").substring(0,3), { fill:0xFFFF00, fontWeight:"bold", fontSize:"9px", fontFamily:"courier"});
-        text.position.y = this.galGfx.radius+7;
+        text = new PIXI.Text(name.replace(/\x00/g,"").substring(0,3), { fill:0xFFFF00, fontWeight:"bold", fontSize:"9px", fontFamily:"arial"});
+        text.position.y = this.galGfx.width/2;
+		text.position.x = -text.width/2;
         this.galGfx.addChild(text);
 
         this.includingWorld = includingWorld;
@@ -457,7 +458,7 @@ world.Planet.prototype = {
     showRepair: function(doShow) {
         if(!this.repair && doShow) {
             var wrench = new PIXI.Graphics().lineStyle(1,0x44FF00,1).beginFill(0x00FF00).drawPolygon([0,0, -3,3, -3,8, 0,11, 0,19, -3,22, -3,26, 0,29, 0,23, 4,23, 4,29, 7,26, 7,22, 4,19, 4,11, 7,8, 7,3, 4,0, 4,6, 0,6]);
-			wrench.position.set(-3, -this.gfx.radius+3);
+			wrench.position.set(-3, -this.gfx.height/4+2);
             this.gfx.addChild(wrench);
 			var dot = new PIXI.Graphics().beginFill(0x00FF00).drawCircle(2);
 			dot.position.x = -3;
@@ -469,7 +470,7 @@ world.Planet.prototype = {
     showFuel: function(doShow) {
         if(!this.fuel && doShow) {
             var tank = new PIXI.Graphics().lineStyle(1,0xFFFF00,1).beginFill(0xFF7700).drawPolygon([0,0,5,0,8,2,8,13,0,13]);
-			tank.position.set(this.gfx.radius-12,-7);
+			tank.position.set(this.gfx.width/2-13,-7);
             tank.addChild(new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawPolygon([2,3,5,6]));
             tank.addChild(new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawPolygon([2,6,5,3]));
             this.gfx.addChild(tank);
@@ -490,15 +491,15 @@ world.Planet.prototype = {
     showArmies: function(num) {
         this.armyCountGfx.text = num;
         if(num == 0) {
-            this.armyGfx.opacity = 0;
+            this.armyGfx.alpha = 0;
             this.galGfx.fill = "none";
         }
         else if(num >= 5) {
-            this.armyGfx.opacity = 1;
+            this.armyGfx.alpha = 1;
             this.galGfx.fill = "#44F";
         }
         else if(num < 5 && num > 0) {
-            this.armyGfx.opacity = 0.4;
+            this.armyGfx.alpha = 0.4;
             this.galGfx.fill = "none";
         }
         this.armyGfx.changed = true;
