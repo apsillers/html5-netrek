@@ -26,6 +26,16 @@ var teamLib = {
     ORI:0x8,
     FED:0x1,
 
+	getRaceNameFromValue: function(value) {
+		var result = {
+			0: "IND",
+			1: "FED",
+			2: "ROM",
+			4: "KLI",
+			8: "ORI"
+		}
+	},
+	
     getRaceColor: function(race, isLight) {
         if(race == FED) return isLight?0x333300:0xFFFF00;
         if(race == KLI) return isLight?0x003300:0x00FF00;

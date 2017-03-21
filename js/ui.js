@@ -47,42 +47,48 @@ hud = {
 		this.lApp = lApp;
 		this.rApp = rApp;
         this.uiGfx = new PIXI.Container();
-        this.uiGfxRight = new PIXI.Container({x:1, y:4});
+        this.uiGfxRight = new PIXI.Container({x:2, y:4});
  
         this.healthMeter = new PIXI.Container();
-        this.healthCircle = new PIXI.Graphics().beginFill(0x00AA00).arc(0, 0, 29, 0, -3*Math.PI/4, Math.PI);
-		this.damageMeter = new PIXI.Graphics().lineStyle(30,0xAA0000,1).arc(0, 0, 15, 0, 0, Math.PI);
-        this.damageText = new PIXI.Text("100", {fill:0xFFFFFF,  fontWeight:"bold", fontSize:"9pt", fontFamily:"courier" });
+        this.healthCircle = new PIXI.Graphics().beginFill(0x00AA00).arc(0, 0, 29, 0, Math.PI, true);new PIXI.Graphics().beginFill(0x00AA00).arc(0, 0, 29, 0, Math.PI, true);
+		this.healthCircle.rotation = Math.PI/4;
+		this.damageMeter = new PIXI.Graphics().lineStyle(30,0xAA0000,1).arc(0, 0, 29, 0, 0, true);
+		this.healthCircle.rotation = Math.PI/4;
+        this.damageText = new PIXI.Text("100", {fill:0xFFFFFF,  fontWeight:"bold", fontSize:"9pt", fontFamily:"arial" });
 		this.damageText.rotation = -this.healthCircle.rotation;
-		this.damageText.position.set(0,12);
-		this.shieldMeter = new PIXI.Graphics().lineStyle(30,0x33AAFF,1).arc(0, 0, 28, 0, 0, Math.PI);
-		//this.shieldMeter.rotation = -3*Math.PI/4;
-        this.shieldText = new PIXI.Text("100",{fill:0xFFFFFF, fontWeight:"bold", fontSize:"9pt", fontFamily:"courier" });
+		this.damageText.position.set(-13,-10);
+		this.shieldMeter = new PIXI.Graphics().lineStyle(30,0x33AAFF,1).arc(0, 0, 28, 0, Math.PI);
+		this.shieldMeter.rotation = -3*Math.PI/4;
+        this.shieldText = new PIXI.Text("100",{fill:0xFFFFFF, fontWeight:"bold", fontSize:"9pt", fontFamily:"arial" });
 		this.shieldText.rotation = -this.shieldMeter.rotation;
-		this.shieldText.position.set(20, 20);
-		this.healthMeter.addChild(this.shieldMeter);
+		this.shieldText.position.set(35, 20);
 		
+		this.healthMeter.addChild(this.shieldMeter);
         this.healthMeter.addChild(this.healthCircle);
 		this.healthCircle.addChild(this.damageMeter);
         this.healthCircle.addChild(this.damageText);
-        this.shieldMeter.addChild(this.shieldText);
+		this.shieldMeter.addChild(this.shieldText);
         this.uiGfx.addChild(this.healthMeter);
 
         this.fuelBox = new PIXI.Graphics().lineStyle(1,0xFFFFFF,1).drawPolygon([0,0,0,-60,60,0]);
         this.fuelMeter = new PIXI.Graphics().beginFill(0xFF7700).drawPolygon([0,0,0,-60,60,0]);
-        this.fuelText = new PIXI.Text("100",{fill:0xFFFFFF, fontWeight:"bold", fontSize:"9pt", fontFamily:"courier"});
-		this.fuelText.position.set(15-this.fuelText.width/2,-10);
+        this.fuelText = new PIXI.Text("100",{fill:0xFFFFFF, fontWeight:"bold", fontSize:"9pt", fontFamily:"arial"});
+		this.fuelText.position.set(15-this.fuelText.width/2,-20);
         this.fuelBox.addChild(this.fuelMeter);
         this.fuelBox.addChild(this.fuelText);
         this.uiGfx.addChild(this.fuelBox);
-
+		
         this.maxSpeed = 12;
         this.targetSpeed = 0;
-        this.speedMeter = new PIXI.Graphics().lineStyle(2,0xFFFFFF,1).drawPolygon([0,0, 0,-300, 50,-300, 20,0]);
+        this.speedMeter = new PIXI.Container()
+		this.speedMeterSprite = new PIXI.Sprite(lApp.renderer.generateTexture(new PIXI.Graphics().lineStyle(2,0xFFFFFF,1).beginFill(0xFFFFFF,0.1).drawPolygon([0,0, 0,-300, 50,-300, 20,0, 0,0])));
+		this.speedMeterSprite.position.y = -300;
+		this.speedMeterSprite.interactive = true;
+		this.speedMeter.addChild(this.speedMeterSprite);
         this.speedMeter.position.set(20,350);
 		this.meter = new PIXI.Graphics();
-        this.speedPointer = new PIXI.Graphics().lineStyle(2,0xFFFFFF,1).drawPolygon([-2,0, -9,-3, -9,3]);
-        this.speedNumber = new PIXI.Text("0", { fill: 0xFFFFFF, fontWeight:"bold", fontSize:"12pt", fontFamily:"courier" });
+        this.speedPointer = new PIXI.Graphics().lineStyle(2,0xFFFFFF,1).drawPolygon([-2,0, -9,-3, -9,3, -2,0]);
+        this.speedNumber = new PIXI.Text("0", { fill: 0xFFFFFF, fontWeight:"bold", fontSize:"12pt", fontFamily:"arial" });
 		this.speedNumber.y = 35;
         this.speedMeter.addChild(this.meter);
         this.speedMeter.addChild(this.speedPointer);
@@ -90,16 +96,20 @@ hud = {
         
         this.smallModeSpeedMeter = new PIXI.Container();
 		this.smallModeSpeedMeter.position.set(10, 65);
-        this.smallModeCurrentSpeed = new PIXI.Text("0", { fill: 0xFFFFFF, fontWeight:"bold", fontSize:"16pt", fontFamily:"courier" });
+        this.smallModeCurrentSpeed = new PIXI.Text("0", { fill: 0xFFFFFF, fontWeight:"bold", fontSize:"16pt", fontFamily:"arial" });
 		this.smallModeCurrentSpeed.position.set(0, 30);
-        this.smallModeTargetSpeed = new PIXI.Text("0", { fill: 0x00FF00, fontWeight:"bold", fontSize:"16pt", fontFamily:"courier" });
+        this.smallModeTargetSpeed = new PIXI.Text("0", { fill: 0x00FF00, fontWeight:"bold", fontSize:"16pt", fontFamily:"arial" });
 		this.smallModeTargetSpeed.position.set(25, 30);
         this.smallModeSpeedPlus = new PIXI.Graphics().beginFill(0x00AA00).lineStyle(1,0x00FF00,1).drawCircle(0,0,15)
 		this.smallModeSpeedPlus.position.set(32, -3);
-        //this.smallModeSpeedPlus.addChild(new TextNode("+", { fill: "#0F0", fontWeight:"bold", fontSize:"16pt", fontFamily:"courier", align:"center", y:5 }));
+		var plusText = new PIXI.Text("+", { fill: "#0F0", fontWeight:"bold", fontSize:"16pt", fontFamily:"arial", align:"center" });
+        this.smallModeSpeedPlus.addChild(plusText);
+		plusText.position.set((this.smallModeSpeedPlus.width-plusText.width)/2, 7);
         this.smallModeSpeedMinus = new PIXI.Graphics().beginFill(0x770000).lineStyle(1,0xFF0000,1).drawCircle(0,0,15)
-		this.smallModeSpeedPlus.position.set(32, 50);
-        //this.smallModeSpeedMinus.addChild(new TextNode("-", { fill: "#F00", fontWeight:"bold", fontSize:"16pt", fontFamily:"courier", align:"center", y:5 }));
+		this.smallModeSpeedMinus.position.set(32, 50);
+		var minusText = new PIXI.Text("+", { fill: "#0F0", fontWeight:"bold", fontSize:"16pt", fontFamily:"arial", align:"center" });
+        this.smallModeSpeedMinus.addChild(minusText);
+		minusText.position.set((this.smallModeSpeedMinus.width-minusText.width)/2, 5);
         this.smallModeSpeedMeter.addChild(this.smallModeCurrentSpeed);
         this.smallModeSpeedMeter.addChild(this.smallModeTargetSpeed);
         this.smallModeSpeedMeter.addChild(this.smallModeSpeedPlus);
@@ -113,14 +123,15 @@ hud = {
         }
 
         this.setSpeedOnClick = function(e) {
-            var y = -e.pageY + $(e.target).offset().top + hud.speedMeter.y;
+            var y = hud.speedMeterSprite.height - e.data.global.y + hud.speedMeterSprite.worldTransform.ty;
+			console.log(y)
             var speed = Math.ceil(12 * Math.pow(y/300,1/0.75));
             net.sendArray(CP_SPEED.data(speed));
             hud.showSpeedPointer(speed);
             e.stopPropagation();
             clearTimeout(world.torpFireTimeout);
         }
-        //this.speedMeter.addEventListener("click", this.setSpeedOnClick);
+        this.speedMeterSprite.on("click", this.setSpeedOnClick);
 
         function speedChanger(diff) {
             return function(e) {
@@ -134,33 +145,32 @@ hud = {
         //this.smallModeSpeedPlus.addEventListener("click", speedChanger(1));
         //this.smallModeSpeedMinus.addEventListener("click", speedChanger(-1));
 
-        this.etempMeter = new PIXI.Graphics().lineStyle(2,0xAAAAAA,1).drawPolygon([0,0, 20,0, 20,-100]);
+        this.etempMeter = new PIXI.Graphics().lineStyle(2,0xAAAAAA,1).drawPolygon([0,0, 20,0, 20,-100,0,0]);
 		this.etempMeter.position.set(50, 350);
         this.etempBar = new PIXI.Graphics();
         this.etempMeter.addChild(this.etempBar);
         this.uiGfx.addChild(this.etempMeter);
 
-        this.armyStatNode = new PIXI.Container()
-		this.armyStatNode.position.set(100, 480);
+        this.armyStatNode = new PIXI.Container();
         this.uiGfx.addChild(this.armyStatNode);
 
         this.armyGfx = new PIXI.Graphics().beginFill(0x0000FF).drawPolygon([0,0, 0,10, 10,10, 10,0]);
 		var circle1 = new PIXI.Graphics().beginFill(0x0000FF).drawCircle(0,0,5);
-		circle1.position.set(0,5);
+		circle1.position.set(5,-10);
         this.armyGfx.addChild(circle1)
 		var circle2 = new PIXI.Graphics().beginFill(0x0000FF).drawCircle(0,0,5);
-		circle2.position.set(5,-10);
+		circle2.position.set(5,1);
         this.armyGfx.addChild(circle2);
         this.armyStatNode.addChild(this.armyGfx);
 
-        this.armyText = new PIXI.Text("", {fill:"white", fontWeight:"bold", fontSize:"12pt", fontFamily:"courier" });
+        this.armyText = new PIXI.Text("", {fill:"white", fontWeight:"bold", fontSize:"12pt", fontFamily:"arial" });
 		this.armyText.x = 16;
         this.armyStatNode.addChild(this.armyText);
 
         this.warning = new PIXI.Graphics().lineStyle(1,0xFF0000,1).beginFill(0xFF4444).drawRect(0,0,this.hCanvas.width-30,25);
 		this.warning.position.set(15,15);
 		this.warning.visible = false;
-        this.warningText = new PIXI.Text("", {fill:"white", fontWeight:"bold", fontSize:"10pt", fontFamily:"courier"});
+        this.warningText = new PIXI.Text("", {fill:"white", fontWeight:"bold", fontSize:"10pt", fontFamily:"arial"});
 		this.warningText.position.set(5,15);
         this.warning.addChild(this.warningText);
         this.uiGfx.addChild(this.warning);
@@ -178,61 +188,66 @@ hud = {
 		
 
         /* add right-panel buttons */
-        this.shieldButton = this.createButton(0, 0, "blue", "s", "Shield", "bold 14pt courier",
+        this.shieldButton = this.createButton(0, 0, 0x0000FF, "s", "Shield", "bold 14pt arial",
                              function(){ net.sendArray(CP_SHIELD.data(world.player.shields?0:1)); });
         this.uiGfxRight.addChild(this.shieldButton);
-/*
-        this.cloakButton = this.createButton(0, 45, "#797", "c", "Cloak", "bold 14pt courier",
+
+        this.cloakButton = this.createButton(0, 45, 0x779977, "c", "Cloak", "bold 14pt arial",
                             function(){ net.sendArray(CP_CLOAK.data(world.player.cloaked?0:1)); });
         this.uiGfxRight.addChild(this.cloakButton);
 
-        this.repairButton = this.createButton(0, 90, "orange", "Sft+R", "Repair", "bold 10pt courier",
+        this.repairButton = this.createButton(0, 90,  0xFFA500, "Sft+R", "Repair", "bold 10pt arial",
                              function(){ net.sendArray(CP_REPAIR.data(world.player.repairing?0:1)); });
         this.uiGfxRight.addChild(this.repairButton);
 
-        this.tractorButton = this.createButton(0, 135, "green", "Sft+R", "Tractor", "bold 10pt courier", function(){
+        this.tractorButton = this.createButton(0, 135, 0x00FF00, "Sft+R", "Tractor", "bold 10pt arial", function(){
             if(world.player.tractoring) { net.sendArray(CP_TRACTOR.data(0,0)); }
             else { world.setTractorCursor(true, false); }
         });
         this.uiGfxRight.addChild(this.tractorButton);
 
-        this.pressorButton = this.createButton(0, 180, "purple", "y", "Pressor", "bold 14pt courier", function(){
+        this.pressorButton = this.createButton(0, 180, 0xFF00FF, "y", "Pressor", "bold 14pt arial", function(){
             if(world.player.pressing) { net.sendArray(CP_REPRESS.data(0,0)); }
             else { world.setTractorCursor(true, true); }
         });
         this.uiGfxRight.addChild(this.pressorButton);
 
-        this.orbitButton = this.createButton(50, 0, "yellow", "o", "Orbit", "bold 14pt courier",
+        this.orbitButton = this.createButton(50, 0, 0xFFFF00, "o", "Orbit", "bold 14pt arial",
                             function(){ net.sendArray(CP_ORBIT.data(world.player.orbitting?0:1)); });
         this.uiGfxRight.addChild(this.orbitButton);
 
-        this.bombButton = this.createButton(50, 45, "red", "b", "Bomb", "bold 14pt courier", function(){
+        this.bombButton = this.createButton(50, 45, 0xFF0000, "b", "Bomb", "bold 14pt arial", function(){
             net.sendArray(CP_BOMB.data(world.player.bombing?0:1));
         });
-        this.pickupButton = this.createButton(50, 90, "#ffd700", "z", "Pickup", "bold 14pt courier", function(){
+        this.pickupButton = this.createButton(50, 90, 0xFFD700, "z", "Pickup", "bold 14pt arial", function(){
             net.sendArray(CP_BEAM.data(1));
         });
-        this.dropButton = this.createButton(50, 135, "#ffd700", "x", "Drop", "bold 14pt courier", function(){
+        this.dropButton = this.createButton(50, 135, 0xffd700, "x", "Drop", "bold 14pt arial", function(){
             net.sendArray(CP_BEAM.data(2));
         });
-
+/*
         this.dPadMap = new CanvasNode({});
         this.dPadMap.addChild(new Polygon([0,0, 20,0, 20,20, 40,20, 40,40, 20,40, 20,60, 0,60, 0,40, -20,40, -20,20, 0,20], {fill:"#444", stroke:"white", zIndex:-50}));
-        this.dPadUp = new TextNode("", {fill:"white", fontWeight:"bold", fontSize:"8pt", fontFamily:"courier", y:-5, x:10, align:"center"});
+        this.dPadUp = new TextNode("", {fill:"white", fontWeight:"bold", fontSize:"8pt", fontFamily:"arial", y:-5, x:10, align:"center"});
         this.dPadMap.addChild(this.dPadUp);
-        this.dPadDown = new TextNode("", {fill:"white", fontWeight:"bold", fontSize:"8pt", fontFamily:"courier", y:70, x:10, align:"center"});
+        this.dPadDown = new TextNode("", {fill:"white", fontWeight:"bold", fontSize:"8pt", fontFamily:"arial", y:70, x:10, align:"center"});
         this.dPadMap.addChild(this.dPadDown);
-        this.dPadLeft = new TextNode("", {fill:"white", fontWeight:"bold", fontSize:"8pt", fontFamily:"courier", y:32, x:-25, align:"right"});
+        this.dPadLeft = new TextNode("", {fill:"white", fontWeight:"bold", fontSize:"8pt", fontFamily:"arial", y:32, x:-25, align:"right"});
         this.dPadMap.addChild(this.dPadLeft);
-        this.dPadRight = new TextNode("", {fill:"white", fontWeight:"bold", fontSize:"8pt", fontFamily:"courier", y:32, x:45, align:"left"});
+        this.dPadRight = new TextNode("", {fill:"white", fontWeight:"bold", fontSize:"8pt", fontFamily:"arial", y:32, x:45, align:"left"});
         this.dPadMap.addChild(this.dPadRight);
-
-        this.showMapButton = new CanvasNode();
-        this.showMapButton.addChild(new Circle(25, {fill:"#0AA", stroke:"#0FF", x:32, y:200 }));
-        this.showMapButton.addChild(new TextNode("Map", {fill:"white", fontSize:"12pt", fontFamily:"courier", x:32, y:200, align:"center"}))
+*/
+        this.showMapButton = new PIXI.Container();
+		var mapButton = new PIXI.Graphics().lineStyle(1,0x00ffff,1).beginFill(0x00aaaa).drawCircle(0,0,25);
+		mapButton.position.set(32,200);
+        this.showMapButton.addChild(mapButton);
+		var mapButtonText = new PIXI.Text("Map", {fill:"white", fontSize:"12pt", fontFamily:"arial", x:32, y:200, align:"center"});
+		mapButtonText.position.set((this.showMapButton.width-mapButtonText.width)/2+32,200);
+        this.showMapButton.addChild(mapButtonText);
+		this.showMapButton = new PIXI.Sprite(lApp.renderer.generateTexture(this.showMapButton));
         this.uiGfx.addChild(this.showMapButton);
 
-        this.showMapButton.addEventListener("click", function() {
+        this.showMapButton.on("click", function() {
             world.gGroup.visible = !world.gGroup.visible;
             clearTimeout(world.torpFireTimeout);
         });
@@ -243,7 +258,7 @@ hud = {
             ["Repair", "Shields", "", "Cloak"],
             ["Tractor", "Det torps", "Pressor", "Det own"],
         ]
-		*/
+		
     },
 
     draw: function() {
@@ -271,10 +286,11 @@ hud = {
         this.setXY(this.shieldMeter, 38, leftCanvas.height-37);
         this.setXY(this.fuelBox, 4, leftCanvas.height-5);
         this.setXY(this.directionWheel, leftCanvas.width / 2, leftCanvas.height / 2);
+		this.armyStatNode.position.set(100, leftCanvas.height-30);
         //this.setXY(this.dPadMap, leftCanvas.width - 100, leftCanvas.height - 100);
 		
 
-        /*if(!smallMode) {
+        if(!smallMode) {
             this.uiGfx.addChild(this.speedMeter);
             this.uiGfx.removeChild(this.smallModeSpeedMeter);
             this.uiGfx.addChild(this.showMapButton);
@@ -282,8 +298,7 @@ hud = {
                 this.uiGfxRight.x = 1;
                 this.uiGfxRight.x = 4;
                 this.uiGfx.removeChild(this.uiGfxRight);
-                this.rCanvas.addChild(this.uiGfxRight);
-                this.rCanvas.addChild(world.gGroup);
+                this.rGroup.addChild(this.uiGfxRight);
                 world.gGroup.x = 0;
             }
             this.uiGfx.removeChild(this.showMapButton);
@@ -307,7 +322,7 @@ hud = {
 		
         this.warning.width = leftCanvas.width-30;
         this.warning.changed = true;
-		*/
+		
     },
 
     undraw: function() {
@@ -325,16 +340,18 @@ hud = {
     createButton: function(x, y, color, key, text, font, onClick) {
         var width = 45, height = 40;
         var button = new PIXI.Container();
-		var colorBacking = new PIXI.Graphics().beginFill(color,1).lineStyle(1,color,1).drawRoundedRect(x, y, width, height, 5);
+		button.position.set(x,y);
+		var colorBacking = new PIXI.Graphics().beginFill(color,1).lineStyle(1,color,1).drawRoundedRect(0, 0, width, height, 6);
 		colorBacking.alpha = 0.1;
 		button.addChild(colorBacking);
-		button.addChild(new PIXI.Graphics().lineStyle(1,color,1).drawRoundedRect(x, y, width, height, 5));
-		var keyText = new PIXI.Text(key, {fill:"white", font:font });
-		keyText.position.set((width - keyText.width)/2, 15);
+		button.addChild(new PIXI.Graphics().lineStyle(2,color,1).drawRoundedRect(0, 0, width, height, 6));
+		var keyText = new PIXI.Text(key, {fill:0xFFFFFF, font:font });
+		keyText.position.set((width - keyText.width)/2, 6);
         button.addChild(keyText);
-        var nameText = new PIXI.Text(text, {fill:"white", fontWeight:"bold", fontSize:"8pt", fontFamily:"courier" });
-		keyText.position.set((width - nameText.width)/2, 29);
-		var clickableFace = new PIXI.Sprite(this.lApp.renderer.generateTexture(new PIXI.Graphics().beginFill(0,0).drawRoundedRect(x, y, width, height, 5)));
+        var nameText = new PIXI.Text(text, {fill:0xFFFFFF, fontWeight:"bold", fontSize:"8pt", fontFamily:"arial" });
+		nameText.position.set((width - nameText.width)/2, 27);
+		button.addChild(nameText);
+		var clickableFace = new PIXI.Sprite(this.lApp.renderer.generateTexture(new PIXI.Graphics().beginFill(0,0).drawRoundedRect(0, 0, width, height, 5)));
 		clickableFace.interactive = true;
         clickableFace.on("click",function() {
             onClick.call(button);
@@ -383,13 +400,13 @@ hud = {
         this.shieldButton.children[0].alpha = shieldsUp?1:0.1;
     },
     setCloakIndic: function(cloakUp) {
-        //this.cloakButton.children[0].alpha = cloakUp?1:0.1;
+        this.cloakButton.children[0].alpha = cloakUp?1:0.1;
     },
     setRepairIndic: function(repairUp) {
-        //this.repairButton.children[0].alpha = repairUp?1:0.1;
+        this.repairButton.children[0].alpha = repairUp?1:0.1;
     },
     setOrbitIndic: function(orbit) {
-        /*this.orbitButton.children[0].alpha = orbit?1:0.1;
+        this.orbitButton.children[0].alpha = orbit?1:0.1;
         if(orbit) {
             this.uiGfxRight.addChild(this.dropButton);
             this.uiGfxRight.addChild(this.pickupButton);
@@ -398,16 +415,16 @@ hud = {
             this.uiGfxRight.removeChild(this.dropButton);
             this.uiGfxRight.removeChild(this.pickupButton);
             this.uiGfxRight.removeChild(this.bombButton);
-       }*/
+       }
     },
     setBombIndic: function(bomb) {
-        //this.bombButton.children[0].alpha = bomb?1:0.1;
+        this.bombButton.children[0].alpha = bomb?1:0.1;
     },
     setPressorIndic: function(pressor) {
-        //this.pressorButton.children[0].alpha = pressor?1:0.1;
+        this.pressorButton.children[0].alpha = pressor?1:0.1;
     },
     setTractorIndic: function(tractor) {
-        //this.tractorButton.children[0].alpha = tractor?1:0.1;
+        this.tractorButton.children[0].alpha = tractor?1:0.1;
     },
 
     showMaxSpeed: function(maxSpeed) {
@@ -428,7 +445,7 @@ hud = {
     showWarning: function(msg) {
         if(msg == "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13\x0FB") return;
 
-        msg = msg.replace(/Helmsman:\s+/, "").replace(/,? captain!/, "!");
+        msg = msg.replace(/Helmsman:\s+/, "").replace(/,? captain!/, "!").replace(/\x00/, "");
 
         var self = this;
         this.warning.visible = true;
@@ -444,24 +461,35 @@ hud = {
     },
     showShieldLevel: function(percent) {
         percent = Math.max(0,Math.min(100,percent));
-        this.shieldMeter.startAngle = (100-percent)/100 * Math.PI;
+        this.healthMeter.removeChild(this.shieldMeter);
+		this.shieldMeter.removeChild(this.shieldText);
+		this.shieldMeter = new PIXI.Graphics().lineStyle(30,0x33AAFF,1).arc(0, 0, 28, 0, percent/100 * Math.PI);
+		this.shieldMeter.rotation = -3*Math.PI/4;
         this.shieldText.text = Math.floor(percent).toString();
-        this.shieldMeter.changed = true;
+		
+		this.shieldMeter.addChild(this.shieldText);
+		this.healthMeter.addChildAt(this.shieldMeter, 0);
+		this.reposition();
     },
     showHullLevel: function(percent) {
-        percent = Math.max(0,Math.min(100,percent))
-        this.damageMeter.endAngle = (100-percent)/100 * Math.PI;
+        percent = Math.max(0,Math.min(100,percent));
+		var parent = this.damageMeter.parent,
+		    index = parent.children.indexOf(this.damageMeter);
+		parent.removeChild(this.damageMeter);
+        this.damageMeter = new PIXI.Graphics().lineStyle(29,0xAA0000,1).arc(0, 0, 15, 0, -(100-percent)/98 * Math.PI, true);
+		this.damageMeter.rotation = Math.PI/150;
+		parent.addChildAt(this.damageMeter, index);
         this.damageText.text = Math.floor(percent).toString();
-        this.healthMeter.changed = true;
     },
     showFuelLevel: function(percent) {
-        percent = Math.max(0,Math.min(100,percent));
+        var percent = Math.max(0,Math.min(100,percent));
         var level = 60 * Math.pow(percent/100, 0.9);
-        this.fuelBox.removeChild(this.fuelMeter);
+        var parent = this.fuelMeter.parent,
+            index = parent.children.indexOf(this.fuelMeter);
+        parent.removeChild(this.fuelMeter);
         this.fuelMeter = new PIXI.Graphics().beginFill(0xFF7700).drawPolygon([0,0,0,-level,60-level,-level,60,0]);
-        this.fuelBox.addChild(this.fuelMeter);
+        parent.addChildAt(this.fuelMeter, index);
         this.fuelText.text = Math.floor(percent).toString() + "%";
-        this.fuelMeter.changed = true;
     },
     showSpeed: function(speed) {
         var frac = Math.pow(speed/12, 0.75);
@@ -469,12 +497,11 @@ hud = {
 		
         this.meter = new PIXI.Graphics().beginFill(0x00FF00).drawPolygon([20,0, 0,0, 0,-frac*300, 20 + frac*30, -frac*300]);
         this.speedMeter.addChild(this.meter);
-        this.speedMeter.changed = true;
 
         this.smallModeCurrentSpeed.text = speed;
 
-        if(speed) this.speedNumber.text = "Warp " + speed;
-        else this.speedNumber.text = "";
+        if(speed) { this.speedNumber.text = "Warp " + speed; }
+        else { this.speedNumber.text = ""; }
     },
     showSpeedPointer: function(speed) {
         if(speed > this.maxSpeed) { speed = this.maxSpeed; }
@@ -488,20 +515,21 @@ hud = {
         var y = 100 * Math.pow(percent/100, 0.9);
         var x = 20 * Math.pow(percent/100, 0.9);
         this.etempMeter.removeChild(this.etempBar);
-        this.etempBar = new PIXI.Graphics().beginFill(0xFFFF00).endFill(0xFF0000).drawPolygon([0,0, 20,0, 20,-y, x,-y]);
+        this.etempBar = new PIXI.Graphics().beginFill(0xFFFF00).drawPolygon([0,0, 20,0, 20,-y, x,-y]);
         this.etempMeter.addChild(this.etempBar);
         this.etempMeter.changed = true;
     },
     showArmies: function(armies, kills) {
         var maxArmies = Math.min(Math.floor(kills * 2), shipStats[world.player.shipType].maxArmies);
 
-        this.armyText.text = armies + " / " + maxArmies;
+        this.armyText.text = armies + " / " + Math.floor(maxArmies/5);
 
         if(maxArmies == 0) {
-            this.armyText.opacity = 0;
-            this.armyText.changed = true;
-            this.armyGfx.opacity = 0;
-            this.armyGfx.changed = true;
-        }
+            this.armyText.alpha = 0;
+            this.armyGfx.alpha = 0;
+        } else {
+            this.armyText.alpha = 1;
+            this.armyGfx.alpha = 1;
+		}
     }
 }

@@ -100,7 +100,6 @@ Ship.prototype = {
     },
 
     setImage: function(img) {
-		if(this == world.ships[7]) { console.log(img); }
         if(this.hullGfx) { this.gfx.removeChild(this.hullGfx); }
         this.hullGfx = new PIXI.Sprite(img);
 		this.hullGfx.pivot.set(this.hullGfx.width/2, this.hullGfx.height/2);

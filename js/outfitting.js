@@ -38,7 +38,7 @@ outfitting = {
     otherElems: [],
     selectedShip: CA,
     mask: [],
-    defaultInfoText: ["Select a ship, then choose a race to","enter the game.","","New players should try a Cruiser first.","",""],
+    defaultInfoText: ["Select a ship, then choose a race to enter the game.","","New players should try a Cruiser first.","",""],
     drawn: false,
 
     /* Add a race button to the canvas and return its cake.js object. */
@@ -46,12 +46,12 @@ outfitting = {
 		var Text = PIXI.Text;
         var _self = this;
         this._netrekDisabled = false;
-        var desc = ["Your race sets your team alligience and", "your home planet (for refit & respawn).","","Each ship class is identical across all","races, e.g., a Klingon Scout is just","as good as a Federation one."];
-        var button = new PIXI.Graphics().lineStyle(2, fg, 1).beginFill(bg).drawRoundedRect(0, 0, this.raceButtonDim, this.raceButtonDim, 10).endFill();
+        var desc = ["Your race sets your team alligience and your home", "planet (for refit & respawn).","","Each ship class is identical across all races, e.g., a", "Klingon Scout is just as good as a Federation one."];
+        var button = new PIXI.Graphics().lineStyle(3, fg, 1).beginFill(bg).drawRoundedRect(0, 0, this.raceButtonDim, this.raceButtonDim, 10).endFill();
 		button.position.set(x,y);
-		var raceTitle = new Text(txt, {fill: fg, fontWeight:"bold", fontSize:"20pt", fontFamily:"Courier" });
+		var raceTitle = new Text(txt, {fill: fg, fontWeight:"bold", fontSize:"20pt", fontFamily:"arial" });
 		raceTitle.position.set(this.raceButtonDim/2 - raceTitle.width/2, 30);
-		var raceName = new Text(longtxt, {fill: fg, fontWeight:"bold", fontSize:"11pt", fontFamily:"Courier" });
+		var raceName = new Text(longtxt, {fill: fg, fontWeight:"bold", fontSize:"11pt", fontFamily:"arial" });
 		raceName.position.set(this.raceButtonDim/2 - raceName.width/2, this.raceButtonDim-20);
         button.addChild(raceTitle);
         button.addChild(raceName);
@@ -79,7 +79,7 @@ outfitting = {
         var _self = this;
 		var button = new PIXI.Graphics().lineStyle(2, fg, 1).beginFill(bg).drawRoundedRect(0, 0, this.shipButtonDim, this.shipButtonDimY, 10).endFill();
 		button.position.set(x,y);
-		var text = new PIXI.Text(txt, {fill: fg, fontWeight: "bold", fontSize:"8pt", fontFamily:"Courier", textAlign:"center"});
+		var text = new PIXI.Text(txt, {fill: fg, fontWeight: "bold", fontSize:"8pt", fontFamily:"arial", textAlign:"center"});
 		text.position.set(this.shipButtonDim/2 - text.width/2, 15);
         button.addChild(text);
 		
@@ -130,42 +130,37 @@ outfitting = {
         var justRightPx = centerPx + this.shipButtonDim + 10;
         this.shipButtons[SC] = this.makeShipButton("Scout", SC, justLeftPx,
                                                    topRowPx, 0x00FFFF, 0x003333,
-                               ["Fast and light, the Scout excels at",
-                                "dodging enemy fire and rushing behind",
-                                "enemy lines to bomb planets.","",
-                                "It has weak phasers, but fast torpedos,",
-                                "making it fit for long-range fighting."]);
+                               ["Fast and light, the Scout excels at dodging enemy fire",
+							    "and rushing behind enemy lines to bomb planets.","",
+                                "It has weak phasers, but fast torpedos, making it fit for",
+								"long-range fighting."]);
         this.shipButtons[DD] = this.makeShipButton("Destroyer", DD, centerPx,
                                                    topRowPx, 0x00FFFF, 0x003333,
-                               ["The Destroyer is a challenging ship to",
-                                "command effectively, but is noted for",
-                                "its superior cloaking abilites.","",
+                               ["The Destroyer is a challenging ship to command",
+							    "effectively, but is noted for its superior cloaking abilites.","",
                                 "Useful for suicide runs on Starbases."]);
         this.shipButtons[CA] = this.makeShipButton("Cruiser", CA, justLeftPx,
                                                    bottomRowPx, 0x00FFFF, 0x003333,
-                               ["A well-balanced ship, favored widely",
-                                "by captains of all skill levels.","",
+                               ["A well-balanced ship, favored widely by captains of all",
+							   "skill levels.","",
                                 "Highly recommended for new players."]);
         this.shipButtons[BB] = this.makeShipButton("Battleship", BB, centerPx,
                                                    bottomRowPx, 0x00FFFF, 0x003333,
-                               ["Slow and powerful, Battleships can take",
-                                "a beating, but their powerful weapons",
-                                "use up fuel quickly.","",
+                               ["Slow and powerful, Battleships can take a beating, but",
+							    "their powerful weapons use up fuel quickly.","",
                                 "Excellent for planet defense."]);
         this.shipButtons[AS] = this.makeShipButton("Assult", AS, justRightPx,
                                                    topRowPx, 0x00FFFF, 0x003333,
-                               ["With proper support, the Assult Ship can",
-                                "capture planets quite swiftly. It holds",
-                                "more armies than any other ship and it",
-                                "is an unmatched planet bomber.","",
+                               ["With proper support, the Assult Ship can capture planets",
+							    "quite swiftly. It holds more armies than any other ship",
+								"and it is an unmatched planet bomber.","",
                                 "It also withstands damage very well."]);
         this.shipButtons[SB] = this.makeShipButton("Starbase", SB, justRightPx,
                                                    bottomRowPx, 0x00FFFF, 0x003333,
-                               ["Available only to the most experienced",
-                                "players, a Starbase can usually be",
-                                "destroyed only by a coordinated effort",
-                                "(called 'ogging')."]);
-        this.shipButtons[SB].opacity = 0.3;
+                               ["Available only to the most experienced players, a",
+							    "Starbase can usually be destroyed only by a coordinated",
+								"effort (called \"ogging\")."]);
+        this.shipButtons[SB].alpha = 0.3;
 
 		this.separator = new PIXI.Graphics().lineStyle(2,0x00CCCC,1).moveTo(0,0).lineTo(0,60);
 		this.separator.position.set(justRightPx - 4, topRowPx + 10);
@@ -174,8 +169,8 @@ outfitting = {
 	    this.infoBox = new PIXI.Graphics().lineStyle(2, 0x55FFFF, 1).beginFill(0x003333).drawRoundedRect(0, 0, 420, 120, 10).endFill();
 		this.infoBox.position.set(centerPx-210+this.shipButtonDim/2, bottomRowPx+this.shipButtonDimY+20);
         
-        //this.otherElems.push(new TextNode("http://www.netrek.org", {textAlign:"center", x:this.canvasWidth/2, y:this.canvasHeight-8, fill:"#FFF", font:"16px Courier"}));
-        //this.otherElems.push(new TextNode("Press Tab for a Quick Start guide", {textAlign:"center", x:this.canvasWidth/2, y:18, fill:"#FFF", font:"16px Courier"}));
+        //this.otherElems.push(new TextNode("http://www.netrek.org", {textAlign:"center", x:this.canvasWidth/2, y:this.canvasHeight-8, fill:"#FFF", font:"16px arial"}));
+        //this.otherElems.push(new TextNode("Press Tab for a Quick Start guide", {textAlign:"center", x:this.canvasWidth/2, y:18, fill:"#FFF", font:"16px arial"}));
 
         for(var i=0; i<this.raceButtons.length; ++i) {
             this.oGroup.addChild(this.raceButtons[i]);
@@ -222,7 +217,7 @@ outfitting = {
         var buttonDim = smallMode?this.smallRaceButtonDim:this.raceButtonDim;
         var bufferPx = 10;
         var rightAlignPx = this.canvasWidth - buttonDim - bufferPx;
-        var font = "bold " + (smallMode?8:11) + "pt Courier";
+        var font = "bold " + (smallMode?8:11) + "pt arial";
         /*for(var i=0; i<4; ++i) {
             if(i > 1 && smallMode) { this.raceButtons.x = rightAlignPx; }
             this.raceButtons[i].width = buttonDim;
@@ -282,7 +277,7 @@ outfitting = {
     showInfoText: function(strArray) {
         this.infoBox.removeChildren();
         //for(var i=0; i<strArray.length; ++i) {
-			var textLine = new PIXI.Text(strArray.join("\n"), { fontSize:(smallMode?8:12)+"pt", fontFamily:"courier", fill: 0x55FFFF});
+			var textLine = new PIXI.Text(strArray.join("\n"), { fontSize:(smallMode?8:12)+"pt", fontFamily:"arial", fill: 0x55FFFF});
 			textLine.position.set(10, 5);
 			this.infoBox.addChild(textLine);
         //}
@@ -314,7 +309,7 @@ outfitting = {
             this.motdString.push(line.replace(/\x00/g, " "));
         } else {
             this.motdData = this.motdData || "";
-            this.motdData += line;
+            this.motdData += line.replace(/\x00/g, " ");
         }
     },
     writeMotd: function() {
@@ -326,7 +321,7 @@ outfitting = {
 				}
 			}
 			var lines = this.motdString.join("\n");
-			this.motdGfx = new PIXI.Text(lines, { fill:"white", fontSize:"7pt", fontFamily:"Courier", lineHeight:12});
+			this.motdGfx = new PIXI.Text(lines, { fill:"white", fontSize:"7pt", fontFamily:"arial", lineHeight:12});
 			this.mGroup.addChild(this.motdGfx);
 		}
     }
