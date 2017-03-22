@@ -60,13 +60,13 @@ var Ship = function(options) {
     } else {
         this.gfx = options.gfx;
     }
-    this.numberGfx = new PIXI.Text(this.number, { fill: teamLib.getRaceColor(options.team) });
-	this.numberGfx.position.set(15, -3);
+    this.numberGfx = new PIXI.Text(this.number, { fill: teamLib.getRaceColor(options.team), fontSize:"9pt" });
+	this.numberGfx.position.set(15, 0);
     this.gfx.addChild(this.numberGfx);
 
     if(typeof options.galGfx != "object") {
         var tac_xy = world.netrek2tac(options.x, options.y);
-		this.galGfx = new PIXI.Text(this.number, { fill: teamLib.getRaceColor(options.team), fontWeight:"bold", fontSize:"13px", fontFamily:"courier" });
+		this.galGfx = new PIXI.Text(this.number, { fill: teamLib.getRaceColor(options.team), fontWeight:"bold", fontSize:"20px", fontFamily:"courier" });
         this.galGfx.position.set(tac_xy[0], tac_xy[1]);
         
     } else {

@@ -23,6 +23,7 @@ world = {
     wGroup: new PIXI.Container(),        // world group
     gGroup: new PIXI.Container(),        // galactic group
     planetGroup: new PIXI.Container(),
+	gPlanetGroup: new PIXI.Container(),
     redrawInterval: null,
     objects: [],         // all objects in the world (which are doubly recorded in the arrays below)
     ships: [],           // array of ships, indexed by ship id
@@ -74,6 +75,7 @@ world = {
         var rect = new PIXI.Graphics().lineStyle(2,0xFFFFFF,0.7).beginFill(0x444444).drawRect(0,0,dims[0] - this.galacticXOffset, dims[1]);
         rect.position.x = this.galacticXOffset;
         this.gGroup.addChild(rect);
+		this.gGroup.addChild(this.gPlanetGroup);
 		this.wGroup.addChild(this.planetGroup);
     },
 
@@ -146,9 +148,13 @@ world = {
                 var offsetY = e.pageY - offset.top;
 
                     if(!e.shiftKey) {
+						console.log(this.uiElementWasJustClicked);
+						if(hud.uiElementWasJustClicked!= null) { return; }
                         clearTimeout(_self.torpFireTimeout);
                         // maybe this click was intended for a UI element, which may cancel the torp fire
-                        _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 10);
+                        _self.torpFireTimeout = setTimeout(function() {
+							net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY))));
+						}, 10);
                     } else {
                         net.sendArray(CP_PHASER.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY))));
                     }
@@ -312,7 +318,10 @@ world = {
     },
     addPlanet: function(num, planetObj) {
         this.planets[num] = planetObj;
-        this.add(planetObj);
+        this.planetGroup.addChild(planetObj.gfx);
+
+        if(planetObj.galGfx) this.gPlanetGroup.addChild(planetObj.galGfx);
+        this.objects.push(planetObj);
     },
     addShip: function(num, shipObj) {
         this.ships[num] = shipObj;
@@ -403,11 +412,11 @@ world = {
     Planet: function(placeX, placeY, name, features, includingWorld) {
         var planet_self = this;
         var world_xy = world.netrek2world(placeX, placeY);
-        var cir = new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawCircle(0,0,18);
+        var cir = new PIXI.Graphics().lineStyle(2,0x999900,1).drawCircle(0,0,19);
         cir.position.set(world_xy[0], world_xy[1]);
 
         var text = new PIXI.Text(name.replace(/\x00/g,""), { fill:0xFFFF00, fontWeight:"bold", fontSize:"11px", fontFamily:"arial" });
-        text.position.y = cir.height/2+15;
+        text.position.y = cir.height/2;
 		text.position.x = -text.width/2;
         cir.addChild(text);
         
@@ -419,14 +428,15 @@ world = {
         this.repair = false;
         this.agri = false;
 
-        this.armyGfx = new PIXI.Graphics().beginFill(0x0000FF,0.4).drawPolygon([0,0, 0,6, 6,6, 6,0]);
+        this.armyGfx = new PIXI.Container();
+		this.armyGfx.addChild(new PIXI.Graphics().beginFill(0x0000FF).drawPolygon([0,0, 0,6, 6,6, 6,0]));
         this.armyGfx.position.set(-14, -2);
         var part1 = new PIXI.Graphics().beginFill(0x0000FF).arc(0, 0, 3, Math.PI, Math.PI * 2);
         part1.position.set(3,0);
         this.armyGfx.addChild(part1);
-        //var part2 = new PIXI.Graphics().beginFill(0x0000FF).arc(0, 0, 3, Math.PI, Math.PI * 2);
-        //part1.position.set(3,-6);
-        //this.armyGfx.addChild(part2);
+        var part2 = new PIXI.Graphics().beginFill(0x0000FF).drawCircle(0, 0, 3);
+        part2.position.set(3,-6);
+        this.armyGfx.addChild(part2);
         this.gfx.addChild(this.armyGfx);
 
         this.armyCountGfx = new PIXI.Text("0", {fill:0xFFFFFF, fontWeight:"bold", fontSize:"8px", fontFamily:"courier"});
@@ -441,7 +451,7 @@ world = {
 
         text = new PIXI.Text(name.replace(/\x00/g,"").substring(0,3), { fill:0xFFFF00, fontWeight:"bold", fontSize:"9px", fontFamily:"arial"});
         text.position.y = this.galGfx.width/2;
-		text.position.x = -text.width/2;
+		text.position.x = -3*text.width/4;
         this.galGfx.addChild(text);
 
         this.includingWorld = includingWorld;
@@ -460,8 +470,7 @@ world.Planet.prototype = {
             var wrench = new PIXI.Graphics().lineStyle(1,0x44FF00,1).beginFill(0x00FF00).drawPolygon([0,0, -3,3, -3,8, 0,11, 0,19, -3,22, -3,26, 0,29, 0,23, 4,23, 4,29, 7,26, 7,22, 4,19, 4,11, 7,8, 7,3, 4,0, 4,6, 0,6]);
 			wrench.position.set(-3, -this.gfx.height/4+2);
             this.gfx.addChild(wrench);
-			var dot = new PIXI.Graphics().beginFill(0x00FF00).drawCircle(2);
-			dot.position.x = -3;
+			var dot = new PIXI.Graphics().beginFill(0x00FF00).drawCircle(-7,-3,2);
 			this.galGfx.addChild(dot);
         }
         this.repair = doShow;
@@ -474,7 +483,7 @@ world.Planet.prototype = {
             tank.addChild(new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawPolygon([2,3,5,6]));
             tank.addChild(new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawPolygon([2,6,5,3]));
             this.gfx.addChild(tank);
-            this.galGfx.addChild(new PIXI.Graphics().beginFill(0xFF7700).drawCircle(3,0,2));
+            this.galGfx.addChild(new PIXI.Graphics().beginFill(0xFF7700).drawCircle(0,-3,2));
         }
         this.fuel = doShow;
     },

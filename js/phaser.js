@@ -41,13 +41,8 @@ Phaser = function(placeX, placeY, dir, status, target, includingWorld) {
         var destY = 100 * -Math.cos(radDir);
     }
 
-    var line = new Line(0, 0, destX, destY,
-    {
-        x: world_xy[0],
-        y: world_xy[1],
-        fill: status==PHHIT?"#F00":"#FFF",
-        stroke: status==PHHIT?"#F00":"#FFF"
-    });
+    var line = new PIXI.Graphics().lineStyle(1,status==PHHIT?0xFF0000:0xFFFFFF,1).moveTo(0,0).lineTo(destX, destY);
+	line.position.set(world_xy[0], world_xy[1])
 
     this.gfx = line;
     this.includingWorld = includingWorld;

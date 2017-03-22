@@ -124,13 +124,13 @@ hud = {
 
         this.setSpeedOnClick = function(e) {
             var y = hud.speedMeterSprite.height - e.data.global.y + hud.speedMeterSprite.worldTransform.ty;
-			console.log(y)
             var speed = Math.ceil(12 * Math.pow(y/300,1/0.75));
             net.sendArray(CP_SPEED.data(speed));
             hud.showSpeedPointer(speed);
             e.stopPropagation();
             clearTimeout(world.torpFireTimeout);
-        }
+			hud.uiElementWasJustClicked = setTimeout(function() { hud.uiElementWasJustClicked = null; }, 10);
+		}
         this.speedMeterSprite.on("click", this.setSpeedOnClick);
 
         function speedChanger(diff) {
@@ -170,8 +170,8 @@ hud = {
         this.warning = new PIXI.Graphics().lineStyle(1,0xFF0000,1).beginFill(0xFF4444).drawRect(0,0,this.hCanvas.width-30,25);
 		this.warning.position.set(15,15);
 		this.warning.visible = false;
-        this.warningText = new PIXI.Text("", {fill:"white", fontWeight:"bold", fontSize:"10pt", fontFamily:"arial"});
-		this.warningText.position.set(5,15);
+        this.warningText = new PIXI.Text("", {fill:"white", fontSize:"10pt", fontFamily:"arial"});
+		this.warningText.position.set(2,5);
         this.warning.addChild(this.warningText);
         this.uiGfx.addChild(this.warning);
         this.warningTimeout = null;
@@ -250,6 +250,7 @@ hud = {
         this.showMapButton.on("click", function() {
             world.gGroup.visible = !world.gGroup.visible;
             clearTimeout(world.torpFireTimeout);
+			hud.uiElementWasJustClicked = setTimeout(function() { hud.uiElementWasJustClicked = null; }, 10);
         });
 
         this.dPadCommands = [
@@ -356,6 +357,8 @@ hud = {
         clickableFace.on("click",function() {
             onClick.call(button);
             clearTimeout(world.torpFireTimeout);
+			hud.uiElementWasJustClicked = setTimeout(function() { hud.uiElementWasJustClicked = null; }, 10);
+			console.log(hud.uiElementWasJustClicked);
         });
 		button.addChild(clickableFace);
         return button;
@@ -445,7 +448,7 @@ hud = {
     showWarning: function(msg) {
         if(msg == "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13\x0FB") return;
 
-        msg = msg.replace(/Helmsman:\s+/, "").replace(/,? captain!/, "!").replace(/\x00/, "");
+        msg = msg.replace(/Helmsman:\s+/, "").replace(/,? captain!/, "!").replace(/\x00/g, "");
 
         var self = this;
         this.warning.visible = true;
