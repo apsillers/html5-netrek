@@ -95,21 +95,28 @@ hud = {
         this.speedMeter.addChild(this.speedNumber);
         
         this.smallModeSpeedMeter = new PIXI.Container();
-		this.smallModeSpeedMeter.position.set(10, 65);
+		this.smallModeSpeedMeter.position.set(10, 15);
         this.smallModeCurrentSpeed = new PIXI.Text("0", { fill: 0xFFFFFF, fontWeight:"bold", fontSize:"16pt", fontFamily:"arial" });
-		this.smallModeCurrentSpeed.position.set(0, 30);
+		this.smallModeCurrentSpeed.position.set(0, 25);
         this.smallModeTargetSpeed = new PIXI.Text("0", { fill: 0x00FF00, fontWeight:"bold", fontSize:"16pt", fontFamily:"arial" });
-		this.smallModeTargetSpeed.position.set(25, 30);
+		this.smallModeTargetSpeed.position.set(25, 25);
+		
         this.smallModeSpeedPlus = new PIXI.Graphics().beginFill(0x00AA00).lineStyle(1,0x00FF00,1).drawCircle(0,0,15)
-		this.smallModeSpeedPlus.position.set(32, -3);
 		var plusText = new PIXI.Text("+", { fill: "#0F0", fontWeight:"bold", fontSize:"16pt", fontFamily:"arial", align:"center" });
         this.smallModeSpeedPlus.addChild(plusText);
-		plusText.position.set((this.smallModeSpeedPlus.width-plusText.width)/2, 7);
+		plusText.position.set(-plusText.width/2, -12);
+		this.smallModeSpeedPlus = new PIXI.Sprite(this.lApp.renderer.generateTexture(this.smallModeSpeedPlus));
+		this.smallModeSpeedPlus.interactive = true;
+		this.smallModeSpeedPlus.position.set(15, -7);
+
         this.smallModeSpeedMinus = new PIXI.Graphics().beginFill(0x770000).lineStyle(1,0xFF0000,1).drawCircle(0,0,15)
-		this.smallModeSpeedMinus.position.set(32, 50);
-		var minusText = new PIXI.Text("+", { fill: "#0F0", fontWeight:"bold", fontSize:"16pt", fontFamily:"arial", align:"center" });
+		var minusText = new PIXI.Text("-", { fill: "#0F0", fontWeight:"bold", fontSize:"16pt", fontFamily:"arial", align:"center" });
         this.smallModeSpeedMinus.addChild(minusText);
-		minusText.position.set((this.smallModeSpeedMinus.width-minusText.width)/2, 5);
+		minusText.position.set(-minusText.width/2, -12);
+		this.smallModeSpeedMinus = new PIXI.Sprite(this.lApp.renderer.generateTexture(this.smallModeSpeedMinus));
+		this.smallModeSpeedMinus.interactve = true;
+		this.smallModeSpeedMinus.position.set(15, 50);
+		
         this.smallModeSpeedMeter.addChild(this.smallModeCurrentSpeed);
         this.smallModeSpeedMeter.addChild(this.smallModeTargetSpeed);
         this.smallModeSpeedMeter.addChild(this.smallModeSpeedPlus);
@@ -131,7 +138,7 @@ hud = {
             clearTimeout(world.torpFireTimeout);
 			hud.uiElementWasJustClicked = setTimeout(function() { hud.uiElementWasJustClicked = null; }, 10);
 		}
-        this.speedMeterSprite.on("click", this.setSpeedOnClick);
+        this.speedMeterSprite.on("pointertap", this.setSpeedOnClick);
 
         function speedChanger(diff) {
             return function(e) {
@@ -140,10 +147,11 @@ hud = {
                 net.sendArray(CP_SPEED.data(this.targetSpeed));
                 e.stopPropagation();
                 clearTimeout(world.torpFireTimeout);
+                hud.uiElementWasJustClicked = setTimeout(function() { hud.uiElementWasJustClicked = null; }, 10);
             }.bind(hud);
         }
-        //this.smallModeSpeedPlus.addEventListener("click", speedChanger(1));
-        //this.smallModeSpeedMinus.addEventListener("click", speedChanger(-1));
+        this.smallModeSpeedPlus.on("pointertap", speedChanger(1));
+        this.smallModeSpeedMinus.on("pointertap", speedChanger(-1));
 
         this.etempMeter = new PIXI.Graphics().lineStyle(2,0xAAAAAA,1).drawPolygon([0,0, 20,0, 20,-100,0,0]);
 		this.etempMeter.position.set(50, 350);
@@ -178,10 +186,11 @@ hud = {
 
         /* wheel for steering in touch interfaces */
         this.directionWheel = new PIXI.Graphics().lineStyle(20, 0xCCCCCC, 0.7).drawCircle(0,0,40);
-        this.directionNeedle = new PIXI.Graphics().lineStyle(4, 0x0000FF, 1)
-		                        .moveTo(0, this.directionWheel.radius - 10)
-								.lineTo(0, this.directionWheel.radius + 10);
+        this.directionNeedle = new PIXI.Graphics().lineStyle(40, 0x0000FF, 1)
+		                        .moveTo(0, 0)
+								.lineTo(0, this.directionWheel.radius + 20);
         this.directionWheel.addChild(this.directionNeedle);
+        this.directionWheel.position.set(0,0);
         this.weaponNeedle = new PIXI.Graphics().lineStyle(4, 0xFF0000, 1)
 		                        .moveTo(0, this.directionWheel.radius - 10)
 								.lineTo(0, this.directionWheel.radius + 10);
@@ -239,15 +248,16 @@ hud = {
 */
         this.showMapButton = new PIXI.Container();
 		var mapButton = new PIXI.Graphics().lineStyle(1,0x00ffff,1).beginFill(0x00aaaa).drawCircle(0,0,25);
-		mapButton.position.set(32,200);
-        this.showMapButton.addChild(mapButton);
+		this.showMapButton.addChild(mapButton);
 		var mapButtonText = new PIXI.Text("Map", {fill:"white", fontSize:"12pt", fontFamily:"arial", x:32, y:200, align:"center"});
-		mapButtonText.position.set((this.showMapButton.width-mapButtonText.width)/2+32,200);
-        this.showMapButton.addChild(mapButtonText);
+		mapButtonText.position.set(-mapButtonText.width/2,-mapButtonText.height/2);
+        mapButton.addChild(mapButtonText);
 		this.showMapButton = new PIXI.Sprite(lApp.renderer.generateTexture(this.showMapButton));
+		this.showMapButton.interactive = true;
         this.uiGfx.addChild(this.showMapButton);
+        this.showMapButton.position.set(0,100);
 
-        this.showMapButton.on("click", function() {
+        this.showMapButton.on("pointertap", function() {
             world.gGroup.visible = !world.gGroup.visible;
             clearTimeout(world.torpFireTimeout);
 			hud.uiElementWasJustClicked = setTimeout(function() { hud.uiElementWasJustClicked = null; }, 10);
@@ -316,7 +326,7 @@ hud = {
             this.etempMeter.x = 70;
             this.etempMeter.y = 150;
             if(this.drawn) {
-                hud.hCanvas.addChild(world.gGroup);
+                hud.hGroup.addChild(world.gGroup);
                 world.gGroup.x = -world.galacticXOffset - (world.netrek2tac(100000)[0] - world.galacticXOffset) / 2 + hud.hCanvas.width / 2;
             }
         }
@@ -354,11 +364,10 @@ hud = {
 		button.addChild(nameText);
 		var clickableFace = new PIXI.Sprite(this.lApp.renderer.generateTexture(new PIXI.Graphics().beginFill(0,0).drawRoundedRect(0, 0, width, height, 5)));
 		clickableFace.interactive = true;
-        clickableFace.on("click",function() {
+        clickableFace.on("pointertap",function() {
             onClick.call(button);
             clearTimeout(world.torpFireTimeout);
 			hud.uiElementWasJustClicked = setTimeout(function() { hud.uiElementWasJustClicked = null; }, 10);
-			console.log(hud.uiElementWasJustClicked);
         });
 		button.addChild(clickableFace);
         return button;
@@ -387,15 +396,13 @@ hud = {
     },
     showDirectionNeedle: function(show) {
         if(show) { this.directionWheel.addChild(this.directionNeedle); }
-        else { this.directionWheel.removeChild(this.directionNeedle); }
+        //else { this.directionWheel.removeChild(this.directionNeedle); }
     },
     showDirectionAngle: function(rads) {
-        this.directionNeedle.rotation = [rads+Math.PI,0,0];
-        this.directionNeedle.changed = true;
+        //this.directionNeedle.rotation = rads+Math.PI;
     },
     showWeaponAngle: function(rads) {
-        this.weaponNeedle.rotation = [rads+Math.PI,0,0];
-        this.weaponNeedle.changed = true;
+        this.weaponNeedle.rotation = rads+Math.PI;
     },
 
 

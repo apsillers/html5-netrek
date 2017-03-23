@@ -51,8 +51,6 @@ var Ship = function(options) {
     if(typeof options.gfx != "object") {
         var world_xy = world.netrek2world(options.x, options.y);
 		this.gfx = new PIXI.Container();
-		this.shieldsGfx = new PIXI.Graphics().lineStyle(1,teamLib.getRaceColor(options.team),1).drawCircle(0, 0, 12);
-		this.gfx.addChild(this.shieldsGfx);
 		this.gfx.position.set(world_xy[1], world_xy[0]);
 		
         this.setImage(options.img);
@@ -60,18 +58,17 @@ var Ship = function(options) {
     } else {
         this.gfx = options.gfx;
     }
-    this.numberGfx = new PIXI.Text(this.number, { fill: teamLib.getRaceColor(options.team), fontSize:"9pt" });
-	this.numberGfx.position.set(15, 0);
-    this.gfx.addChild(this.numberGfx);
 
     if(typeof options.galGfx != "object") {
         var tac_xy = world.netrek2tac(options.x, options.y);
-		this.galGfx = new PIXI.Text(this.number, { fill: teamLib.getRaceColor(options.team), fontWeight:"bold", fontSize:"20px", fontFamily:"courier" });
-        this.galGfx.position.set(tac_xy[0], tac_xy[1]);
+		this.galGfx = new PIXI.Container();
+		this.galGfx.position.set(tac_xy[0], tac_xy[1]);
         
     } else {
         this.gfx = options.gfx;
     }
+
+    this.updateColor();
 
     this.includingWorld = options.world;
     this.gfxRoot = world.wGroup;
@@ -93,6 +90,19 @@ Ship.prototype = {
         this.y = y;
     },
     
+    updateColor: function() {
+        this.gfx.removeChild(this.shieldsGfx);
+        this.shieldsGfx = new PIXI.Graphics().lineStyle(1,teamLib.getRaceColor(this.team),1).drawCircle(0, 0, 12);
+        this.gfx.addChild(this.shieldsGfx);
+        this.gfx.removeChild(this.numberGfx);
+		this.numberGfx = new PIXI.Text(this.number, { fill: teamLib.getRaceColor(this.team), fontSize:"9pt" });
+	    this.numberGfx.position.set(15, 0);
+	    this.gfx.addChild(this.numberGfx);
+	    
+	    this.galGfx.removeChild(this.galGfx.children[0]);
+		this.galGfx.addChild(new PIXI.Text(this.number, { fill: teamLib.getRaceColor(this.team), fontWeight:"bold", fontSize:"20px", fontFamily:"courier" }));
+    },
+    
     // convert 0-255 rotation to radians and set
     setRotation: function(byteRot) {
         var rads = Math.PI*2 * byteRot/255;
@@ -102,6 +112,7 @@ Ship.prototype = {
     setImage: function(img) {
         if(this.hullGfx) { this.gfx.removeChild(this.hullGfx); }
         this.hullGfx = new PIXI.Sprite(img);
+        this.hullGfx.interactive = true;
 		this.hullGfx.pivot.set(this.hullGfx.width/2, this.hullGfx.height/2);
         this.gfx.addChild(this.hullGfx);
     },
@@ -109,20 +120,14 @@ Ship.prototype = {
     setTeam: function(team) {
         this.team = team;
         
-        this.numberGfx.fill = teamLib.getRaceColor(team);
-        this.numberGfx.changed = true;
-
-        this.galGfx.fill = teamLib.getRaceColor(team);
-        this.galGfx.changed = true;
+        this.updateColor();
     },
 
     setVisible: function(isVis) {
         this.gfx.visible = isVis;
-        //this.gfx.changed = true;
 
-        this.galGfx.fill = isVis?teamLib.getRaceColor(this.team):"#666";
-        this.galGfx.text = isVis?this.number:"?";
-        //this.galGfx.changed = true;
+        this.galGfx.removeChild(this.galGfx.children[0]);
+		this.galGfx.addChild(new PIXI.Text(isVis?this.number:"?", { fill: isVis?teamLib.getRaceColor(this.team):"#666", fontWeight:"bold", fontSize:"20px", fontFamily:"courier" }));
 
         this.cloaked = !isVis;
     },

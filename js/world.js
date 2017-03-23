@@ -72,7 +72,7 @@ world = {
         new Border({x:0, y:100000, width: 100000, height: 0})
 
         var dims = this.netrek2tac(100000, 100000);
-        var rect = new PIXI.Graphics().lineStyle(2,0xFFFFFF,0.7).beginFill(0x444444).drawRect(0,0,dims[0] - this.galacticXOffset, dims[1]);
+        var rect = new PIXI.Graphics().lineStyle(2,0xFFFFFF,0.7).beginFill(0x333333,0.4).drawRect(0,0,dims[0] - this.galacticXOffset, dims[1]);
         rect.position.x = this.galacticXOffset;
         this.gGroup.addChild(rect);
 		this.gGroup.addChild(this.gPlanetGroup);
@@ -84,7 +84,7 @@ world = {
 		this.lGroup.addChild(this.wGroup);
 
         if(smallMode) {
-            this.wCanvas.addChild(this.gGroup);
+            this.wGroup.addChild(this.gGroup);
         } else {
             this.rGroup.addChild(this.gGroup);
         }
@@ -148,8 +148,8 @@ world = {
                 var offsetY = e.pageY - offset.top;
 
                     if(!e.shiftKey) {
-						console.log(this.uiElementWasJustClicked);
 						if(hud.uiElementWasJustClicked!= null) { return; }
+                        
                         clearTimeout(_self.torpFireTimeout);
                         // maybe this click was intended for a UI element, which may cancel the torp fire
                         _self.torpFireTimeout = setTimeout(function() {
@@ -268,12 +268,12 @@ world = {
                 net.sendArray(CP_DIRECTION.data(_self.rad2byte(_self.directingAngle)));
                 _self.showDirecting(false);
             } else {
-                clearTimeout(_self.torpFireTimeout);
+                /*clearTimeout(_self.torpFireTimeout);
                 var offset = $(this).offset();
                 var offsetX = e.changedTouches[0].pageX - offset.left;
                 var offsetY = e.changedTouches[0].pageY - offset.top;
                 _self.torpFireTimeout = setTimeout(function() { net.sendArray(CP_TORP.data(_self.rad2byte(_self.getAngleFromCenter(offsetX, offsetY)))); }, 10);
-            }
+            */}
         });
 
         gamepad.startReading();
@@ -313,7 +313,7 @@ world = {
         var index = this.objects.indexOf(obj);
 
         if(index > -1) { var r = this.objects.splice(index,1); }
-        obj.gfx.parent.removeChild(obj.gfx);
+        if(obj.gfx.parent) { obj.gfx.parent.removeChild(obj.gfx); }
         if(obj.galGfx) { obj.galGfx.parent.removeChild(obj.galGfx); }
     },
     addPlanet: function(num, planetObj) {

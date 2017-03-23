@@ -60,8 +60,9 @@ outfitting = {
 		button.interactive = true;
 		
         button.on("mouseover",function(){ _self.showInfoText(desc); });
+        button.on("pointerdown",function(){ _self.showInfoText(desc); });
         button.on("mouseout",function(){ _self.showInfoText(_self.defaultInfoText); });
-        button.on("click",function(){
+        button.on("pointertap",function(){
             //alert("is this disabled: " + !!this._netrekDisabled);
             if(!this._netrekDisabled) {
                 world.player.setImage(imageLib.getTexture(racenum, _self.selectedShip)); 
@@ -87,8 +88,9 @@ outfitting = {
 		button.interactive = true;
 		
         button.on("mouseover",function(){ _self.showInfoText(desc); });
+        button.on("pointerdown",function(){ _self.showInfoText(desc); });
         button.on("mouseout",function() { _self.showInfoText(_self.defaultInfoText); });
-        button.on("click",function() { _self.selectShip(shipId); });
+        button.on("pointertap",function() { _self.selectShip(shipId); });
         return button;
     },
    
