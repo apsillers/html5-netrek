@@ -412,17 +412,19 @@ world = {
     Planet: function(placeX, placeY, name, features, includingWorld) {
         var planet_self = this;
         var world_xy = world.netrek2world(placeX, placeY);
-        var cir = new PIXI.Graphics().lineStyle(2,0x999900,1).drawCircle(0,0,19);
-        cir.position.set(world_xy[0], world_xy[1]);
+        var gfx = new PIXI.Container();
+        this.ring = new PIXI.Graphics().lineStyle(2,0x999900,1).drawCircle(0,0,19);
+        gfx.addChild(this.ring);
+        gfx.position.set(world_xy[0], world_xy[1]);
 
         var text = new PIXI.Text(name.replace(/\x00/g,""), { fill:0xFFFF00, fontWeight:"bold", fontSize:"11px", fontFamily:"arial" });
-        text.position.y = cir.height/2;
+        text.position.y = gfx.height/2;
 		text.position.x = -text.width/2;
-        cir.addChild(text);
+        gfx.addChild(text);
         
         this.x = placeX;
         this.y = placeY;
-        this.gfx = cir;
+        this.gfx = gfx;
         this.name = name;
         this.fuel = false;
         this.repair = false;
@@ -430,7 +432,7 @@ world = {
 
         this.armyGfx = new PIXI.Container();
 		this.armyGfx.addChild(new PIXI.Graphics().beginFill(0x0000FF).drawPolygon([0,0, 0,6, 6,6, 6,0]));
-        this.armyGfx.position.set(-14, -2);
+        this.armyGfx.position.set(-15, 0);
         var part1 = new PIXI.Graphics().beginFill(0x0000FF).arc(0, 0, 3, Math.PI, Math.PI * 2);
         part1.position.set(3,0);
         this.armyGfx.addChild(part1);
@@ -439,12 +441,16 @@ world = {
         this.armyGfx.addChild(part2);
         this.gfx.addChild(this.armyGfx);
 
-        this.armyCountGfx = new PIXI.Text("0", {fill:0xFFFFFF, fontWeight:"bold", fontSize:"8px", fontFamily:"courier"});
-		this.armyCountGfx.position.y = 2;
+        this.armyCountGfx = new PIXI.Text("0", {fill:0xFFFFFF, fontWeight:"bold", fontSize:"9px", fontFamily:"courier"});
+		this.armyCountGfx.position.y = -3;
         this.armyGfx.addChild(this.armyCountGfx);
 
         var tac_xy = world.netrek2tac(placeX, placeY);
-		this.galGfx = new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawCircle(-3.5,-3.5,7);
+		this.galGfx = new PIXI.Container();
+		this.galPop = new PIXI.Graphics().beginFill(0x4444FF,0).drawCircle(-3.5,-3.5,7);
+		this.galRing = new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawCircle(-3.5,-3.5,7);
+		this.galGfx.addChild(this.galPop);
+		this.galGfx.addChild(this.galRing);
 		this.galGfx.position.set(tac_xy[0], tac_xy[1]);
         this.galGfx.x -= this.galGfx.width/2;
         this.galGfx.y += this.galGfx.width/2;
@@ -468,7 +474,7 @@ world.Planet.prototype = {
     showRepair: function(doShow) {
         if(!this.repair && doShow) {
             var wrench = new PIXI.Graphics().lineStyle(1,0x44FF00,1).beginFill(0x00FF00).drawPolygon([0,0, -3,3, -3,8, 0,11, 0,19, -3,22, -3,26, 0,29, 0,23, 4,23, 4,29, 7,26, 7,22, 4,19, 4,11, 7,8, 7,3, 4,0, 4,6, 0,6]);
-			wrench.position.set(-3, -this.gfx.height/4+2);
+			wrench.position.set(-3, -this.gfx.height/4-1);
             this.gfx.addChild(wrench);
 			var dot = new PIXI.Graphics().beginFill(0x00FF00).drawCircle(-7,-3,2);
 			this.galGfx.addChild(dot);
@@ -478,21 +484,29 @@ world.Planet.prototype = {
 
     showFuel: function(doShow) {
         if(!this.fuel && doShow) {
-            var tank = new PIXI.Graphics().lineStyle(1,0xFFFF00,1).beginFill(0xFF7700).drawPolygon([0,0,5,0,8,2,8,13,0,13]);
-			tank.position.set(this.gfx.width/2-13,-7);
-            tank.addChild(new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawPolygon([2,3,5,6]));
-            tank.addChild(new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawPolygon([2,6,5,3]));
-            this.gfx.addChild(tank);
-            this.galGfx.addChild(new PIXI.Graphics().beginFill(0xFF7700).drawCircle(0,-3,2));
+            this.tank = new PIXI.Graphics().lineStyle(1,0xFFFF00,1).beginFill(0xFF7700).drawPolygon([0,0,5,0,8,2,8,13,0,13]);
+			this.tank.position.set(this.ring.width/2-13,-7);
+            this.tank.addChild(new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawPolygon([2,3,5,6]));
+            this.tank.addChild(new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawPolygon([2,6,5,3]));
+            this.gfx.addChild(this.tank);
+            this.galGfx.addChild(this.fuelDot = new PIXI.Graphics().beginFill(0xFF7700).drawCircle(0,-3,2));
+        }
+        else if(!doShow && this.tank) {
+            this.gfx.removeChild(this.tank);
+            this.galGfx.removeChild(this.fuelDot);
         }
         this.fuel = doShow;
     },
 
     showAgri: function(doShow) {
-        if(!this.agri && doShow) {
-            this.galGfx.stroke = "#0FF";
-            this.gfx.stroke = "#0FF";
-            this.gfx.strokeWidth = 2;
+        if(this.agri != doShow) {
+            var color = doShow?0x00FFFF:0xFFFF00;
+            this.galGfx.removeChild(this.galRing);
+            this.galRing = new PIXI.Graphics().lineStyle(1,color,1).drawCircle(-3.5,-3.5,7);
+            this.galGfx.addChild(this.galRing);
+            this.gfx.removeChild(this.ring);
+            this.ring = new PIXI.Graphics().lineStyle(3,color,1).drawCircle(0,0,19);
+            this.gfx.addChild(this.ring);
         }
         this.agri = doShow;
     },
@@ -501,15 +515,15 @@ world.Planet.prototype = {
         this.armyCountGfx.text = num;
         if(num == 0) {
             this.armyGfx.alpha = 0;
-            this.galGfx.fill = "none";
+            this.galPop.alpha = 0;
         }
         else if(num >= 5) {
             this.armyGfx.alpha = 1;
-            this.galGfx.fill = "#44F";
+            this.galPop.alpha = 1;
         }
         else if(num < 5 && num > 0) {
             this.armyGfx.alpha = 0.4;
-            this.galGfx.fill = "none";
+            this.galPop.alpha = 0;
         }
         this.armyGfx.changed = true;
     },
