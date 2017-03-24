@@ -193,6 +193,8 @@ outfitting = {
     },
    
     draw: function() {
+        leftCanvas.renderer.resolution = 2;
+        rightCanvas.renderer.resolution = 2;
 		this.lGroup.addChild(this.oGroup);
 		this.rGroup.addChild(this.mGroup);
 
