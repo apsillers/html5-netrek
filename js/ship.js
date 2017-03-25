@@ -74,17 +74,6 @@ var Ship = function(options) {
 
     this.includingWorld = options.world;
     this.gfxRoot = world.wGroup;
-
-    this.hullGfx.on("click", function() {
-        if(world.tractorCursor) {
-            if(world.isPressor) {
-                net.sendArray(CP_REPRESS.data(1, parseInt(_self.number)));
-            } else {
-                net.sendArray(CP_TRACTOR.data(1, parseInt(_self.number)));
-            }
-            world.setTractorCursor(false);
-        }
-    });
 }
 Ship.prototype = {
     setPosition: function(x,y) {
@@ -118,6 +107,19 @@ Ship.prototype = {
         this.hullGfx.interactive = true;
 		this.hullGfx.pivot.set(this.hullGfx.width/2, this.hullGfx.height/2);
         this.gfx.addChild(this.hullGfx);
+        
+        var _self = this;
+        this.hullGfx.on("click", function() {
+            if(world.tractorCursor) {
+                if(world.isPressor) {
+                    net.sendArray(CP_REPRESS.data(1, parseInt(_self.number)));
+                } else {
+                    net.sendArray(CP_TRACTOR.data(1, parseInt(_self.number)));
+                }
+                world.setTractorCursor(false);
+            }
+        });
+            
     },
 
     setTeam: function(team) {
