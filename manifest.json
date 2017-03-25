@@ -1,0 +1,14 @@
+{
+  "short_name": "Netrek",
+  "name": "Netrek Client",
+  "icons": [
+    {
+      "src": "data/ic_launcher.png",
+      "type": "image/png",
+      "sizes": "48x48"
+    }
+  ],
+  "start_url": "index.html?launcher=true",
+  "display": "standalone",
+  "orientation": "landscape"
+}
