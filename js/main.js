@@ -31,9 +31,10 @@ window.addEventListener("load", function() {
     // make canvas and world
     leftCanvas = new PIXI.Application($(lCanvas).data("width"), $(lCanvas).data("height"));
 	lCanvas.appendChild(leftCanvas.view);
+	leftCanvas.renderer.resolution = 2;
     rightCanvas = new PIXI.Application($(rCanvas).data("width"), $(rCanvas).data("height"));
     rCanvas.appendChild(rightCanvas.view);
-	
+	rightCanvas.renderer.resolution = 2;
     outfitting.init(leftCanvas, rightCanvas);
     world.init(leftCanvas, rightCanvas);
     hud.init(leftCanvas, rightCanvas);
@@ -41,6 +42,8 @@ window.addEventListener("load", function() {
     playerList.init($("#playerlist")[0]);
     chat.init($("#chatInput")[0]);
     gamepad.init();
+
+    //window.onerror = function(a,b,c) { alert([a,b,c].join(" ")); };
 
     $("#tutorial-enable-link").click(function() { tutorial.activateTutorial(); });
 
@@ -91,7 +94,9 @@ window.addEventListener("load", function() {
                         $("#chatbox").show();
                     }
 
+                    leftCanvas.renderer.resolution = 1;
                     leftCanvas.renderer.resize(leftWidth, winHeight);
+                    leftCanvas.renderer.resolution = 2;
                     $("#canvasland").width(winWidth);
 
                     var chatHeight = winHeight - $(rCanvas).data("height") - 2;
