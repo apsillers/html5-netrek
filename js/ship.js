@@ -27,6 +27,8 @@
 var Ship = function(options) {
     if(options == undefined) options = {};
 
+    this.fontSize = "10pt";
+
     var _self = this;
 
     this.x = options.x || 0;
@@ -100,7 +102,8 @@ Ship.prototype = {
 	    this.gfx.addChild(this.numberGfx);
 	    
 	    this.galGfx.removeChild(this.galGfx.children[0]);
-		this.galGfx.addChild(new PIXI.Text(this.number, { fill: teamLib.getRaceColor(this.team), fontWeight:"bold", fontSize:"20px", fontFamily:"courier" }));
+		this.galGfx.addChild(new PIXI.Text(this.number, { fill: teamLib.getRaceColor(this.team), fontWeight:"bold", fontSize:this.fontSize, fontFamily:"courier" }));
+        this.galGfx.children[0].position.set(-this.galGfx.children[0].width/2, -this.galGfx.children[0].height/2);
     },
     
     // convert 0-255 rotation to radians and set
@@ -127,7 +130,8 @@ Ship.prototype = {
         this.gfx.visible = isVis;
 
         this.galGfx.removeChild(this.galGfx.children[0]);
-		this.galGfx.addChild(new PIXI.Text(isVis?this.number:"?", { fill: isVis?teamLib.getRaceColor(this.team):"#666", fontWeight:"bold", fontSize:"20px", fontFamily:"courier" }));
+		this.galGfx.addChild(new PIXI.Text(isVis?this.number:"?", { fill: isVis?teamLib.getRaceColor(this.team):"#666", fontWeight:"bold", fontSize:this.fontSize, fontFamily:"courier" }));
+        this.galGfx.children[0].position.set(-this.galGfx.children[0].width/2, -this.galGfx.children[0].height/2);
 
         this.cloaked = !isVis;
     },

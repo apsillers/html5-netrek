@@ -447,17 +447,18 @@ world = {
 
         var tac_xy = world.netrek2tac(placeX, placeY);
 		this.galGfx = new PIXI.Container();
-		this.galPop = new PIXI.Graphics().beginFill(0x4444FF,0).drawCircle(-3.5,-3.5,7);
-		this.galRing = new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawCircle(-3.5,-3.5,7);
+		this.galPop = new PIXI.Graphics().beginFill(0x4444FF,1).drawCircle(0,0,7);
+		this.galPop.alpha = 0;
+		this.galRing = new PIXI.Graphics().lineStyle(1.5,0xFFFF00,1).drawCircle(0,0,7);
 		this.galGfx.addChild(this.galPop);
 		this.galGfx.addChild(this.galRing);
 		this.galGfx.position.set(tac_xy[0], tac_xy[1]);
         this.galGfx.x -= this.galGfx.width/2;
         this.galGfx.y += this.galGfx.width/2;
 
-        text = new PIXI.Text(name.replace(/\x00/g,"").substring(0,3), { fill:0xFFFF00, fontWeight:"bold", fontSize:"9px", fontFamily:"arial"});
-        text.position.y = this.galGfx.width/2;
-		text.position.x = -3*text.width/4;
+        text = new PIXI.Text(name.replace(/\x00/g,"").substring(0,3), { fill:0xFFFF00, fontWeight:"bold", fontSize:"9pt", fontFamily:"courier"});
+        text.position.y = this.galGfx.width/2+1;
+		text.position.x = -text.width/2;
         this.galGfx.addChild(text);
 
         this.includingWorld = includingWorld;
@@ -476,8 +477,12 @@ world.Planet.prototype = {
             var wrench = new PIXI.Graphics().lineStyle(1,0x44FF00,1).beginFill(0x00FF00).drawPolygon([0,0, -3,3, -3,8, 0,11, 0,19, -3,22, -3,26, 0,29, 0,23, 4,23, 4,29, 7,26, 7,22, 4,19, 4,11, 7,8, 7,3, 4,0, 4,6, 0,6]);
 			wrench.position.set(-3, -this.gfx.height/4-1);
             this.gfx.addChild(wrench);
-			var dot = new PIXI.Graphics().beginFill(0x00FF00).drawCircle(-7,-3,2);
-			this.galGfx.addChild(dot);
+			this.repairDot = new PIXI.Graphics().beginFill(0x00FF00).drawCircle(-3.5,0.5,2.5);
+			this.galGfx.addChild(this.repairDot);
+        }
+        else if(!doShow && this.tank) {
+            this.gfx.removeChild(this.wrench);
+            this.galGfx.removeChild(this.repairDot);
         }
         this.repair = doShow;
     },
@@ -489,7 +494,7 @@ world.Planet.prototype = {
             this.tank.addChild(new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawPolygon([2,3,5,6]));
             this.tank.addChild(new PIXI.Graphics().lineStyle(1,0xFFFF00,1).drawPolygon([2,6,5,3]));
             this.gfx.addChild(this.tank);
-            this.galGfx.addChild(this.fuelDot = new PIXI.Graphics().beginFill(0xFF7700).drawCircle(0,-3,2));
+            this.galGfx.addChild(this.fuelDot = new PIXI.Graphics().beginFill(0xFF7700).drawCircle(3.5,0.5,2.5));
         }
         else if(!doShow && this.tank) {
             this.gfx.removeChild(this.tank);
@@ -502,7 +507,7 @@ world.Planet.prototype = {
         if(this.agri != doShow) {
             var color = doShow?0x00FFFF:0xFFFF00;
             this.galGfx.removeChild(this.galRing);
-            this.galRing = new PIXI.Graphics().lineStyle(1,color,1).drawCircle(-3.5,-3.5,7);
+            this.galRing = new PIXI.Graphics().lineStyle(2,color,1).drawCircle(0,0,7);
             this.galGfx.addChild(this.galRing);
             this.gfx.removeChild(this.ring);
             this.ring = new PIXI.Graphics().lineStyle(3,color,1).drawCircle(0,0,19);

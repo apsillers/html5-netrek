@@ -56,7 +56,7 @@ outfitting = {
         button.addChild(raceTitle);
         button.addChild(raceName);
 		
-		button = new PIXI.Sprite(button.generateTexture());
+		button = new PIXI.Sprite(this.lApp.renderer.generateTexture(button));
 		button.interactive = true;
 		
         button.on("mouseover",function(){ _self.showInfoText(desc); });
@@ -84,7 +84,7 @@ outfitting = {
 		text.position.set(this.shipButtonDim/2 - text.width/2, 15);
         button.addChild(text);
 		
-		button = new PIXI.Sprite(button.generateTexture());
+		button = new PIXI.Sprite(this.lApp.renderer.generateTexture(button));
 		button.interactive = true;
 		
         button.on("mouseover",function(){ _self.showInfoText(desc); });
@@ -99,6 +99,8 @@ outfitting = {
         this.mCanvas = rApp.view;
 		this.lGroup = app.stage;
 		this.rGroup = rApp.stage;
+		this.lApp = app;
+		this.rApp = rApp;
 
         this.canvasWidth = this.oCanvas.width;
         this.canvasHeight = this.oCanvas.height;
@@ -294,6 +296,7 @@ outfitting = {
 
         if(!this.shipSelector) {
             this.shipSelector = new PIXI.Graphics().lineStyle(3, 0xFF00FF, 1).beginFill(0x440044, 0.2).drawRoundedRect(0, 0, this.shipButtonDim, this.shipButtonDimY, 10).endFill();
+            this.shipSelector.position.set(1,1);
         } else {
 			this.previousShipButton.removeChild(this.shipSelector);
 		}

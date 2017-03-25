@@ -197,41 +197,41 @@ hud = {
 		
 
         /* add right-panel buttons */
-        this.shieldButton = this.createButton(0, 0, 0x0000FF, "s", "Shield", "bold 14pt arial",
+        this.shieldButton = this.createButton(0, 0, 0x0000FF, "s", "Shield", "bold", "14pt", "arial",
                              function(){ net.sendArray(CP_SHIELD.data(world.player.shields?0:1)); });
         this.uiGfxRight.addChild(this.shieldButton);
 
-        this.cloakButton = this.createButton(0, 45, 0x779977, "c", "Cloak", "bold 14pt arial",
+        this.cloakButton = this.createButton(0, 45, 0x779977, "c", "Cloak", "bold", "14pt", "arial",
                             function(){ net.sendArray(CP_CLOAK.data(world.player.cloaked?0:1)); });
         this.uiGfxRight.addChild(this.cloakButton);
 
-        this.repairButton = this.createButton(0, 90,  0xFFA500, "Sft+R", "Repair", "bold 10pt arial",
+        this.repairButton = this.createButton(0, 90,  0xFFA500, "Sft+R", "Repair", "bold", "10pt", "arial",
                              function(){ net.sendArray(CP_REPAIR.data(world.player.repairing?0:1)); });
         this.uiGfxRight.addChild(this.repairButton);
 
-        this.tractorButton = this.createButton(0, 135, 0x00FF00, "Sft+R", "Tractor", "bold 10pt arial", function(){
+        this.tractorButton = this.createButton(0, 135, 0x00FF00, "Sft+T", "Tractor", "bold", "10pt", "arial", function(){
             if(world.player.tractoring) { net.sendArray(CP_TRACTOR.data(0,0)); }
             else { world.setTractorCursor(true, false); }
         });
         this.uiGfxRight.addChild(this.tractorButton);
 
-        this.pressorButton = this.createButton(0, 180, 0xFF00FF, "y", "Pressor", "bold 14pt arial", function(){
+        this.pressorButton = this.createButton(0, 180, 0xFF00FF, "y", "Pressor", "bold", "14pt", "arial", function(){
             if(world.player.pressing) { net.sendArray(CP_REPRESS.data(0,0)); }
             else { world.setTractorCursor(true, true); }
         });
         this.uiGfxRight.addChild(this.pressorButton);
 
-        this.orbitButton = this.createButton(50, 0, 0xFFFF00, "o", "Orbit", "bold 14pt arial",
+        this.orbitButton = this.createButton(50, 0, 0xFFFF00, "o", "Orbit", "bold", "14pt", "arial",
                             function(){ net.sendArray(CP_ORBIT.data(world.player.orbitting?0:1)); });
         this.uiGfxRight.addChild(this.orbitButton);
 
-        this.bombButton = this.createButton(50, 45, 0xFF0000, "b", "Bomb", "bold 14pt arial", function(){
+        this.bombButton = this.createButton(50, 45, 0xFF0000, "b", "Bomb", "bold", "14pt", "arial", function(){
             net.sendArray(CP_BOMB.data(world.player.bombing?0:1));
         });
-        this.pickupButton = this.createButton(50, 90, 0xFFD700, "z", "Pickup", "bold 14pt arial", function(){
+        this.pickupButton = this.createButton(50, 90, 0xFFD700, "z", "Pickup", "bold", "14pt", "arial", function(){
             net.sendArray(CP_BEAM.data(1));
         });
-        this.dropButton = this.createButton(50, 135, 0xffd700, "x", "Drop", "bold 14pt arial", function(){
+        this.dropButton = this.createButton(50, 135, 0xffd700, "x", "Drop", "bold", "14pt", "arial", function(){
             net.sendArray(CP_BEAM.data(2));
         });
 /*
@@ -348,7 +348,7 @@ hud = {
         gfx.y = y;
     },
 
-    createButton: function(x, y, color, key, text, font, onClick) {
+    createButton: function(x, y, color, key, text, fontWeight, fontSize, fontFamily, onClick) {
         var width = 45, height = 40;
         var button = new PIXI.Container();
 		button.position.set(x,y);
@@ -356,7 +356,7 @@ hud = {
 		colorBacking.alpha = 0.1;
 		button.addChild(colorBacking);
 		button.addChild(new PIXI.Graphics().lineStyle(2,color,1).drawRoundedRect(0, 0, width, height, 6));
-		var keyText = new PIXI.Text(key, {fill:0xFFFFFF, font:font });
+		var keyText = new PIXI.Text(key, {fill:0xFFFFFF, fontWeight:fontWeight, fontSize:fontSize, fontFamily:fontFamily });
 		keyText.position.set((width - keyText.width)/2, 6);
         button.addChild(keyText);
         var nameText = new PIXI.Text(text, {fill:0xFFFFFF, fontWeight:"bold", fontSize:"8pt", fontFamily:"arial" });
