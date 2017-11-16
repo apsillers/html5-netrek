@@ -110,8 +110,8 @@ hud = {
                 clearTimeout(world.torpFireTimeout);
             }.bind(hud);
         }
-        this.smallModeSpeedPlus.addEventListener("click", speedChanger(1));  
-        this.smallModeSpeedMinus.addEventListener("click", speedChanger(-1));        
+        this.smallModeSpeedPlus.addEventListener("click", speedChanger(1));
+        this.smallModeSpeedMinus.addEventListener("click", speedChanger(-1));
 
         this.etempMeter = new Polygon([0,0, 20,0, 20,-100], {x:50, y:350, fill:"none", stroke: "#AAA", strokeWidth:2});
         this.etempBar = new Rectangle(0,0);
@@ -152,21 +152,21 @@ hud = {
                              function(){ net.sendArray(CP_SHIELD.data(world.player.shields?0:1)); });
         this.uiGfxRight.append(this.shieldButton);
 
-        this.cloakButton = this.createButton(0, 50, "#797", "c", "Cloak", "bold 14pt courier",
+        this.cloakButton = this.createButton(0, 45, "#797", "c", "Cloak", "bold 14pt courier",
                             function(){ net.sendArray(CP_CLOAK.data(world.player.cloaked?0:1)); });
         this.uiGfxRight.append(this.cloakButton);
 
-        this.repairButton = this.createButton(0, 100, "orange", "Sft+R", "Repair", "bold 10pt courier",
+        this.repairButton = this.createButton(0, 90, "orange", "Sft+R", "Repair", "bold 10pt courier",
                              function(){ net.sendArray(CP_REPAIR.data(world.player.repairing?0:1)); });
         this.uiGfxRight.append(this.repairButton);
 
-        this.tractorButton = this.createButton(0, 150, "green", "Sft+R", "Tractor", "bold 10pt courier", function(){
+        this.tractorButton = this.createButton(0, 135, "green", "Sft+R", "Tractor", "bold 10pt courier", function(){
             if(world.player.tractoring) { net.sendArray(CP_TRACTOR.data(0,0)); }
             else { world.setTractorCursor(true, false); }
         });
         this.uiGfxRight.append(this.tractorButton);
 
-        this.pressorButton = this.createButton(0, 200, "purple", "y", "Pressor", "bold 14pt courier", function(){
+        this.pressorButton = this.createButton(0, 180, "purple", "y", "Pressor", "bold 14pt courier", function(){
             if(world.player.pressing) { net.sendArray(CP_REPRESS.data(0,0)); }
             else { world.setTractorCursor(true, true); }
         });
@@ -176,13 +176,13 @@ hud = {
                             function(){ net.sendArray(CP_ORBIT.data(world.player.orbitting?0:1)); });
         this.uiGfxRight.append(this.orbitButton);
 
-        this.bombButton = this.createButton(50, 50, "red", "b", "Bomb", "bold 14pt courier", function(){
+        this.bombButton = this.createButton(50, 45, "red", "b", "Bomb", "bold 14pt courier", function(){
             net.sendArray(CP_BOMB.data(world.player.bombing?0:1));
         });
-        this.pickupButton = this.createButton(50, 100, "#ffd700", "z", "Pickup", "bold 14pt courier", function(){
+        this.pickupButton = this.createButton(50, 90, "#ffd700", "z", "Pickup", "bold 14pt courier", function(){
             net.sendArray(CP_BEAM.data(1));
         });
-        this.dropButton = this.createButton(50, 150, "#ffd700", "x", "Drop", "bold 14pt courier", function(){
+        this.dropButton = this.createButton(50, 135, "#ffd700", "x", "Drop", "bold 14pt courier", function(){
             net.sendArray(CP_BEAM.data(2));
         });
 
@@ -293,10 +293,10 @@ hud = {
     },
 
     createButton: function(x, y, color, key, text, font, onClick) {
-        var width = 45, height = 45;
-        var button = new Rectangle(width,height, { stroke:color, cursor: "pointer", fill:"black", x:x, y:y });
-        button.append(new TextNode(key, {fill:"white", font:font, y:17, x:22, align:"center"}));
-        button.append(new TextNode(text, {fill:"white", font:"bold 8pt courier", y:31, x:22, align:"center"}));
+        var width = 45, height = 40;
+        var button = new Rectangle(width,height, { stroke:color, cursor: "pointer", fill:"black", x:x, y:y, rx:5, ry:5 });
+        button.append(new TextNode(key, {fill:"white", font:font, y:15, x:22, align:"center"}));
+        button.append(new TextNode(text, {fill:"white", font:"bold 8pt courier", y:29, x:22, align:"center"}));
         button.addEventListener("click",function() {
             onClick.call(this);
             clearTimeout(world.torpFireTimeout);
