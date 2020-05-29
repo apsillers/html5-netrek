@@ -39,7 +39,10 @@ gamepad = {
 
         window.requestAnimationFrame(function() { _self.readControls.call(_self); });
 
-        var pad = _self.pad = new this.ControllerState(navigator.getGamepads()[0]);
+        var gamepads = navigator.getGamepads();
+        var availableGamepad = gamepads[0] || gamepads[1] || gamepads[2] || gamepads[3];
+
+        var pad = _self.pad = new this.ControllerState(availableGamepad);
         if(!pad.valid) { return; }
         var lastPad = _self.lastPad;
         
@@ -127,88 +130,37 @@ gamepad = {
 
         this.valid = true;
 
-        // madcatz 360 is super weird
-        if(pad.id.indexOf("Vendor: 1bad Product: f016") != -1) {
-            var mode = "madcatz 360";
-        } else {
-            var mode = "standard";
-        }
+        console.log(pad.axes[0])
 
-        // axes are spec-correct
-        // button is off-spec, should be 10
         this.leftStickX = pad.axes[0];
         this.leftStickY = pad.axes[1];
-        if(mode == "madcatz 360") {
-            this.leftStickButton = pad.buttons[9];
-        } else {
-            this.leftStickButton = pad.buttons[10];
-        }
+        this.leftStickButton = pad.buttons[10].value;
 
-        // off-spec: should be axes 2 and 3 and button 11
-        if(mode == "madcatz 360") {
-            this.rightStickX = pad.axes[3];
-            this.rightStickY = pad.axes[4];
-            this.rightStickButton = pad.buttons[10];
-        } else {
-            this.rightStickX = pad.axes[2];
-            this.rightStickY = pad.axes[3];
-            this.rightStickButton = pad.buttons[11];
-        }
+        this.rightStickX = pad.axes[2];
+        this.rightStickY = pad.axes[3];
+        this.rightStickButton = pad.buttons[11].value;
 
-        // spec-correct
-        this.faceButton1 = pad.buttons[0];
-        this.faceButton2 = pad.buttons[1];
-        this.faceButton3 = pad.buttons[2];
-        this.faceButton4 = pad.buttons[3]; 
+        this.faceButton1 = pad.buttons[0].value;
+        this.faceButton2 = pad.buttons[1].value;
+        this.faceButton3 = pad.buttons[2].value;
+        this.faceButton4 = pad.buttons[3].value; 
 
-        // crazy off-spec: dPad should be in buttons, not axes!
-        // each is either a 1 or 0
-        if(mode == "madcatz 360") {
-            this.dPadUp = -pad.axes[7];
-            this.dPadDown = pad.axes[7];
-            this.dPadLeft = -pad.axes[6];
-            this.dPadRight = pad.axes[6];
-        } else {
-            this.dPadUp = pad.buttons[12];
-            this.dPadDown = pad.buttons[13];
-            this.dPadLeft = pad.buttons[14];
-            this.dPadRight = pad.buttons[15];
-        }
+        this.dPadUp = pad.buttons[12].value;
+        this.dPadDown = pad.buttons[13].value;
+        this.dPadLeft = pad.buttons[14].value;
+        this.dPadRight = pad.buttons[15].value;
 
+        this.l1 = pad.buttons[4].value;
+        this.r1 = pad.buttons[5].value;
 
-        // spec-correct for L1 and R1, but...
-        this.l1 = pad.buttons[4];
-        this.r1 = pad.buttons[5];
+        this.l2 = pad.buttons[6].value;
+        this.r2 = pad.buttons[7].value;
 
-        // L2 and R2 are crazy off-spec: reported as axes ranging from -1 to 1 (unpressed to pressed)
-        // they should be buttons, from 0 to 1, so I normalize them
-        if(mode == "madcatz 360") {
-            this.l2 = (pad.axes[2]+1)/2;
-            this.r2 = (pad.axes[5]+1)/2;
-        } else {
-            this.l2 = pad.buttons[6];
-            this.r2 = pad.buttons[7];
-        }
+        this.selectButton = pad.buttons[8].value;
 
-        // off-spec? should be button 8?
-        // there is no "select" button, so it's hard to say -- this is the "back" button
-        if(mode == "madcatz 360") {
-             this.selectButton = pad.buttons[6];
-        } else {
-             this.selectButton = pad.buttons[8];
-        }
-        // off-spec, should be button 9
-        if(mode == "madcatz 360") {
-             this.startButton = pad.buttons[7];
-        } else {
-             this.startButton = pad.buttons[9];
-        }
-        // spec-correct? as above, there is no "select" button (which is what 8 should be)
-        if(mode == "madcatz 360") {
-             this.xboxButton = pad.buttons[8];
-        } else {
-             this.xboxButton = pad.buttons[16];
-        }
+        this.startButton = pad.buttons[9].value;
+
+        this.xboxButton = (pad.buttons[16] || {}).value;
     
     },
     justReleased: function(name) {

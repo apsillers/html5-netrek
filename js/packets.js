@@ -265,7 +265,7 @@ serverPackets = [
     format: '!bxxx80s',
     handler: function(data) {
         var unpacked = packer.unpack(this.format, data);
-        if(unpacked) message = unpacked[1];
+        if(unpacked) message = unpacked[1].replace(/\x00/g," ");
         if(net_logging) console.log(message);
         outfitting.motdLine(message);
     }
@@ -658,7 +658,7 @@ serverPackets = [
 
     handler: function(data) {
         var uvars = packer.unpack(this.format, data);
-        var ignored = uvars.shift(), message = uvars.shift();
+        var ignored = uvars.shift(), message = uvars.shift().replace(/\x00/g," ");
         console.log("SP_WARNING message=", message);
         hud.showWarning(message);
     }
