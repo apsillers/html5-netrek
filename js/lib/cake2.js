@@ -27,7 +27,11 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 
 
-if(!window.Profiler) 
+// NOTE: modern browsers (Chrome) ship a native window.Profiler constructor
+// (the JS Self-Profiling API) which has no wrap_class method. Only the
+// presence of a usable wrap_class matters here, so test for that directly
+// instead of for window.Profiler, otherwise the native object shadows the stub.
+if(!window.Profiler || typeof window.Profiler.wrap_class !== "function")
     Profiler = {
     	wrap_class: function() {}
     }
@@ -869,7 +873,18 @@ function GenericEvent(type, config, bubbles, cancelable) {
         this[i] = config[i];
 }
 //GenericEvent.prototype = document.createEvent('Events');
-GenericEvent.prototype = Event.prototype;
+// NOTE: was `GenericEvent.prototype = Event.prototype`. In modern browsers
+// Event.prototype.type is a getter-only accessor, so on these synthetic
+// (non-Event) instances the constructor's `this.type = type` silently no-ops
+// and any later read of `event.type` throws "Illegal invocation" — which made
+// every dispatchEvent(new GenericEvent(...)) hit its try/catch and bail,
+// silently killing all 'rootChanged' scene-graph updates. cake runs its own
+// propagation via the event.stopped flag / listener return values, so a plain
+// prototype with a no-op stopPropagation is all these events need. (Native DOM
+// events keep their own prototype and are unaffected.)
+GenericEvent.prototype = {
+    stopPropagation: function() {}
+};
 
 Curves = {
   angularDistance : function(a, b) {
