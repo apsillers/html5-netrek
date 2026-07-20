@@ -37,6 +37,13 @@ var imageLib = {
                 img.onload = function() {
                     if(--total == 0) { callback(); }
                 }
+                // A missing/404 asset must still advance the counter, otherwise
+                // the completion callback never fires and the page hangs forever
+                // on "Loading...". Fail gracefully and log which asset is missing.
+                img.onerror = function() {
+                    if(window.console) console.error("Failed to load image: " + this.src);
+                    if(--total == 0) { callback(); }
+                }
                 img.src = "data/img/"+this.races[i]+"/"+this.ships[j]+"0.png";
             }
         }
